@@ -1,4 +1,4 @@
-package com.example.roborally;
+package client;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;

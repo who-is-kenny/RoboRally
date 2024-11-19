@@ -3,6 +3,6 @@ module com.example.roborally {
     requires javafx.fxml;
 
 
-    opens com.example.roborally to javafx.fxml;
-    exports com.example.roborally;
+    opens client to javafx.fxml;
+    exports client;
 }

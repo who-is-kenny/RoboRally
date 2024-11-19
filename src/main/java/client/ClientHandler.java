@@ -1,4 +1,4 @@
-package com.example.roborally;
+package client;
 
 import java.io.*;
 import java.net.Socket;

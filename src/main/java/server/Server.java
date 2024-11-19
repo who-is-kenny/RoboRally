@@ -1,4 +1,6 @@
-package com.example.roborally;
+package server;
+
+import client.ClientHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;

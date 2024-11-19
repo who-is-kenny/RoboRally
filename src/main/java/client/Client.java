@@ -1,4 +1,4 @@
-package com.example.roborally;
+package client;
 
 
 import javafx.scene.layout.VBox;
