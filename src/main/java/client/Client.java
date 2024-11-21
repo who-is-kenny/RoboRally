@@ -17,6 +17,15 @@ public class Client {
     private BufferedReader in;
     private PrintWriter out;
     private final Gson gson = new Gson();
+    private int clientID = 0;
+
+    public int getClientID() {
+        return clientID;
+    }
+
+    public void setClientID(int clientID) {
+        this.clientID = clientID;
+    }
 
 
     public Client(Socket socket){
@@ -27,19 +36,25 @@ public class Client {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // establish connection with server/client handler
-            String connectionMessage = in.readLine();
-            Message handlerMessage = gson.fromJson(connectionMessage, Message.class);
-            if (handlerMessage.getMessageType().equals("HelloClient")){
-                // creating message and sending it back to the handler to establish connection.
-                Message helloServer = new Message();
-                helloServer.setMessageType("HelloServer");
-                MessageBody helloServerBody = new MessageBody();
-                helloServerBody.setProtocol("Version 0.1");
-                helloServerBody.setAI(false);
-                helloServerBody.setGroup("Neidische Narwahl");
-                helloServer.setMessageBody(helloServerBody);
-                out.println(gson.toJson(helloServer));
+
+            while (clientID == 0){
+                String connectionMessage = in.readLine();
+                Message handlerMessage = gson.fromJson(connectionMessage, Message.class);
+                if (handlerMessage.getMessageType().equals("HelloClient")){
+                    // creating message and sending it back to the handler to establish connection.
+                    Message helloServer = new Message();
+                    helloServer.setMessageType("HelloServer");
+                    MessageBody helloServerBody = new MessageBody();
+                    helloServerBody.setProtocol("Version 0.1");
+                    helloServerBody.setAI(false);
+                    helloServerBody.setGroup("Neidische Narwahl");
+                    helloServer.setMessageBody(helloServerBody);
+                    out.println(gson.toJson(helloServer));
+                } else if (handlerMessage.getMessageType().equals("Welcome")) {
+                    setClientID(handlerMessage.getMessageBody().getClientID());
+                }
             }
+
 
 
         } catch (IOException e) {

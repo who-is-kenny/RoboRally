@@ -8,11 +8,14 @@ import server.MessageBody;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 
 public class ClientHandler implements Runnable{
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    private int clientID;
+    private Map<Integer, ClientHandler> clients;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -20,9 +23,11 @@ public class ClientHandler implements Runnable{
     private static final Gson gson = new Gson();
 
 
-    public ClientHandler(Socket socket){
+    public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
 
         this.socket = socket;
+        this.clientID =clientID;
+        this.clients = clients;
         clientHandlers.add(this);
 
     }
@@ -54,7 +59,16 @@ public class ClientHandler implements Runnable{
                     connectionEstablished = true;
                 }
             }
+            // send welcome message
+            Message welcomeMessage = new Message();
+            welcomeMessage.setMessageType("Welcome");
+            MessageBody welcomeMessageBody = new MessageBody();
+            welcomeMessageBody.setClientID(clientID);
+            welcomeMessage.setMessageBody(welcomeMessageBody);
+            out.println(gson.toJson(welcomeMessage));
+
             out.println("connection established");
+
 
             out.println("Enter a name: ");
 
