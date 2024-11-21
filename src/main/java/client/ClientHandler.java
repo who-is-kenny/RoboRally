@@ -57,6 +57,8 @@ public class ClientHandler implements Runnable{
                 Message clientMessage = gson.fromJson(clientInput, Message.class);
                 if(clientMessage.getMessageType().equals("HelloServer") && clientMessage.getMessageBody().getProtocol().equals("Version 0.1")){
                     connectionEstablished = true;
+                }else{
+                    sendErrorMessage();
                 }
             }
             // send welcome message
@@ -93,15 +95,15 @@ public class ClientHandler implements Runnable{
 
             // receiving messages
             while(socket.isConnected()) {
-                String message;
-                message = in.readLine();
+                String message = in.readLine();
+
                 if (message.equals("bye")){
                     System.out.println(name + " left the server");
                     sendOtherClients(name + " left the room");
                     closeEverything();
                     break;
                 }else{
-                    sendOtherClients(name + ": " + message);
+                    sendOtherClients(name + "  " +clientID +  ": " + message);
                 }
             }
         }catch (IOException e){
@@ -124,6 +126,15 @@ public class ClientHandler implements Runnable{
             }
 
         }
+    }
+
+    public void sendErrorMessage(){
+        Message errorMessage = new Message();
+        errorMessage.setMessageType("Error");
+        MessageBody errorMessageBody = new MessageBody();
+        errorMessageBody.setError("Whoops. That did not work. Try to adjust something.");
+        errorMessage.setMessageBody(errorMessageBody);
+        out.println(gson.toJson(errorMessage));
     }
 
 

@@ -1,5 +1,6 @@
 package client;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,12 +9,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import server.Message;
+import server.MessageBody;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -30,8 +34,12 @@ public class ClientController implements Initializable {
     private VBox vbox_message;
     @FXML
     private ScrollPane sp_message;
+    @FXML
+    private CheckBox name_dropdown;
 
     private Client client;
+
+    private static final Gson gson = new Gson();
 
 
     /**
@@ -77,6 +85,27 @@ public class ClientController implements Initializable {
         }
     }
 
+    public String createPrivateMessage(String message , int targetClientID){
+        Message privateMessage = new Message();
+        privateMessage.setMessageType("SendChat");
+        MessageBody privateMessageBody = new MessageBody();
+        privateMessageBody.setMessage(message);
+        privateMessageBody.setTo(targetClientID);
+        privateMessage.setMessageBody(privateMessageBody);
+        return gson.toJson(privateMessage);
+    }
+
+    public String createBroadcastMessage(String message){
+        Message broadcastMessage = new Message();
+        broadcastMessage.setMessageType("SendChat");
+        MessageBody broadcastMessageBody = new MessageBody();
+        broadcastMessageBody.setMessage(message);
+        broadcastMessageBody.setTo(-1);
+        broadcastMessageBody.setPrivate(true);
+        broadcastMessage.setMessageBody(broadcastMessageBody);
+        return gson.toJson(broadcastMessage);
+    }
+
 
 
     @Override
@@ -93,7 +122,6 @@ public class ClientController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 sp_message.setVvalue((Double) t1);
-
             }
         });
 

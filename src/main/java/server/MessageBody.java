@@ -1,14 +1,38 @@
 package server;
 
+import java.util.List;
+
 public class MessageBody{
     // establish connection (2)
     private String protocol;
     private String group;
     private Boolean isAI;
     private int clientID;
+    // lobby(3)
+    private String name;
+    private int figure;
+    private boolean ready;
+    private String map;
+    private List<String> availableMaps;
     // chatnachrichten (4)
     private String message;
     private int to;
+    private boolean isPrivate;
+    // error message (5)
+    private String error;
+    //cards (6)
+    private String card;
+    // player turn(7)
+    private int phase;
+    // Aufbauphase (7.1)
+    private int x;
+    private int y;
+    // Programmierphase (7.3)
+    private List<String> cardsInHand;
+    private int register;
+    private boolean filled;
+    private List<Integer> clientIDs;
+    private List<String> cards;
 
 
 
@@ -62,4 +86,22 @@ public class MessageBody{
     public void setTo(int to) {
         this.to = to;
     }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+
 }

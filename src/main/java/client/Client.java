@@ -101,6 +101,8 @@ public class Client {
 
 
 
+
+
     public void closeClient(){   //Socket socket, PrintWriter out, BufferedReader in
         System.out.println("closing client");
         try {
