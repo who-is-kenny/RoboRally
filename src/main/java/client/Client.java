@@ -1,7 +1,11 @@
 package client;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import javafx.scene.layout.VBox;
+import server.Message;
+import server.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,6 +16,7 @@ public class Client {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
+    private final Gson gson = new Gson();
 
 
     public Client(Socket socket){
@@ -20,6 +25,23 @@ public class Client {
             this.socket = socket;
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            // establish connection with server/client handler
+            String connectionMessage = in.readLine();
+            Message handlerMessage = gson.fromJson(connectionMessage, Message.class);
+            if (handlerMessage.getMessageType().equals("HelloClient")){
+                // creating message and sending it back to the handler to establish connection.
+                Message helloServer = new Message();
+                helloServer.setMessageType("HelloServer");
+                MessageBody helloServerBody = new MessageBody();
+                helloServerBody.setProtocol("Version 0.1");
+                helloServerBody.setAI(false);
+                helloServerBody.setGroup("Neidische Narwahl");
+                helloServer.setMessageBody(helloServerBody);
+                out.println(gson.toJson(helloServer));
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,7 +71,6 @@ public class Client {
                 String messageFromHandler;
                 while( socket.isConnected()){
                     try {
-
                         messageFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
                         ClientController.addMessage(messageFromHandler , vBox);
                     } catch (IOException e) {

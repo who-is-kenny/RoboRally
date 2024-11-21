@@ -1,5 +1,10 @@
 package client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import server.Message;
+import server.MessageBody;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,6 +17,7 @@ public class ClientHandler implements Runnable{
     private BufferedReader in;
     private PrintWriter out;
     private String name;
+    private static final Gson gson = new Gson();
 
 
     public ClientHandler(Socket socket){
@@ -30,6 +36,26 @@ public class ClientHandler implements Runnable{
         try {
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()),true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            //establish connection with client
+            Message helloClient = new Message();
+            helloClient.setMessageType("HelloClient");
+            MessageBody helloClientBody = new MessageBody();
+            helloClientBody.setProtocol("Version 0.1");
+            helloClient.setMessageBody(helloClientBody);
+            out.println(gson.toJson(helloClient));
+
+            // wait for client response to establish connection
+            boolean connectionEstablished = false;
+            while (!connectionEstablished){
+                String clientInput = in.readLine();
+                Message clientMessage = gson.fromJson(clientInput, Message.class);
+                if(clientMessage.getMessageType().equals("HelloServer") && clientMessage.getMessageBody().getProtocol().equals("Version 0.1")){
+                    connectionEstablished = true;
+                }
+            }
+            out.println("connection established");
+
             out.println("Enter a name: ");
 
             // check valid name
@@ -98,5 +124,17 @@ public class ClientHandler implements Runnable{
             e.printStackTrace();
         }
     }
+
+//    public static void main(String[] args) {
+//        Gson gson = new Gson();
+//
+//        MessageBody body = new MessageBody();
+//        body.setProtocol("Version 0.1");
+//
+//        Message message = new Message();
+//        message.setMessageType("HelloClient");
+//        message.setMessageBody(body);
+//        System.out.println(gson.toJson(message));
+//    }
 }
 

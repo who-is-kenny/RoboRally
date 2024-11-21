@@ -5,6 +5,9 @@ public class MessageBody{
     private String group;
     private Boolean isAI;
 
+    public MessageBody() {
+    }
+
     public String getProtocol() {
         return protocol;
     }

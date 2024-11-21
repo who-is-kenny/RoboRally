@@ -4,6 +4,9 @@ public class Message {
     private String messageType;
     private MessageBody messageBody;
 
+    public Message() {
+    }
+
     public String getMessageType() {
         return messageType;
     }
