@@ -8,10 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -35,12 +32,35 @@ public class ClientController implements Initializable {
     @FXML
     private ScrollPane sp_message;
     @FXML
-    private CheckBox name_dropdown;
+    private ChoiceBox name_dropdown;
 
     private Client client;
 
     private static final Gson gson = new Gson();
 
+    public ClientController(Client client) {
+        this.client = client;
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+//        try{
+//            Socket socket = new Socket("localhost" , 8888);
+//            client = new Client(socket);
+//            System.out.println("connected to server");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        vbox_message.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                sp_message.setVvalue((Double) t1);
+            }
+        });
+
+        client.receiveFromClientHandler(vbox_message);
+    }
 
     /**
      * creates a new text box and adds it to the chat GUI
@@ -69,7 +89,8 @@ public class ClientController implements Initializable {
      * adds text to own chat and sends text to client handler to be broadcasted
      * @param e
      */
-    public void sendMessage(ActionEvent e) {
+    @FXML
+    private void sendMessage(ActionEvent e) {
         String message = text_input.getText();
         System.out.println(message);
         if (!message.isEmpty()) {
@@ -107,26 +128,6 @@ public class ClientController implements Initializable {
     }
 
 
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-        try{
-            Socket socket = new Socket("localhost" , 8888);
-            client = new Client(socket);
-            System.out.println("connected to server");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        vbox_message.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                sp_message.setVvalue((Double) t1);
-            }
-        });
-
-        client.receiveFromClientHandler(vbox_message);
-    }
 }
 
 

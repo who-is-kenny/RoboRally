@@ -50,10 +50,13 @@ public class Client {
                     helloServerBody.setGroup("Neidische Narwahl");
                     helloServer.setMessageBody(helloServerBody);
                     out.println(gson.toJson(helloServer));
+                    // handle welcome message
                 } else if (handlerMessage.getMessageType().equals("Welcome")) {
                     setClientID(handlerMessage.getMessageBody().getClientID());
                 }
             }
+
+
 
 
 

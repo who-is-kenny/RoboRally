@@ -8,8 +8,9 @@ public class MessageBody{
     private String group;
     private Boolean isAI;
     private int clientID;
+
     // lobby(3)
-    private String name;
+    private String playerName;
     private int figure;
     private boolean ready;
     private String map;
@@ -38,7 +39,7 @@ public class MessageBody{
 
     public MessageBody() {
     }
-
+    // establish connection (2)
     public String getProtocol() {
         return protocol;
     }
@@ -70,6 +71,53 @@ public class MessageBody{
     public void setClientID(int clientID) {
         this.clientID = clientID;
     }
+
+    // lobby(3)
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public int getFigure() {
+        return figure;
+    }
+
+    public void setFigure(int figure) {
+        this.figure = figure;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
+    }
+
+    public List<String> getAvailableMaps() {
+        return availableMaps;
+    }
+
+    public void setAvailableMaps(List<String> availableMaps) {
+        this.availableMaps = availableMaps;
+    }
+
+
+    // chatnachrichten (4)
+
+
 
     public String getMessage() {
         return message;

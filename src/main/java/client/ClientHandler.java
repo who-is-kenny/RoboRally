@@ -1,6 +1,5 @@
 package client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import server.Message;
 import server.MessageBody;
@@ -9,24 +8,28 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Objects;
 
 public class ClientHandler implements Runnable{
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-    private int clientID;
+
     private Map<Integer, ClientHandler> clients;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private String name;
     private static final Gson gson = new Gson();
+
+    // attributes for game.
+
+    private String name;
+    private int clientID;
+    private int robotID;
 
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
 
         this.socket = socket;
-        this.clientID =clientID;
+        this.clientID = clientID;
         this.clients = clients;
         clientHandlers.add(this);
 
@@ -69,42 +72,49 @@ public class ClientHandler implements Runnable{
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
 
-            out.println("connection established");
-
-
-            out.println("Enter a name: ");
-
-            // check valid name
-            boolean validName = false;
-            while(!validName){
-                String tempName = in.readLine();
-                validName = true;
-                for (ClientHandler ch : clientHandlers){
-                    if (Objects.equals(ch.name, tempName)){
-                        out.println("name already taken , please choose another name: ");
-                        validName = false;
-                    }
-                }
-                name = tempName;
-
-            }
-            out.println("welcome " + name);
-            sendOtherClients(name + " joined the room");
+//            out.println("connection established");
+//
+//
+//            out.println("Enter a name: ");
+//
+//            // check valid name
+//            boolean validName = false;
+//            while(!validName){
+//                String tempName = in.readLine();
+//                validName = true;
+//                for (ClientHandler ch : clientHandlers){
+//                    if (Objects.equals(ch.name, tempName)){
+//                        out.println("name already taken , please choose another name: ");
+//                        validName = false;
+//                    }
+//                }
+//                name = tempName;
+//
+//            }
+//            out.println("welcome " + name);
+//            sendOtherClients(name + " joined the room");
 
 
 
             // receiving messages
             while(socket.isConnected()) {
-                String message = in.readLine();
+                String clientInput = in.readLine();
+                Message clientMessage = gson.fromJson(clientInput, Message.class);
+                MessageBody clientMessageBody = clientMessage.getMessageBody();
+                switch (clientMessage.getMessageType()){
+                    case "PlayerValue":
+                        handlePlayerValue(clientMessageBody);
 
-                if (message.equals("bye")){
-                    System.out.println(name + " left the server");
-                    sendOtherClients(name + " left the room");
-                    closeEverything();
-                    break;
-                }else{
-                    sendOtherClients(name + "  " +clientID +  ": " + message);
                 }
+
+//                if (message.equals("bye")){
+//                    System.out.println(name + " left the server");
+//                    sendOtherClients(name + " left the room");
+//                    closeEverything();
+//                    break;
+//                }else{
+//                    sendOtherClients(name + "  " +clientID +  ": " + message);
+//                }
             }
         }catch (IOException e){
             closeEverything();
@@ -126,6 +136,13 @@ public class ClientHandler implements Runnable{
             }
 
         }
+    }
+
+    private void handlePlayerValue(MessageBody messageBody){
+        this.name = messageBody.getPlayerName();
+        this.robotID = messageBody.getFigure();
+        System.out.println(name);
+        System.out.println(robotID);
     }
 
     public void sendErrorMessage(){
