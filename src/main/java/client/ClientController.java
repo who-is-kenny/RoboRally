@@ -65,7 +65,6 @@ public class ClientController implements Initializable {
     /**
      * creates a new text box and adds it to the chat GUI
      * @param messageFromHandler
-     * @param vBox
      */
     public static void addMessage(String messageFromHandler, VBox vBox) {
         HBox hBox = new HBox();

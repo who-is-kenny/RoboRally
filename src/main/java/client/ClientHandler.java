@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class ClientHandler implements Runnable{
 
@@ -72,49 +73,42 @@ public class ClientHandler implements Runnable{
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
 
-//            out.println("connection established");
-//
-//
-//            out.println("Enter a name: ");
-//
-//            // check valid name
-//            boolean validName = false;
-//            while(!validName){
-//                String tempName = in.readLine();
-//                validName = true;
-//                for (ClientHandler ch : clientHandlers){
-//                    if (Objects.equals(ch.name, tempName)){
-//                        out.println("name already taken , please choose another name: ");
-//                        validName = false;
-//                    }
-//                }
-//                name = tempName;
-//
-//            }
-//            out.println("welcome " + name);
-//            sendOtherClients(name + " joined the room");
+            out.println("connection established");
+
+
+            out.println("Enter a name: ");
+
+            // check valid name
+            boolean validName = false;
+            while(!validName){
+                String tempName = in.readLine();
+                validName = true;
+                for (ClientHandler ch : clientHandlers){
+                    if (Objects.equals(ch.name, tempName)){
+                        out.println("name already taken , please choose another name: ");
+                        validName = false;
+                    }
+                }
+                name = tempName;
+
+            }
+            out.println("welcome " + name);
+            sendOtherClients(name + " joined the room");
 
 
 
             // receiving messages
             while(socket.isConnected()) {
-                String clientInput = in.readLine();
-                Message clientMessage = gson.fromJson(clientInput, Message.class);
-                MessageBody clientMessageBody = clientMessage.getMessageBody();
-                switch (clientMessage.getMessageType()){
-                    case "PlayerValue":
-                        handlePlayerValue(clientMessageBody);
+                String message = in.readLine();
 
+                if (message.equals("bye")){
+                    System.out.println(name + " left the server");
+                    sendOtherClients(name + " left the room");
+                    closeEverything();
+                    break;
+                }else{
+                    sendOtherClients(name + "  " +clientID +  ": " + message);
                 }
-
-//                if (message.equals("bye")){
-//                    System.out.println(name + " left the server");
-//                    sendOtherClients(name + " left the room");
-//                    closeEverything();
-//                    break;
-//                }else{
-//                    sendOtherClients(name + "  " +clientID +  ": " + message);
-//                }
             }
         }catch (IOException e){
             closeEverything();

@@ -56,6 +56,24 @@ public class Client {
                 }
             }
 
+//            while (socket.isConnected()){
+//                String fromHandler;
+//                try {
+//                    fromHandler = in.readLine();
+//                    Message messageFromHandler = new Message();
+//                    MessageBody messageBodyFrom = new MessageBody();
+//                    ClientController.addMessage(String.valueOf(messageFromHandler));
+//
+//
+//                } catch (Exception e) {
+//                    closeClient();
+//                    System.out.println("ending client listener thread");
+//                    break;
+//                }
+//            }
+
+
+
 
 
 
@@ -80,7 +98,6 @@ public class Client {
 
     /**
      * receives messages from client handler and adds the messages to the chat GUI
-     * @param vBox text box for incoming message
      */
     public void receiveFromClientHandler(VBox vBox){
         new Thread(new Runnable() {
