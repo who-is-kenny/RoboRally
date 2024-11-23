@@ -6,7 +6,7 @@
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.RobotSelectionController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" >
    <children>
       <TextField fx:id="player_name" layoutX="226.0" layoutY="342.0" promptText="enter name" />
       <Button fx:id="confirm_robot" disable="true" layoutX="412.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmRobot" text="confirm" />

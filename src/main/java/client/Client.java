@@ -17,26 +17,30 @@ public class Client {
     private BufferedReader in;
     private PrintWriter out;
     private final Gson gson = new Gson();
+    //clientID getter and setter
     private int clientID = 0;
-
-    private ClientController clientController;
-
-    public ClientController getClientController() {
-        return clientController;
-    }
-
-    public void setClientController(ClientController clientController) {
-        this.clientController = clientController;
-    }
-
     public int getClientID() {
         return clientID;
     }
-
     public void setClientID(int clientID) {
         this.clientID = clientID;
     }
-
+    // chat controller getter and setter
+    private ClientController clientController;
+    public ClientController getClientController() {
+        return clientController;
+    }
+    public void setClientController(ClientController clientController) {
+        this.clientController = clientController;
+    }
+    // robot selection controller getter and setter
+    private RobotSelectionController robotSelectionController;
+    public RobotSelectionController getRobotSelectionController() {
+        return robotSelectionController;
+    }
+    public void setRobotSelectionController(RobotSelectionController robotSelectionController) {
+        this.robotSelectionController = robotSelectionController;
+    }
 
     public Client(Socket socket){
 

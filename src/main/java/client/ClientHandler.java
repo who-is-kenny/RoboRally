@@ -14,7 +14,7 @@ public class ClientHandler implements Runnable{
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
-    private Map<Integer, ClientHandler> clients;
+    private static Map<Integer, ClientHandler> clients;
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -73,42 +73,47 @@ public class ClientHandler implements Runnable{
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
 
-            out.println("connection established");
-
-
-            out.println("Enter a name: ");
-
-            // check valid name
-            boolean validName = false;
-            while(!validName){
-                String tempName = in.readLine();
-                validName = true;
-                for (ClientHandler ch : clientHandlers){
-                    if (Objects.equals(ch.name, tempName)){
-                        out.println("name already taken , please choose another name: ");
-                        validName = false;
-                    }
-                }
-                name = tempName;
-
-            }
-            out.println("welcome " + name);
-            sendOtherClients(name + " joined the room");
+//            out.println("connection established");
+//            out.println("Enter a name: ");
+//
+//            // check valid name
+//            boolean validName = false;
+//            while(!validName){
+//                String tempName = in.readLine();
+//                validName = true;
+//                for (ClientHandler ch : clientHandlers){
+//                    if (Objects.equals(ch.name, tempName)){
+//                        out.println("name already taken , please choose another name: ");
+//                        validName = false;
+//                    }
+//                }
+//                name = tempName;
+//
+//            }
+//            out.println("welcome " + name);
+//            sendOtherClients(name + " joined the room");
 
 
 
             // receiving messages
             while(socket.isConnected()) {
-                String message = in.readLine();
-
-                if (message.equals("bye")){
-                    System.out.println(name + " left the server");
-                    sendOtherClients(name + " left the room");
-                    closeEverything();
-                    break;
-                }else{
-                    sendOtherClients(name + "  " +clientID +  ": " + message);
+                String clientInput = in.readLine();
+                Message clientMessage = gson.fromJson(clientInput , Message.class);
+                MessageBody clientMessageBody = clientMessage.getMessageBody();
+                switch (clientMessage.getMessageType()){
+                    case "PlayerValue":
+                        handlePlayerValue(clientMessageBody);
                 }
+
+//
+//                if (message.equals("bye")){
+//                    System.out.println(name + " left the server");
+//                    sendOtherClients(name + " left the room");
+//                    closeEverything();
+//                    break;
+//                }else{
+//                    sendOtherClients(name + "  " +clientID +  ": " + message);
+//                }
             }
         }catch (IOException e){
             closeEverything();
@@ -128,7 +133,12 @@ public class ClientHandler implements Runnable{
             if (ch != null && ch.name != null && !ch.name.equals(name)) {
                 ch.out.println(message);
             }
+        }
+    }
 
+    public static void broadcastMessage(String message){
+        for (Map.Entry<Integer,ClientHandler> entry : clients.entrySet()){
+            entry.getValue().out.println(message);
         }
     }
 

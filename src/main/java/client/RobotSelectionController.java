@@ -45,6 +45,10 @@ public class RobotSelectionController implements Initializable {
 
     private static final Gson gson = new Gson();
 
+    public RobotSelectionController(Client client) {
+        this.client = client;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 

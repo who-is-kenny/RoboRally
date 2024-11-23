@@ -21,11 +21,19 @@ public class RRChatApplication extends Application {
         ClientController chatController = new ClientController(client);
         chatLoader.setController(chatController);
         client.setClientController(chatController);
+
+
+        //creating robotselectionLoader
+        FXMLLoader robotSelectionLoader = new FXMLLoader(RRChatApplication.class.getResource("chooserobot.fxml"));
+        RobotSelectionController robotSelectionController = new RobotSelectionController(client);
+        robotSelectionLoader.setController(robotSelectionController);
+        client.setRobotSelectionController ( robotSelectionController);
+
+        // start listen thread for messages
         client.receiveFromClientHandler();
 
         // setting scene
-
-        Scene scene = new Scene(chatLoader.load(), 600, 400);
+        Scene scene = new Scene(robotSelectionLoader.load(), 600, 400);
         stage.setTitle("RoboRallyChat");
         stage.setScene(scene);
         stage.show();
