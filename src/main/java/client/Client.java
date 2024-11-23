@@ -19,6 +19,16 @@ public class Client {
     private final Gson gson = new Gson();
     private int clientID = 0;
 
+    private ClientController clientController;
+
+    public ClientController getClientController() {
+        return clientController;
+    }
+
+    public void setClientController(ClientController clientController) {
+        this.clientController = clientController;
+    }
+
     public int getClientID() {
         return clientID;
     }
@@ -55,29 +65,6 @@ public class Client {
                     setClientID(handlerMessage.getMessageBody().getClientID());
                 }
             }
-
-//            while (socket.isConnected()){
-//                String fromHandler;
-//                try {
-//                    fromHandler = in.readLine();
-//                    Message messageFromHandler = new Message();
-//                    MessageBody messageBodyFrom = new MessageBody();
-//                    ClientController.addMessage(String.valueOf(messageFromHandler));
-//
-//
-//                } catch (Exception e) {
-//                    closeClient();
-//                    System.out.println("ending client listener thread");
-//                    break;
-//                }
-//            }
-
-
-
-
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,7 +86,7 @@ public class Client {
     /**
      * receives messages from client handler and adds the messages to the chat GUI
      */
-    public void receiveFromClientHandler(VBox vBox){
+    public void receiveFromClientHandler(){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -107,7 +94,7 @@ public class Client {
                 while( socket.isConnected()){
                     try {
                         messageFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
-                        ClientController.addMessage(messageFromHandler , vBox);
+                        clientController.addMessage(messageFromHandler);
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");
                         closeClient();

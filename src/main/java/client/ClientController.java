@@ -16,8 +16,6 @@ import javafx.scene.text.TextFlow;
 import server.Message;
 import server.MessageBody;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -59,14 +57,15 @@ public class ClientController implements Initializable {
             }
         });
 
-        client.receiveFromClientHandler(vbox_message);
+//        client.receiveFromClientHandler(vbox_message);
     }
 
     /**
      * creates a new text box and adds it to the chat GUI
+     *
      * @param messageFromHandler
      */
-    public static void addMessage(String messageFromHandler, VBox vBox) {
+    public void addMessage(String messageFromHandler) {
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 5, 5, 10));
         Text text = new Text(messageFromHandler);
@@ -77,7 +76,7 @@ public class ClientController implements Initializable {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                vBox.getChildren().add(hBox);
+                vbox_message.getChildren().add(hBox);
             }
         });
 
