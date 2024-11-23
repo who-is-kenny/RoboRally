@@ -5,10 +5,7 @@ import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import server.Message;
 import server.MessageBody;
 
@@ -19,6 +16,12 @@ import java.util.ResourceBundle;
 public class RobotSelectionController implements Initializable {
 
 
+    @FXML
+    private ToggleGroup ready;
+    @FXML
+    private ToggleButton not_ready_button;
+    @FXML
+    private ToggleButton ready_button;
     @FXML
     private RadioButton robot_1;
     @FXML
@@ -46,8 +49,7 @@ public class RobotSelectionController implements Initializable {
 
     private static final Gson gson = new Gson();
 
-    public RobotSelectionController(Client client) {
-        this.client = client;
+    public RobotSelectionController() {
     }
 
     @Override
@@ -82,6 +84,14 @@ public class RobotSelectionController implements Initializable {
         player_name.clear();
         player_name.setDisable(true);
     }
+    @FXML
+    private void confirmReady(ActionEvent e){
+        System.out.println("ready");
+    }
+    @FXML
+    private void confirmUnready(ActionEvent e){
+        System.out.println("unready");
+    }
 
     public void handlePlayerAdded(MessageBody ms , int clientID){
         int robotID = ms.getFigure();
@@ -111,6 +121,10 @@ public class RobotSelectionController implements Initializable {
 
     public void setSelectedRobotId(int selectedRobotId) {
         this.selectedRobotId = selectedRobotId;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }
 

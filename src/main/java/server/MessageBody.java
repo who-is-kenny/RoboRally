@@ -1,6 +1,7 @@
 package server;
 
 import java.util.List;
+import java.util.Map;
 
 public class MessageBody{
     // establish connection (2)
@@ -15,6 +16,17 @@ public class MessageBody{
     private boolean ready;
     private String map;
     private List<String> availableMaps;
+
+    public Map<Integer, Integer> getSelectedRobots() {
+        return selectedRobots;
+    }
+
+    public void setSelectedRobots(Map<Integer, Integer> selectedRobots) {
+        this.selectedRobots = selectedRobots;
+    }
+
+    private Map<Integer, Integer> selectedRobots; // Add getter and setter
+
     // chatnachrichten (4)
     private String message;
     private int to;

@@ -2,6 +2,7 @@ package client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -25,15 +26,27 @@ public class RRChatApplication extends Application {
 
         //creating robotselectionLoader
         FXMLLoader robotSelectionLoader = new FXMLLoader(RRChatApplication.class.getResource("chooserobot.fxml"));
-        RobotSelectionController robotSelectionController = new RobotSelectionController(client);
-        robotSelectionLoader.setController(robotSelectionController);
-        client.setRobotSelectionController ( robotSelectionController);
+
+        Parent root = robotSelectionLoader.load();
+
+// Retrieve the controller instance created by FXMLLoader
+        RobotSelectionController robotSelectionController = robotSelectionLoader.getController();
+
+// Pass the client to the controller
+        robotSelectionController.setClient(client); // Add a `setClient` method to RobotSelectionController
+
+// Save the controller in the client for later use
+        client.setRobotSelectionController(robotSelectionController);
+//
+//        RobotSelectionController robotSelectionController = new RobotSelectionController(client);
+//        robotSelectionLoader.setController(robotSelectionController);
+//        client.setRobotSelectionController ( robotSelectionController);
 
         // start listen thread for messages
         client.receiveFromClientHandler();
 
         // setting scene
-        Scene scene = new Scene(robotSelectionLoader.load(), 600, 400);
+        Scene scene = new Scene(root, 600, 400);
         stage.setTitle("RoboRallyChat");
         stage.setScene(scene);
         stage.show();

@@ -7,6 +7,7 @@ import server.MessageBody;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,6 +16,8 @@ public class ClientHandler implements Runnable{
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
     private static Map<Integer, ClientHandler> clients;
+    private static final Map<Integer, Integer> selectedRobots = new HashMap<>(); // key: robotID, value: clientID
+
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
@@ -74,6 +77,9 @@ public class ClientHandler implements Runnable{
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
 
+            // send information about selected robots
+            sendCurrentSelections();
+
             System.out.println("waiting for client messages");
 
 
@@ -129,6 +135,15 @@ public class ClientHandler implements Runnable{
 
     }
 
+    private void sendCurrentSelections() {
+        Message currentSelections = new Message();
+        currentSelections.setMessageType("CurrentSelections");
+        MessageBody messageBody = new MessageBody();
+        messageBody.setSelectedRobots(new HashMap<>(selectedRobots)); // Assume MessageBody has a selectedRobots field
+        currentSelections.setMessageBody(messageBody);
+        out.println(gson.toJson(currentSelections));
+    }
+
     /**
      * send message to all other clients other than themselves
      * @param message message to be sent
@@ -150,6 +165,7 @@ public class ClientHandler implements Runnable{
     private void handlePlayerValue(MessageBody messageBody){
         this.name = messageBody.getPlayerName();
         this.robotID = messageBody.getFigure();
+        selectedRobots.put(robotID , clientID);
         System.out.println(name);
         System.out.println(robotID);
     }

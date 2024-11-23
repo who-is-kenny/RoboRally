@@ -9,6 +9,7 @@ import server.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 
 public class Client {
@@ -101,8 +102,13 @@ public class Client {
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
                         switch (messageFromHandler.getMessageType()){
+                            case "CurrentSelections":
+                                Map<Integer, Integer> currentSelections = messageFromHandlerBody.getSelectedRobots();
+                                currentSelections.keySet().forEach(robotSelectionController::disableChosenRobot);
+                                break;
                             case "PlayerAdded":
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
+                                break;
                         }
 
 //                        clientController.addMessage(messageFromHandler);
