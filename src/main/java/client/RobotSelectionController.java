@@ -13,6 +13,7 @@ import server.Message;
 import server.MessageBody;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class RobotSelectionController implements Initializable {
@@ -74,12 +75,19 @@ public class RobotSelectionController implements Initializable {
         robotSelectionMessageBody.setFigure(selectedRobotID);
         robotSelectionMessage.setMessageBody(robotSelectionMessageBody);
         //send json to clienthandler via client
-//        client.sendToClientHandler(gson.toJson(robotSelectionMessage)); // TODO enable function later
+        client.sendToClientHandler(gson.toJson(robotSelectionMessage)); // TODO enable function later
         System.out.println(gson.toJson(robotSelectionMessage));
         disableChosenRobot(selectedRobotID); // TODO remove this line later
         // cleat textbox so cannot confirm again
         player_name.clear();
         player_name.setDisable(true);
+    }
+
+    public void handlePlayerAdded(MessageBody ms , int clientID){
+        int robotID = ms.getFigure();
+        if (ms.getClientID() != clientID){
+            disableChosenRobot(robotID);
+        }
     }
 
     public void disableChosenRobot(int robotID){

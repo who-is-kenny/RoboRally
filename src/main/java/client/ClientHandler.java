@@ -65,6 +65,7 @@ public class ClientHandler implements Runnable{
                     sendErrorMessage();
                 }
             }
+            System.out.println("connection established sending welcome message");
             // send welcome message
             Message welcomeMessage = new Message();
             welcomeMessage.setMessageType("Welcome");
@@ -72,6 +73,9 @@ public class ClientHandler implements Runnable{
             welcomeMessageBody.setClientID(clientID);
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
+
+            System.out.println("waiting for client messages");
+
 
 //            out.println("connection established");
 //            out.println("Enter a name: ");
@@ -103,6 +107,7 @@ public class ClientHandler implements Runnable{
                 switch (clientMessage.getMessageType()){
                     case "PlayerValue":
                         handlePlayerValue(clientMessageBody);
+                        broadcastMessage(createPlayerAddedMessage());
                 }
 
 //
@@ -148,6 +153,19 @@ public class ClientHandler implements Runnable{
         System.out.println(name);
         System.out.println(robotID);
     }
+
+    public String createPlayerAddedMessage (){
+        Message playerAddedMessage = new Message();
+        playerAddedMessage.setMessageType("PlayerAdded");
+        MessageBody playerAddedMessageBody = new MessageBody();
+        playerAddedMessageBody.setClientID(clientID);
+        playerAddedMessageBody.setPlayerName(name);
+        playerAddedMessageBody.setFigure(robotID);
+        playerAddedMessage.setMessageBody(playerAddedMessageBody);
+        return gson.toJson(playerAddedMessage);
+    }
+
+
 
     public void sendErrorMessage(){
         Message errorMessage = new Message();

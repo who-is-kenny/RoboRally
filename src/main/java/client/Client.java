@@ -94,11 +94,18 @@ public class Client {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String messageFromHandler;
+                String inputFromHandler;
                 while( socket.isConnected()){
                     try {
-                        messageFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
-                        clientController.addMessage(messageFromHandler);
+                        inputFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
+                        Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
+                        MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
+                        switch (messageFromHandler.getMessageType()){
+                            case "PlayerAdded":
+                                robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
+                        }
+
+//                        clientController.addMessage(messageFromHandler);
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");
                         closeClient();
@@ -109,6 +116,8 @@ public class Client {
             }
         }).start();
     }
+
+
 
 
 
