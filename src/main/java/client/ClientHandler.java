@@ -154,6 +154,14 @@ public class ClientHandler implements Runnable{
     private String createAllReadyMessage(){
         Message allReadyMessage = new Message();
         allReadyMessage.setMessageType("AllReady");
+        // try to put clientID name here
+        Map<Integer,String> clientIDName = new HashMap<>();
+        for (ClientHandler clientHandler : clientHandlers) {
+            clientIDName.put(clientHandler.clientID, clientHandler.name); // Ensure `name` is initialized
+        }
+        MessageBody allReadyMessageBody = new MessageBody();
+        allReadyMessageBody.setClientIDName(clientIDName);
+        allReadyMessage.setMessageBody(allReadyMessageBody);
         return gson.toJson(allReadyMessage);
     }
 

@@ -24,6 +24,16 @@ public class MessageBody{
         this.currentPlayerStatuses = currentPlayerStatuses;
     }
 
+    private Map <Integer,String> clientIDName;
+
+    public Map<Integer, String> getClientIDName() {
+        return clientIDName;
+    }
+
+    public void setClientIDName(Map<Integer, String> clientIDName) {
+        this.clientIDName = clientIDName;
+    }
+
     private String map;
     private List<String> availableMaps;
 

@@ -18,10 +18,11 @@ public class RRChatApplication extends Application {
         System.out.println("connected to server");
 
         // creating chatloader
-//        FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
-//        Parent chatView = chatLoader.load();
-//        ClientController chatController = chatLoader.getController();
-//        client.setClientController(chatController);
+        FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
+        Parent chatRoot = chatLoader.load();
+        ClientController chatController = chatLoader.getController();
+        client.setClientController(chatController);
+        chatController.setClient(client);
 
 
         //creating robotselectionLoader
@@ -35,7 +36,8 @@ public class RRChatApplication extends Application {
 // Pass the client to the controller
         robotSelectionController.setClient(client); // Add a `setClient` method to RobotSelectionController
         robotSelectionController.setStage(stage);
-
+        //pass chat root to chat controller to be called later when switching scenes
+        robotSelectionController.setChatRoot(chatRoot);
 // Save the controller in the client for later use
         client.setRobotSelectionController(robotSelectionController);
 

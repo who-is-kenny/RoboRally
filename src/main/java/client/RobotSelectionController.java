@@ -26,6 +26,15 @@ public class RobotSelectionController implements Initializable {
         this.stage = stage;
     }
 
+    private Parent chatRoot;
+    public Parent getChatRoot() {
+        return chatRoot;
+    }
+    public void setChatRoot(Parent chatRoot) {
+        this.chatRoot = chatRoot;
+    }
+
+
     @FXML
     private ToggleGroup ready;
     @FXML
@@ -55,7 +64,6 @@ public class RobotSelectionController implements Initializable {
     private Client client;
 
     private int selectedRobotId;
-
 
     private static final Gson gson = new Gson();
 
@@ -140,17 +148,8 @@ public class RobotSelectionController implements Initializable {
 
     public void switchToChatScene(){
         Platform.runLater(()->{
-            try {
-                FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
-                Parent chatRoot = chatLoader.load();
-                ClientController chatController = chatLoader.getController();
-                client.setClientController(chatController);
-                chatController.setClient(client);
-                Scene chatScene = new Scene(chatRoot, 600, 400);
-                stage.setScene(chatScene);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Scene chatScene = new Scene(chatRoot, 600, 400);
+            stage.setScene(chatScene);
 
         });
     }

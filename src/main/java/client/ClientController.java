@@ -17,6 +17,7 @@ import server.Message;
 import server.MessageBody;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ClientController implements Initializable {
@@ -30,17 +31,23 @@ public class ClientController implements Initializable {
     @FXML
     private ScrollPane sp_message;
     @FXML
-    private ChoiceBox name_dropdown;
+    private ChoiceBox <String> name_dropdown;
 
     public Client getClient() {
         return client;
     }
-
     public void setClient(Client client) {
         this.client = client;
     }
-
     private Client client;
+
+    private Map<Integer, String> clientIdName;
+    public Map<Integer, String> getClientIdName() {
+        return clientIdName;
+    }
+    public void setClientIdName(Map<Integer, String> clientIdName) {
+        this.clientIdName = clientIdName;
+    }
 
     private static final Gson gson = new Gson();
 
@@ -131,6 +138,14 @@ public class ClientController implements Initializable {
         broadcastMessageBody.setPrivate(true);
         broadcastMessage.setMessageBody(broadcastMessageBody);
         return gson.toJson(broadcastMessage);
+    }
+
+    public void updateClientList (){
+        name_dropdown.getItems().add("everyone");
+        for(Map.Entry<Integer,String> entry : clientIdName.entrySet()){
+            String dropdownName = entry.getValue() + " (" + entry.getKey() + ")";
+            name_dropdown.getItems().add(dropdownName);
+        }
     }
 
 

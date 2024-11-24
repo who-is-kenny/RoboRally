@@ -3,6 +3,7 @@ package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.scene.layout.VBox;
 import server.Message;
 import server.MessageBody;
@@ -110,7 +111,10 @@ public class Client {
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
                                 break;
                             case "AllReady":
+                                clientController.setClientIdName(messageFromHandlerBody.getClientIDName());
                                 robotSelectionController.switchToChatScene();
+                                clientController.updateClientList();
+                                break;
 
                         }
 
