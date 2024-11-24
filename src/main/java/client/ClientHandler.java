@@ -86,29 +86,6 @@ public class ClientHandler implements Runnable{
 
             System.out.println("waiting for client messages");
 
-
-//            out.println("connection established");
-//            out.println("Enter a name: ");
-//
-//            // check valid name
-//            boolean validName = false;
-//            while(!validName){
-//                String tempName = in.readLine();
-//                validName = true;
-//                for (ClientHandler ch : clientHandlers){
-//                    if (Objects.equals(ch.name, tempName)){
-//                        out.println("name already taken , please choose another name: ");
-//                        validName = false;
-//                    }
-//                }
-//                name = tempName;
-//
-//            }
-//            out.println("welcome " + name);
-//            sendOtherClients(name + " joined the room");
-
-
-
             // receiving messages
             while(socket.isConnected()) {
                 String clientInput = in.readLine();
@@ -118,21 +95,17 @@ public class ClientHandler implements Runnable{
                     case "PlayerValue":
                         handlePlayerValue(clientMessageBody);
                         broadcastMessage(createPlayerAddedMessage());
+                        break;
                     case "SetStatus":
                         handleSetStatus(clientMessageBody);
                         broadcastMessage(createPlayerStatusMessage());
+                        break;
+                    case "SendChat":
+                        handleSendChat(clientMessageBody);
+
+
 
                 }
-
-//
-//                if (message.equals("bye")){
-//                    System.out.println(name + " left the server");
-//                    sendOtherClients(name + " left the room");
-//                    closeEverything();
-//                    break;
-//                }else{
-//                    sendOtherClients(name + "  " +clientID +  ": " + message);
-//                }
             }
         }catch (IOException e){
             closeEverything();
@@ -141,6 +114,35 @@ public class ClientHandler implements Runnable{
 
 
 
+    }
+
+    private void handleSendChat(MessageBody clientMessageBody) {
+        String message = clientMessageBody.getMessage();
+        int to = clientMessageBody.getTo();
+        int from = clientMessageBody.getFrom();
+        if(to == -1){
+            //create public message from server
+            Message pm = new Message();
+            pm.setMessageType("ReceivedChat");
+            MessageBody pmb = new MessageBody();
+            pmb.setMessage(message);
+            pmb.setFrom(from);
+            pmb.setTo(to);
+            pmb.setPrivate(false);
+            pm.setMessageBody(pmb);
+            broadcastMessage(gson.toJson(pm));
+        }else{
+            //create private message from server
+            Message dm = new Message();
+            dm.setMessageType("ReceivedChat");
+            MessageBody dmb = new MessageBody();
+            dmb.setMessage(message);
+            dmb.setFrom(from);
+            dmb.setTo(to);
+            dmb.setPrivate(true);
+            dm.setMessageBody(dmb);
+            sendMessageToClient(to,gson.toJson(dm));
+        }
     }
 
     private void handleSetStatus(MessageBody messageBody) {
@@ -213,6 +215,12 @@ public class ClientHandler implements Runnable{
     public static void broadcastMessage(String message){
         for (Map.Entry<Integer,ClientHandler> entry : clients.entrySet()){
             entry.getValue().out.println(message);
+        }
+    }
+    public static void sendMessageToClient(int targetClientId, String message) {
+        ClientHandler handler = clients.get(targetClientId);
+        if (handler != null) {
+            handler.out.println(message);
         }
     }
 

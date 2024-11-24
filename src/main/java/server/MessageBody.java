@@ -50,6 +50,16 @@ public class MessageBody{
     // chatnachrichten (4)
     private String message;
     private int to;
+
+    public int getFrom() {
+        return from;
+    }
+
+    public void setFrom(int from) {
+        this.from = from;
+    }
+
+    private int from;
     private boolean isPrivate;
     // error message (5)
     private String error;

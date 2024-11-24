@@ -78,12 +78,12 @@ public class ClientController implements Initializable {
     /**
      * creates a new text box and adds it to the chat GUI
      *
-     * @param messageFromHandler
+     * @param messageBody
      */
-    public void addMessage(String messageFromHandler) {
+    public void addMessage(MessageBody messageBody) {
         HBox hBox = new HBox();
         hBox.setPadding(new Insets(10, 5, 5, 10));
-        Text text = new Text(messageFromHandler);
+        Text text = new Text(messageBody.getMessage());
         TextFlow textFlow = new TextFlow(text);
         textFlow.setPadding(new Insets(10, 5, 5, 10));
         hBox.getChildren().add(textFlow);
@@ -114,7 +114,20 @@ public class ClientController implements Initializable {
             textFlow.setPadding(new Insets(5, 5, 5, 10));
             hBox.getChildren().add(textFlow);
             vbox_message.getChildren().add(hBox);
-            client.sendToClientHandler(message);
+            // check if we send to everyone or someone specific
+            String dropdownSelected = name_dropdown.getValue();
+            // set to everyone if nothing selected
+            if (dropdownSelected ==null){
+                dropdownSelected = "everyone";
+            }
+            String chatMessage;
+            if(!dropdownSelected.equals("everyone")){
+                int targetID = Integer.parseInt(dropdownSelected.substring(dropdownSelected.lastIndexOf('(') + 1,dropdownSelected.lastIndexOf(')') ));
+                chatMessage = createPrivateMessage(message , targetID );
+            }else{
+                chatMessage = createBroadcastMessage(message);
+            }
+            client.sendToClientHandler(chatMessage);
             text_input.clear();
         }
     }
@@ -125,6 +138,7 @@ public class ClientController implements Initializable {
         MessageBody privateMessageBody = new MessageBody();
         privateMessageBody.setMessage(message);
         privateMessageBody.setTo(targetClientID);
+        privateMessageBody.setFrom(client.getClientID());
         privateMessage.setMessageBody(privateMessageBody);
         return gson.toJson(privateMessage);
     }
@@ -135,6 +149,7 @@ public class ClientController implements Initializable {
         MessageBody broadcastMessageBody = new MessageBody();
         broadcastMessageBody.setMessage(message);
         broadcastMessageBody.setTo(-1);
+        broadcastMessageBody.setFrom(client.getClientID());
         broadcastMessageBody.setPrivate(true);
         broadcastMessage.setMessageBody(broadcastMessageBody);
         return gson.toJson(broadcastMessage);

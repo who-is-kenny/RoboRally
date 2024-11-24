@@ -115,6 +115,11 @@ public class Client {
                                 robotSelectionController.switchToChatScene();
                                 clientController.updateClientList();
                                 break;
+                            case "ReceivedChat":
+                                if(messageFromHandlerBody.getFrom() != clientID){
+                                    clientController.addMessage(messageFromHandlerBody);
+                                }
+
 
                         }
 
@@ -129,12 +134,6 @@ public class Client {
             }
         }).start();
     }
-
-
-
-
-
-
 
     public void closeClient(){   //Socket socket, PrintWriter out, BufferedReader in
         System.out.println("closing client");
