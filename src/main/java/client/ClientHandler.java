@@ -28,6 +28,7 @@ public class ClientHandler implements Runnable{
     private String name;
     private int clientID;
     private int robotID;
+    private boolean isReady;
 
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
@@ -114,6 +115,10 @@ public class ClientHandler implements Runnable{
                     case "PlayerValue":
                         handlePlayerValue(clientMessageBody);
                         broadcastMessage(createPlayerAddedMessage());
+                    case "SetStatus":
+                        handleSetStatus(clientMessageBody);
+                        broadcastMessage(createPlayerStatusMessage());
+
                 }
 
 //
@@ -134,6 +139,31 @@ public class ClientHandler implements Runnable{
 
 
     }
+
+    private void handleSetStatus(MessageBody messageBody) {
+        this.isReady = messageBody.isReady();
+        boolean allReady = clientHandlers.stream().allMatch(ch ->ch.isReady);
+        if(allReady){
+            broadcastMessage(createAllReadyMessage());
+        }
+    }
+
+    private String createAllReadyMessage(){
+        Message allReadyMessage = new Message();
+        allReadyMessage.setMessageType("AllReady");
+        return gson.toJson(allReadyMessage);
+    }
+
+    private String createPlayerStatusMessage(){
+        Message playerStatusMessage = new Message();
+        playerStatusMessage.setMessageType("PlayerStatus");
+        MessageBody playerStatusMessageBody = new MessageBody();
+        playerStatusMessageBody.setReady(true);
+        playerStatusMessageBody.setClientID(clientID);
+        playerStatusMessage.setMessageBody(playerStatusMessageBody);
+        return gson.toJson(playerStatusMessage);
+    }
+
 
     private void sendCurrentSelections() {
         Message currentSelections = new Message();
@@ -162,6 +192,8 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    // methods for robot selection and player name
+
     private void handlePlayerValue(MessageBody messageBody){
         this.name = messageBody.getPlayerName();
         this.robotID = messageBody.getFigure();
@@ -170,7 +202,7 @@ public class ClientHandler implements Runnable{
         System.out.println(robotID);
     }
 
-    public String createPlayerAddedMessage (){
+    private String createPlayerAddedMessage (){
         Message playerAddedMessage = new Message();
         playerAddedMessage.setMessageType("PlayerAdded");
         MessageBody playerAddedMessageBody = new MessageBody();

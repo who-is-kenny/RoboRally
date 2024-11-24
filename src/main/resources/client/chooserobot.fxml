@@ -21,11 +21,11 @@
       <RadioButton id="4" fx:id="robot_4" layoutX="58.0" layoutY="282.0" mnemonicParsing="false" text="bot 4" toggleGroup="$robots" />
       <RadioButton id="5" fx:id="robot_5" layoutX="257.0" layoutY="282.0" mnemonicParsing="false" text="bot 5" toggleGroup="$robots" />
       <RadioButton id="6" fx:id="robot_6" layoutX="453.0" layoutY="282.0" mnemonicParsing="false" text="bot 6" toggleGroup="$robots" />
-      <ToggleButton fx:id="ready_button" layoutX="368.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
+      <ToggleButton fx:id="ready_button" disable="true" layoutX="368.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
          <toggleGroup>
             <ToggleGroup fx:id="ready" />
          </toggleGroup>
       </ToggleButton>
-      <ToggleButton fx:id="not_ready_button" layoutX="469.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmUnready" text="not ready" toggleGroup="$ready" />
+      <ToggleButton fx:id="not_ready_button" disable="true" layoutX="469.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmUnready" text="not ready" toggleGroup="$ready" />
    </children>
 </AnchorPane>

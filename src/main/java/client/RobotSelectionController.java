@@ -83,13 +83,32 @@ public class RobotSelectionController implements Initializable {
         // cleat textbox so cannot confirm again
         player_name.clear();
         player_name.setDisable(true);
+        // enable ready and unready button after confirmation of robot.
+        ready_button.setDisable(false);
+        not_ready_button.setDisable(false);
     }
     @FXML
     private void confirmReady(ActionEvent e){
+        //create ready message
+        Message readyMessage = new Message();
+        readyMessage.setMessageType("SetStatus");
+        MessageBody readyMessageBody = new MessageBody();
+        readyMessageBody.setReady(true);
+        readyMessage.setMessageBody(readyMessageBody);
+        client.sendToClientHandler(gson.toJson(readyMessage));
+        System.out.println(gson.toJson(readyMessage));
         System.out.println("ready");
     }
     @FXML
     private void confirmUnready(ActionEvent e){
+        //create unready message
+        Message unreadyMessage = new Message();
+        unreadyMessage.setMessageType("SetStatus");
+        MessageBody unreadyMessageBody = new MessageBody();
+        unreadyMessageBody.setReady(false);
+        unreadyMessage.setMessageBody(unreadyMessageBody);
+        client.sendToClientHandler(gson.toJson(unreadyMessage));
+        System.out.println(gson.toJson(unreadyMessage));
         System.out.println("unready");
     }
 
