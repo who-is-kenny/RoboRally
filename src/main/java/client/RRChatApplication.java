@@ -18,10 +18,10 @@ public class RRChatApplication extends Application {
         System.out.println("connected to server");
 
         // creating chatloader
-        FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
-        ClientController chatController = new ClientController(client);
-        chatLoader.setController(chatController);
-        client.setClientController(chatController);
+//        FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
+//        Parent chatView = chatLoader.load();
+//        ClientController chatController = chatLoader.getController();
+//        client.setClientController(chatController);
 
 
         //creating robotselectionLoader
@@ -34,13 +34,11 @@ public class RRChatApplication extends Application {
 
 // Pass the client to the controller
         robotSelectionController.setClient(client); // Add a `setClient` method to RobotSelectionController
+        robotSelectionController.setStage(stage);
 
 // Save the controller in the client for later use
         client.setRobotSelectionController(robotSelectionController);
-//
-//        RobotSelectionController robotSelectionController = new RobotSelectionController(client);
-//        robotSelectionLoader.setController(robotSelectionController);
-//        client.setRobotSelectionController ( robotSelectionController);
+
 
         // start listen thread for messages
         client.receiveFromClientHandler();

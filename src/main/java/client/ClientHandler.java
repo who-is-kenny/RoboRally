@@ -80,6 +80,9 @@ public class ClientHandler implements Runnable{
 
             // send information about selected robots
             sendCurrentSelections();
+            // TODO send player statuses
+            // send information about player status
+
 
             System.out.println("waiting for client messages");
 
@@ -162,6 +165,19 @@ public class ClientHandler implements Runnable{
         playerStatusMessageBody.setClientID(clientID);
         playerStatusMessage.setMessageBody(playerStatusMessageBody);
         return gson.toJson(playerStatusMessage);
+    }
+
+    private void sendPlayerStatuses(){
+        Message spsMessage = new Message();
+        spsMessage.setMessageType("CurrentPlayerStatuses");
+        MessageBody spsMessageBody = new MessageBody();
+        Map<Integer,Boolean> playerStatuses = new HashMap<>();
+        for(ClientHandler clientHandler : clientHandlers){
+            playerStatuses.put(clientID,isReady);
+        }
+        spsMessageBody.setCurrentPlayerStatuses(playerStatuses);
+        spsMessage.setMessageBody(spsMessageBody);
+        out.println(gson.toJson(spsMessage));
     }
 
 

@@ -32,12 +32,20 @@ public class ClientController implements Initializable {
     @FXML
     private ChoiceBox name_dropdown;
 
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
     private Client client;
 
     private static final Gson gson = new Gson();
 
-    public ClientController(Client client) {
-        this.client = client;
+    public ClientController() {
+
     }
 
     @Override

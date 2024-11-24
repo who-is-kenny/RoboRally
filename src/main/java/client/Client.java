@@ -109,6 +109,9 @@ public class Client {
                             case "PlayerAdded":
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
                                 break;
+                            case "AllReady":
+                                robotSelectionController.switchToChatScene();
+
                         }
 
 //                        clientController.addMessage(messageFromHandler);

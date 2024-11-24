@@ -1,20 +1,30 @@
 package client;
 
 import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import server.Message;
 import server.MessageBody;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class RobotSelectionController implements Initializable {
 
+    private Stage stage;
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
     @FXML
     private ToggleGroup ready;
@@ -126,6 +136,23 @@ public class RobotSelectionController implements Initializable {
         if (Integer.parseInt(robot_4.getId()) == robotID) robot_4.setDisable(true);
         if (Integer.parseInt(robot_5.getId()) == robotID) robot_5.setDisable(true);
         if (Integer.parseInt(robot_6.getId()) == robotID) robot_6.setDisable(true);
+    }
+
+    public void switchToChatScene(){
+        Platform.runLater(()->{
+            try {
+                FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
+                Parent chatRoot = chatLoader.load();
+                ClientController chatController = chatLoader.getController();
+                client.setClientController(chatController);
+                chatController.setClient(client);
+                Scene chatScene = new Scene(chatRoot, 600, 400);
+                stage.setScene(chatScene);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
     }
 
 

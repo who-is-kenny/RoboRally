@@ -14,6 +14,16 @@ public class MessageBody{
     private String playerName;
     private int figure;
     private boolean ready;
+    private Map<Integer, Boolean> currentPlayerStatuses;
+
+    public Map<Integer, Boolean> getCurrentPlayerStatuses() {
+        return currentPlayerStatuses;
+    }
+
+    public void setCurrentPlayerStatuses(Map<Integer, Boolean> currentPlayerStatuses) {
+        this.currentPlayerStatuses = currentPlayerStatuses;
+    }
+
     private String map;
     private List<String> availableMaps;
 
