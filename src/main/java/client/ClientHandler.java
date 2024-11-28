@@ -129,7 +129,7 @@ public class ClientHandler implements Runnable{
 
 
     }
-
+    //chat
     private void handleSendChat(MessageBody clientMessageBody) {
         String message = clientMessageBody.getMessage();
         int to = clientMessageBody.getTo();
@@ -159,6 +159,8 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    // methods for player ready status
+
     private void handleSetStatus(MessageBody messageBody) {
         this.isReady = messageBody.isReady();
         broadcastMessage(createPlayerStatusMessage(isReady));
@@ -175,18 +177,18 @@ public class ClientHandler implements Runnable{
         return gson.toJson(playerStatusMessage);
     }
 
-    public static void broadcastMessage(String message){
-        for (ClientHandler ch : clientHandlers){
-            ch.out.println(message);
-        }
+    // methods for map selection
+
+    private String createSelectMapMessage(){
+        Message selectMapMessage = new Message();
+        selectMapMessage.setMessageType("SelectMap");
+        MessageBody selectMapMessageBody = new MessageBody();
+        selectMapMessageBody.setAvailableMaps(availableMaps);
+        selectMapMessage.setMessageBody(selectMapMessageBody);
+        return gson.toJson(selectMapMessage);
     }
-    public static void sendMessageToClient(int targetClientId, String message) {
-        for(ClientHandler ch : clientHandlers){
-            if (ch.clientID == targetClientId){
-                ch.out.println(message);
-            }
-        }
-    }
+
+
 
     // methods for robot selection and player name
 
@@ -209,17 +211,26 @@ public class ClientHandler implements Runnable{
         return gson.toJson(playerAddedMessage);
     }
 
-    private String createSelectMapMessage(){
-        Message selectMapMessage = new Message();
-        selectMapMessage.setMessageType("SelectMap");
-        MessageBody selectMapMessageBody = new MessageBody();
-        selectMapMessageBody.setAvailableMaps(availableMaps);
-        selectMapMessage.setMessageBody(selectMapMessageBody);
-        return gson.toJson(selectMapMessage);
+    // broadcasting messages
+    public static void broadcastMessage(String message){
+        for (ClientHandler ch : clientHandlers){
+            ch.out.println(message);
+        }
+    }
+
+    //send message to a specific target
+    public static void sendMessageToClient(int targetClientId, String message) {
+        for(ClientHandler ch : clientHandlers){
+            if (ch.clientID == targetClientId){
+                ch.out.println(message);
+            }
+        }
     }
 
 
 
+
+    //error message
     public void sendErrorMessage(){
         Message errorMessage = new Message();
         errorMessage.setMessageType("Error");

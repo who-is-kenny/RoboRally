@@ -24,6 +24,14 @@ public class RRChatApplication extends Application {
         client.setClientController(chatController);
         chatController.setClient(client);
 
+        //creating game board loader
+        FXMLLoader gameBoardLoader = new FXMLLoader(RRChatApplication.class.getResource("DizzyHighway.fxml"));
+        Parent gameBoardRoot = gameBoardLoader.load();
+        GameBoardController gameBoardController = gameBoardLoader.getController();
+        client.setGameBoardController(gameBoardController);
+        gameBoardController.setClient(client);
+
+
 
         //creating robotselectionLoader
         FXMLLoader robotSelectionLoader = new FXMLLoader(RRChatApplication.class.getResource("chooserobot.fxml"));
@@ -37,7 +45,7 @@ public class RRChatApplication extends Application {
         robotSelectionController.setClient(client); // Add a `setClient` method to RobotSelectionController
         robotSelectionController.setStage(stage);
         //pass chat root to chat controller to be called later when switching scenes
-        robotSelectionController.setChatRoot(chatRoot);
+        robotSelectionController.setChatRoot(gameBoardRoot);     // TODO was chat root before
 // Save the controller in the client for later use
         client.setRobotSelectionController(robotSelectionController);
 

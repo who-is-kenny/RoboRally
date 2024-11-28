@@ -51,6 +51,15 @@ public class Client {
         this.robotSelectionController = robotSelectionController;
     }
 
+    //game board controller getter and setter
+    private GameBoardController gameBoardController;
+    public GameBoardController getGameBoardController() {
+        return gameBoardController;
+    }
+    public void setGameBoardController(GameBoardController gameBoardController) {
+        this.gameBoardController = gameBoardController;
+    }
+
 
 
     public Client(Socket socket){
