@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -9,8 +10,8 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.RobotSelectionController">
    <children>
-      <TextField fx:id="player_name" layoutX="58.0" layoutY="342.0" promptText="enter name" />
-      <Button fx:id="confirm_robot" disable="true" layoutX="243.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmRobot" text="confirm" />
+      <TextField fx:id="player_name" layoutX="24.0" layoutY="316.0" promptText="enter name" />
+      <Button fx:id="confirm_robot" disable="true" layoutX="229.0" layoutY="316.0" mnemonicParsing="false" onAction="#confirmRobot" text="confirm" />
       <RadioButton id="1" fx:id="robot_1" layoutX="58.0" layoutY="147.0" mnemonicParsing="false" text="bot 1">
          <toggleGroup>
             <ToggleGroup fx:id="robots" />
@@ -21,11 +22,13 @@
       <RadioButton id="4" fx:id="robot_4" layoutX="58.0" layoutY="282.0" mnemonicParsing="false" text="bot 4" toggleGroup="$robots" />
       <RadioButton id="5" fx:id="robot_5" layoutX="257.0" layoutY="282.0" mnemonicParsing="false" text="bot 5" toggleGroup="$robots" />
       <RadioButton id="6" fx:id="robot_6" layoutX="453.0" layoutY="282.0" mnemonicParsing="false" text="bot 6" toggleGroup="$robots" />
-      <ToggleButton fx:id="ready_button" disable="true" layoutX="368.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
+      <ToggleButton fx:id="ready_button" disable="true" layoutX="99.0" layoutY="355.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
          <toggleGroup>
             <ToggleGroup fx:id="ready" />
          </toggleGroup>
       </ToggleButton>
-      <ToggleButton fx:id="not_ready_button" disable="true" layoutX="469.0" layoutY="342.0" mnemonicParsing="false" onAction="#confirmUnready" text="not ready" toggleGroup="$ready" />
+      <ToggleButton fx:id="not_ready_button" disable="true" layoutX="180.0" layoutY="355.0" mnemonicParsing="false" onAction="#confirmUnready" text="not ready" toggleGroup="$ready" />
+      <ChoiceBox fx:id="available_maps" disable="true" layoutX="334.0" layoutY="341.0" prefWidth="150.0" />
+      <Button fx:id="select_map_button" disable="true" layoutX="502.0" layoutY="343.0" mnemonicParsing="false" onAction="#selectMap" text="select map" />
    </children>
 </AnchorPane>

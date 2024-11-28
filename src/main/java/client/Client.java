@@ -21,6 +21,8 @@ public class Client {
 
     private int totalClients = 0;
     private List<Integer> readyClientIDs = new ArrayList<>();
+    private boolean mapSelected;
+    private String selectedMap;
 
     //clientID getter and setter
     private int clientID = 0;
@@ -122,16 +124,32 @@ public class Client {
                                 if (messageFromHandlerBody.isReady()){
                                     if(!readyClientIDs.contains(messageFromHandlerBody.getClientID())){
                                         readyClientIDs.add(messageFromHandlerBody.getClientID());
+                                        if(readyClientIDs.getFirst() == clientID){
+                                            robotSelectionController.setDisableMap(false);
+                                        }
                                     }
-                                    if (readyClientIDs.size() == totalClients){
+                                    if (mapSelected && readyClientIDs.size() == totalClients){
                                         robotSelectionController.switchToChatScene();
                                         clientController.updateClientList();
                                     }
                                 }else{
                                     if(readyClientIDs.contains(messageFromHandlerBody.getClientID())){
+                                        if (messageFromHandlerBody.getClientID() == clientID){
+                                            robotSelectionController.setDisableMap(true);
+                                        }
                                         readyClientIDs.remove((Integer) messageFromHandlerBody.getClientID());
+                                        if(!readyClientIDs.isEmpty() && readyClientIDs.getFirst() == clientID){
+                                            robotSelectionController.setDisableMap(false);
+                                        }
                                     }
                                 }
+                                break;
+                            case "SelectMap":
+                                robotSelectionController.handleSelectMap(messageFromHandlerBody);
+                                break;
+                            case "MapSelected":
+                                mapSelected = true;
+                                selectedMap = messageFromHandlerBody.getMap();
                                 break;
                             case "ReceivedChat":
                                 if(messageFromHandlerBody.getFrom() != clientID){

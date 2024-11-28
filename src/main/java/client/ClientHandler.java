@@ -6,9 +6,7 @@ import server.message.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ClientHandler implements Runnable{
 
@@ -28,6 +26,7 @@ public class ClientHandler implements Runnable{
     private final int clientID;
     private int robotID = -1;
     private boolean isReady;
+    static List<String> availableMaps = List.of("Dizzy Highway");
 
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
@@ -111,8 +110,12 @@ public class ClientHandler implements Runnable{
                     case "SetStatus":
                         handleSetStatus(clientMessageBody);
                         break;
+                    case "MapSelected":
+                        broadcastMessage(clientInput);
+                        break;
                     case "SendChat":
                         handleSendChat(clientMessageBody);
+                        break;
 
 
 
@@ -159,6 +162,7 @@ public class ClientHandler implements Runnable{
     private void handleSetStatus(MessageBody messageBody) {
         this.isReady = messageBody.isReady();
         broadcastMessage(createPlayerStatusMessage(isReady));
+        out.println(createSelectMapMessage());
     }
 
     private String createPlayerStatusMessage(boolean isReady){
@@ -205,6 +209,15 @@ public class ClientHandler implements Runnable{
         return gson.toJson(playerAddedMessage);
     }
 
+    private String createSelectMapMessage(){
+        Message selectMapMessage = new Message();
+        selectMapMessage.setMessageType("SelectMap");
+        MessageBody selectMapMessageBody = new MessageBody();
+        selectMapMessageBody.setAvailableMaps(availableMaps);
+        selectMapMessage.setMessageBody(selectMapMessageBody);
+        return gson.toJson(selectMapMessage);
+    }
+
 
 
     public void sendErrorMessage(){
@@ -215,6 +228,8 @@ public class ClientHandler implements Runnable{
         errorMessage.setMessageBody(errorMessageBody);
         out.println(gson.toJson(errorMessage));
     }
+
+
 
 
     public void closeEverything(){

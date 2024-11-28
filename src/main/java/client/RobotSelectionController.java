@@ -14,6 +14,7 @@ import server.message.Message;
 import server.message.MessageBody;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class RobotSelectionController implements Initializable {
@@ -32,6 +33,10 @@ public class RobotSelectionController implements Initializable {
     }
 
 
+    @FXML
+    private Button select_map_button;
+    @FXML
+    private ChoiceBox<String> available_maps;
     @FXML
     private ToggleGroup ready;
     @FXML
@@ -77,6 +82,10 @@ public class RobotSelectionController implements Initializable {
                 robots.selectedToggleProperty().isNull(),
                 player_name.textProperty().isEmpty()
         ));
+
+        select_map_button.disableProperty().bind(
+                available_maps.valueProperty().isNull()
+        );
 
     }
 
@@ -130,6 +139,16 @@ public class RobotSelectionController implements Initializable {
         System.out.println("unready");
     }
 
+    @FXML
+    private void selectMap(ActionEvent e){
+        Message mapSelectedMessage = new Message();
+        mapSelectedMessage.setMessageType("MapSelected");
+        MessageBody mapSelectedMessageBody = new MessageBody();
+        mapSelectedMessageBody.setMap(available_maps.getValue());
+        mapSelectedMessage.setMessageBody(mapSelectedMessageBody);
+        client.sendToClientHandler(gson.toJson(mapSelectedMessage));
+    }
+
     public void handlePlayerAdded(MessageBody ms , int clientID){
         int robotID = ms.getFigure();
         if (ms.getClientID() != clientID){
@@ -164,5 +183,21 @@ public class RobotSelectionController implements Initializable {
     }
 
 
+    public void handleSelectMap(MessageBody messageFromHandlerBody) {
+        List<String> availableMaps = messageFromHandlerBody.getAvailableMaps();
+        // Add maps to the ChoiceBox if it's not already populated
+        if (available_maps.getItems().isEmpty()){
+            for (String map : availableMaps){
+                // prevent adding duplicate items
+                if(!available_maps.getItems().contains(map)){
+                    available_maps.getItems().add(map);
+                }
+            }
+        }
+    }
+
+    public void setDisableMap(boolean b){
+        available_maps.setDisable(b);
+    }
 }
 
