@@ -8,4 +8,5 @@ module com.example.roborally {
     opens client to javafx.fxml;
     opens server to com.google.gson; // updated this
     exports client;
+    opens server.message to com.google.gson;
 }

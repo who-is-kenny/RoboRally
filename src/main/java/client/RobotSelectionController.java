@@ -5,18 +5,15 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import server.Message;
-import server.MessageBody;
+import server.message.Message;
+import server.message.MessageBody;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class RobotSelectionController implements Initializable {
@@ -62,6 +59,9 @@ public class RobotSelectionController implements Initializable {
     private TextField player_name;
 
     private Client client;
+    public void setClient(Client client) {
+        this.client = client;
+    }
 
     private int selectedRobotId;
 
@@ -91,7 +91,7 @@ public class RobotSelectionController implements Initializable {
         Message robotSelectionMessage = new Message();
         robotSelectionMessage.setMessageType("PlayerValue");
         MessageBody robotSelectionMessageBody = new MessageBody();
-        robotSelectionMessageBody.setPlayerName(playerName);
+        robotSelectionMessageBody.setName(playerName);
         robotSelectionMessageBody.setFigure(selectedRobotID);
         robotSelectionMessage.setMessageBody(robotSelectionMessageBody);
         //send json to clienthandler via client
@@ -155,11 +155,6 @@ public class RobotSelectionController implements Initializable {
     }
 
 
-
-//    public RobotSelectionController(Client client) {
-//        this.client = client;
-//    }
-
     public int getSelectedRobotId() {
         return selectedRobotId;
     }
@@ -168,8 +163,6 @@ public class RobotSelectionController implements Initializable {
         this.selectedRobotId = selectedRobotId;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
+
 }
 

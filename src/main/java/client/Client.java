@@ -1,15 +1,14 @@
 package client;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import javafx.application.Platform;
-import javafx.scene.layout.VBox;
-import server.Message;
-import server.MessageBody;
+import server.message.Message;
+import server.message.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -19,6 +18,10 @@ public class Client {
     private BufferedReader in;
     private PrintWriter out;
     private final Gson gson = new Gson();
+
+    private int totalClients = 0;
+    private List<Integer> readyClientIDs = new ArrayList<>();
+
     //clientID getter and setter
     private int clientID = 0;
     public int getClientID() {
@@ -27,6 +30,7 @@ public class Client {
     public void setClientID(int clientID) {
         this.clientID = clientID;
     }
+
     // chat controller getter and setter
     private ClientController clientController;
     public ClientController getClientController() {
@@ -35,6 +39,7 @@ public class Client {
     public void setClientController(ClientController clientController) {
         this.clientController = clientController;
     }
+
     // robot selection controller getter and setter
     private RobotSelectionController robotSelectionController;
     public RobotSelectionController getRobotSelectionController() {
@@ -43,6 +48,8 @@ public class Client {
     public void setRobotSelectionController(RobotSelectionController robotSelectionController) {
         this.robotSelectionController = robotSelectionController;
     }
+
+
 
     public Client(Socket socket){
 
@@ -103,27 +110,35 @@ public class Client {
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
                         switch (messageFromHandler.getMessageType()){
-                            case "CurrentSelections":
-                                Map<Integer, Integer> currentSelections = messageFromHandlerBody.getSelectedRobots();
-                                currentSelections.keySet().forEach(robotSelectionController::disableChosenRobot);
-                                break;
                             case "PlayerAdded":
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
+                                String playerName = messageFromHandlerBody.getName();
+                                int ClientID = messageFromHandlerBody.getClientID();
+                                clientController.addClientIDName(playerName,ClientID);
+                                // counts the number of clients to be compared later with number of ready players
+                                totalClients++;
                                 break;
-                            case "AllReady":
-                                clientController.setClientIdName(messageFromHandlerBody.getClientIDName());
-                                robotSelectionController.switchToChatScene();
-                                clientController.updateClientList();
+                            case "PlayerStatus": // TODO remove prints from this case when not needed
+                                if (messageFromHandlerBody.isReady()){
+                                    if(!readyClientIDs.contains(messageFromHandlerBody.getClientID())){
+                                        readyClientIDs.add(messageFromHandlerBody.getClientID());
+                                    }
+                                    if (readyClientIDs.size() == totalClients){
+                                        robotSelectionController.switchToChatScene();
+                                        clientController.updateClientList();
+                                    }
+                                }else{
+                                    if(readyClientIDs.contains(messageFromHandlerBody.getClientID())){
+                                        readyClientIDs.remove((Integer) messageFromHandlerBody.getClientID());
+                                    }
+                                }
                                 break;
                             case "ReceivedChat":
                                 if(messageFromHandlerBody.getFrom() != clientID){
                                     clientController.addMessage(messageFromHandlerBody);
                                 }
-
-
+                                break;
                         }
-
-//                        clientController.addMessage(messageFromHandler);
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");
                         closeClient();

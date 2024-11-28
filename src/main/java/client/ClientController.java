@@ -13,10 +13,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import server.Message;
-import server.MessageBody;
+import server.message.Message;
+import server.message.MessageBody;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -41,7 +42,7 @@ public class ClientController implements Initializable {
     }
     private Client client;
 
-    private Map<Integer, String> clientIdName;
+    private Map<Integer, String> clientIdName = new HashMap<>();
     public Map<Integer, String> getClientIdName() {
         return clientIdName;
     }
@@ -155,12 +156,18 @@ public class ClientController implements Initializable {
         return gson.toJson(broadcastMessage);
     }
 
+    // updates list of clients in chat dropdown
     public void updateClientList (){
         name_dropdown.getItems().add("everyone");
         for(Map.Entry<Integer,String> entry : clientIdName.entrySet()){
             String dropdownName = entry.getValue() + " (" + entry.getKey() + ")";
             name_dropdown.getItems().add(dropdownName);
         }
+    }
+
+    // adds clientid and name to map
+    public void addClientIDName (String playerName , int clientID) {
+        clientIdName.put(clientID,playerName);
     }
 
 

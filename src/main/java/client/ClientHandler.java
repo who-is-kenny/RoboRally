@@ -1,15 +1,14 @@
 package client;
 
 import com.google.gson.Gson;
-import server.Message;
-import server.MessageBody;
+import server.message.Message;
+import server.message.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ClientHandler implements Runnable{
 
@@ -18,7 +17,7 @@ public class ClientHandler implements Runnable{
     private static Map<Integer, ClientHandler> clients;
     private static final Map<Integer, Integer> selectedRobots = new HashMap<>(); // key: robotID, value: clientID
 
-    private Socket socket;
+    private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
     private static final Gson gson = new Gson();
@@ -26,8 +25,8 @@ public class ClientHandler implements Runnable{
     // attributes for game.
 
     private String name;
-    private int clientID;
-    private int robotID;
+    private final int clientID;
+    private int robotID = -1;
     private boolean isReady;
 
 
@@ -70,6 +69,7 @@ public class ClientHandler implements Runnable{
                 }
             }
             System.out.println("connection established sending welcome message");
+
             // send welcome message
             Message welcomeMessage = new Message();
             welcomeMessage.setMessageType("Welcome");
@@ -79,7 +79,19 @@ public class ClientHandler implements Runnable{
             out.println(gson.toJson(welcomeMessage));
 
             // send information about selected robots
-            sendCurrentSelections();
+//            sendCurrentSelections();
+            // loops through clienthandlers and sends information about name and selected robot
+            for (ClientHandler ch : clientHandlers){
+                if (ch.robotID != -1){
+                    out.println(ch.createPlayerAddedMessage());
+                }
+            }
+            // loops through clienthandlers and sends isready status of clients that are ready
+            for (ClientHandler ch : clientHandlers){
+                if(ch.isReady){
+                    out.println(ch.createPlayerStatusMessage(true));
+                }
+            }
             // TODO send player statuses
             // send information about player status
 
@@ -98,7 +110,6 @@ public class ClientHandler implements Runnable{
                         break;
                     case "SetStatus":
                         handleSetStatus(clientMessageBody);
-                        broadcastMessage(createPlayerStatusMessage());
                         break;
                     case "SendChat":
                         handleSendChat(clientMessageBody);
@@ -147,87 +158,36 @@ public class ClientHandler implements Runnable{
 
     private void handleSetStatus(MessageBody messageBody) {
         this.isReady = messageBody.isReady();
-        boolean allReady = clientHandlers.stream().allMatch(ch ->ch.isReady);
-        if(allReady){
-            broadcastMessage(createAllReadyMessage());
-        }
+        broadcastMessage(createPlayerStatusMessage(isReady));
     }
 
-    private String createAllReadyMessage(){
-        Message allReadyMessage = new Message();
-        allReadyMessage.setMessageType("AllReady");
-        // try to put clientID name here
-        Map<Integer,String> clientIDName = new HashMap<>();
-        for (ClientHandler clientHandler : clientHandlers) {
-            clientIDName.put(clientHandler.clientID, clientHandler.name); // Ensure `name` is initialized
-        }
-        MessageBody allReadyMessageBody = new MessageBody();
-        allReadyMessageBody.setClientIDName(clientIDName);
-        allReadyMessage.setMessageBody(allReadyMessageBody);
-        return gson.toJson(allReadyMessage);
-    }
-
-    private String createPlayerStatusMessage(){
+    private String createPlayerStatusMessage(boolean isReady){
         Message playerStatusMessage = new Message();
         playerStatusMessage.setMessageType("PlayerStatus");
         MessageBody playerStatusMessageBody = new MessageBody();
-        playerStatusMessageBody.setReady(true);
+        playerStatusMessageBody.setReady(isReady);
         playerStatusMessageBody.setClientID(clientID);
         playerStatusMessage.setMessageBody(playerStatusMessageBody);
         return gson.toJson(playerStatusMessage);
     }
 
-    private void sendPlayerStatuses(){
-        Message spsMessage = new Message();
-        spsMessage.setMessageType("CurrentPlayerStatuses");
-        MessageBody spsMessageBody = new MessageBody();
-        Map<Integer,Boolean> playerStatuses = new HashMap<>();
-        for(ClientHandler clientHandler : clientHandlers){
-            playerStatuses.put(clientID,isReady);
-        }
-        spsMessageBody.setCurrentPlayerStatuses(playerStatuses);
-        spsMessage.setMessageBody(spsMessageBody);
-        out.println(gson.toJson(spsMessage));
-    }
-
-
-    private void sendCurrentSelections() {
-        Message currentSelections = new Message();
-        currentSelections.setMessageType("CurrentSelections");
-        MessageBody messageBody = new MessageBody();
-        messageBody.setSelectedRobots(new HashMap<>(selectedRobots)); // Assume MessageBody has a selectedRobots field
-        currentSelections.setMessageBody(messageBody);
-        out.println(gson.toJson(currentSelections));
-    }
-
-    /**
-     * send message to all other clients other than themselves
-     * @param message message to be sent
-     */
-    public void sendOtherClients(String message){
-        for (ClientHandler ch : clientHandlers){
-            if (ch != null && ch.name != null && !ch.name.equals(name)) {
-                ch.out.println(message);
-            }
-        }
-    }
-
     public static void broadcastMessage(String message){
-        for (Map.Entry<Integer,ClientHandler> entry : clients.entrySet()){
-            entry.getValue().out.println(message);
+        for (ClientHandler ch : clientHandlers){
+            ch.out.println(message);
         }
     }
     public static void sendMessageToClient(int targetClientId, String message) {
-        ClientHandler handler = clients.get(targetClientId);
-        if (handler != null) {
-            handler.out.println(message);
+        for(ClientHandler ch : clientHandlers){
+            if (ch.clientID == targetClientId){
+                ch.out.println(message);
+            }
         }
     }
 
     // methods for robot selection and player name
 
     private void handlePlayerValue(MessageBody messageBody){
-        this.name = messageBody.getPlayerName();
+        this.name = messageBody.getName();
         this.robotID = messageBody.getFigure();
         selectedRobots.put(robotID , clientID);
         System.out.println(name);
@@ -239,7 +199,7 @@ public class ClientHandler implements Runnable{
         playerAddedMessage.setMessageType("PlayerAdded");
         MessageBody playerAddedMessageBody = new MessageBody();
         playerAddedMessageBody.setClientID(clientID);
-        playerAddedMessageBody.setPlayerName(name);
+        playerAddedMessageBody.setName(name);
         playerAddedMessageBody.setFigure(robotID);
         playerAddedMessage.setMessageBody(playerAddedMessageBody);
         return gson.toJson(playerAddedMessage);
