@@ -28,6 +28,9 @@ public class ClientHandler implements Runnable{
     private boolean isReady;
     static List<String> availableMaps = List.of("Dizzy Highway");
     private String selectedMap;
+    private int startingPointX;
+    private int startingPointY;
+
 
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
@@ -115,11 +118,16 @@ public class ClientHandler implements Runnable{
                         selectedMap = clientMessageBody.getMap();
                         // sends client message to other clients
                         broadcastMessage(clientInput);
+                        // initiates first phase
+                        broadcastMessage(createActivePhaseMessage(0));
                         // sends currentplayer message to start selection
                         broadcastMessage(createCurrentPlayerMessage());
                         break;
                     case "SendChat":
                         handleSendChat(clientMessageBody);
+                        break;
+                    case "SetStartingPoint":
+                        handleSetStartingPoint(clientMessageBody);
                         break;
 
                 }
@@ -132,6 +140,33 @@ public class ClientHandler implements Runnable{
 
 
     }
+
+    private void handleSetStartingPoint(MessageBody clientMessageBody) {
+
+
+        startingPointX = clientMessageBody.getX();
+        startingPointY = clientMessageBody.getY();
+        // create  starting point taken message
+        Message startingPointTakenMessage = new Message();
+        startingPointTakenMessage.setMessageType("StartingPointTaken");
+        MessageBody startingPointTakenMessageBody = new MessageBody();
+        startingPointTakenMessageBody.setX(clientMessageBody.getX());
+        startingPointTakenMessageBody.setY(clientMessageBody.getY());
+        startingPointTakenMessageBody.setDirection("right");
+        startingPointTakenMessageBody.setClientID(clientID);
+        startingPointTakenMessage.setMessageBody(startingPointTakenMessageBody);
+        broadcastMessage(gson.toJson(startingPointTakenMessage));
+
+        // update current player to the next player
+        if (counter < clientHandlers.size()){
+            broadcastMessage(createCurrentPlayerMessage());
+        }else{
+            broadcastMessage(createActivePhaseMessage(2));
+        }
+
+
+    }
+
     //chat
     private void handleSendChat(MessageBody clientMessageBody) {
         String message = clientMessageBody.getMessage();
@@ -216,10 +251,10 @@ public class ClientHandler implements Runnable{
 
     //(7)
     // current player message
-    int counter = 0;
+    private static int counter = 0;
     private String createCurrentPlayerMessage(){
         int currentID = clientHandlers.get(counter).clientID;
-        counter++;
+        counter ++ ;
 
         Message currentPlayerMessage = new Message();
         currentPlayerMessage.setMessageType("CurrentPlayer");
@@ -227,6 +262,17 @@ public class ClientHandler implements Runnable{
         currentPlayerMessageBody.setClientID(currentID);
         currentPlayerMessage.setMessageBody(currentPlayerMessageBody);
         return gson.toJson(currentPlayerMessage);
+    }
+
+
+    private String createActivePhaseMessage (int phase){
+        Message ActivePhaseMessage = new Message();
+        ActivePhaseMessage.setMessageType("ActivePhase");
+        MessageBody ActivePhaseMessageBody = new MessageBody();
+        ActivePhaseMessageBody.setPhase(phase);
+        ActivePhaseMessage.setMessageBody(ActivePhaseMessageBody);
+        return gson.toJson(ActivePhaseMessage);
+
     }
 
     // broadcasting messages

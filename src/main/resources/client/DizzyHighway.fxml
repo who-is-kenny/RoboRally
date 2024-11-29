@@ -45,7 +45,7 @@
         <ImageView fx:id="gear2" fitHeight="40.0" fitWidth="40.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <Image url="@images/Gear.png" />
         </ImageView>
-        <ImageView fx:id="gear3" fitHeight="40.0" fitWidth="40.0" GridPane.rowIndex="3">
+        <ImageView fx:id="gear3" fitHeight="40.0" fitWidth="40.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
             <Image url="@images/Gear.png" />
         </ImageView>
         <ImageView fx:id="gear4" fitHeight="40.0" fitWidth="40.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
@@ -54,7 +54,7 @@
         <ImageView fx:id="gear5" fitHeight="40.0" fitWidth="40.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
             <Image url="@images/Gear.png" />
         </ImageView>
-        <ImageView fx:id="gear6" fitHeight="40.0" fitWidth="40.0" GridPane.rowIndex="6">
+        <ImageView fx:id="gear6" fitHeight="40.0" fitWidth="40.0" GridPane.columnIndex="0" GridPane.rowIndex="6">
             <Image url="@images/Gear.png" />
         </ImageView>
     </GridPane>

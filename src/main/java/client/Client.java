@@ -27,7 +27,21 @@ public class Client {
     private boolean mapSelected;
     private String selectedMap;
 
+    private int activePhase;
+    public int getActivePhase() {
+        return activePhase;
+    }
+    public void setActivePhase(int activePhase) {
+        this.activePhase = activePhase;
+    }
+
     private int currentPlayerID;
+    public int getCurrentPlayerID() {
+        return currentPlayerID;
+    }
+    public void setCurrentPlayerID(int currentPlayerID) {
+        this.currentPlayerID = currentPlayerID;
+    }
 
     //clientID getter and setter
     private int clientID = 0;
@@ -137,6 +151,8 @@ public class Client {
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
                                 String playerName = messageFromHandlerBody.getName();
                                 int ClientID = messageFromHandlerBody.getClientID();
+                                int RobotID =messageFromHandlerBody.getFigure();
+                                gameBoardController.addClientIDRobotID(ClientID,RobotID);
                                 clientController.addClientIDName(playerName,ClientID);
                                 // counts the number of clients to be compared later with number of ready players
                                 totalClients++;
@@ -176,6 +192,20 @@ public class Client {
                                 if(messageFromHandlerBody.getFrom() != clientID){
                                     clientController.addMessage(messageFromHandlerBody);
                                 }
+                                break;
+                            case "ActivePhase":
+                                activePhase = messageFromHandlerBody.getPhase();
+                                if(messageFromHandlerBody.getPhase() == 2){
+                                    gameBoardController.handleactivephase2();
+                                }
+                                System.out.println("active phase: " + activePhase);  //TODO remove print
+                                break;
+                            case "CurrentPlayer":
+                                currentPlayerID = messageFromHandlerBody.getClientID();
+                                System.out.println("currentplayer : " + currentPlayerID);  //TODO remove print
+                                break;
+                            case "StartingPointTaken":
+                                gameBoardController.handleStartingPointTaken(messageFromHandlerBody);
                                 break;
                         }
                     } catch (IOException e) {

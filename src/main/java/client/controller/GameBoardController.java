@@ -1,16 +1,25 @@
 package client.controller;
 
 import client.Client;
+import com.google.gson.Gson;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import server.message.Message;
+import server.message.MessageBody;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class GameBoardController implements Initializable {
+
+    private static final Gson gson = new Gson();
 
     @FXML
     private ImageView DizzyHighway;
@@ -47,14 +56,135 @@ public class GameBoardController implements Initializable {
         this.client = client;
     }
 
+    // stores client id and robot id for starting point selection.
+    private Map<Integer , Integer> ClientIDRobotID = new HashMap<>();
+
     public GameBoardController(){}
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        gear1.setOnMouseClicked(event -> handleGearClick(gear1));
+        gear2.setOnMouseClicked(event -> handleGearClick(gear2));
+        gear3.setOnMouseClicked(event -> handleGearClick(gear3));
+        gear4.setOnMouseClicked(event -> handleGearClick(gear4));
+        gear5.setOnMouseClicked(event -> handleGearClick(gear5));
+        gear6.setOnMouseClicked(event -> handleGearClick(gear6));
+    }
+
+    private void handleGearClick(ImageView gear) {
+        Integer row = GridPane.getRowIndex(gear);
+        Integer col = GridPane.getColumnIndex(gear);
+        // Handle null cases (default to 0 if no position is explicitly set)
+        row = (row == null) ? 0 : row;
+        col = (col == null) ? 0 : col;
+
+        System.out.println("Gear clicked at Row: " + row + ", Column: " + col);
+
+        // create set starting point message
+        Message setStartingPointMessage = new Message();
+        setStartingPointMessage.setMessageType("SetStartingPoint");
+        MessageBody setStartingPointMessageBody = new MessageBody();
+        setStartingPointMessageBody.setX(col);
+        setStartingPointMessageBody.setY(row);
+        setStartingPointMessage.setMessageBody(setStartingPointMessageBody);
+        // send message to client handler
+        if (client.getClientID() == client.getCurrentPlayerID() && client.getActivePhase() == 0){
+            System.out.println("sending coordinates to clienthandler");
+            client.sendToClientHandler(gson.toJson(setStartingPointMessage));
+        }
     }
 
 
+    public void handleStartingPointTaken(MessageBody messageFromHandlerBody) {
+        // Extract coordinates and client info from the message
+        int x = messageFromHandlerBody.getX();
+        int y = messageFromHandlerBody.getY();
+        int clientID = messageFromHandlerBody.getClientID();
+        String direction = messageFromHandlerBody.getDirection();
+
+        // Retrieve the robot ID for this client
+        Integer robotID = ClientIDRobotID.get(clientID);
+//        if (robotID == null) {
+//            System.err.println("No robot ID found for client ID: " + clientID);
+//        }
+
+        String resourcePath = "/client/images/robot" + robotID + ".PNG";
+        URL resourceUrl = getClass().getResource(resourcePath);
+
+        if (resourceUrl == null) {
+            System.err.println("Resource not found: " + resourcePath);
+            return;
+        }
+        System.out.println("Looking for resource: " + resourcePath);
+        System.out.println("Robot ID: " + robotID);
+        System.out.println("Client ID: " + clientID);
+
+        String robotImageFile = resourceUrl.toString();
+        ImageView robotImage = new ImageView(robotImageFile);
 
 
+
+
+        // Load the corresponding robot image
+
+
+//        String robotImageFile = Objects.requireNonNull(getClass().getResource("/client/images/robot" + robotID + ".PNG")).toString(); // Update with your file path
+//        ImageView robotImage = new ImageView(robotImageFile);
+
+        // Set the ID of the robot image to the client ID for future use
+        robotImage.setId(String.valueOf(clientID));
+
+        // Add any desired image properties
+        robotImage.setFitWidth(40); // Set width
+        robotImage.setFitHeight(40); // Set height
+        robotImage.setPreserveRatio(true);
+
+        //  TODO rotate the image based on direction if needed
+//        switch (direction.toLowerCase()) {
+//            case "right":
+//                robotImage.setRotate(90);
+//                break;
+//            case "left":
+//                robotImage.setRotate(270);
+//                break;
+//            case "down":
+//                robotImage.setRotate(180);
+//                break;
+//            default:
+//                // No rotation needed for "up"
+//                break;
+//        }
+
+        Platform.runLater(() -> {
+            // Update the grid with the robot image
+            for (ImageView gear : new ImageView[]{gear1, gear2, gear3, gear4, gear5, gear6}) {
+                if (GridPane.getRowIndex(gear) == y && GridPane.getColumnIndex(gear) == x) {
+                    game_grid.getChildren().remove(gear); // Remove the gear
+                    game_grid.add(robotImage, x, y); // Add robot image to the grid
+                    break;
+                }
+            }
+        });
+
+
+    }
+    //remove remaining gears when active phase = 2
+    public void handleactivephase2() {
+        Platform.runLater(() -> {
+            // Iterate through the grid and remove all the gear images
+            for (ImageView gear : new ImageView[]{gear1, gear2, gear3, gear4, gear5, gear6}) {
+                if (game_grid.getChildren().contains(gear)) {
+                    game_grid.getChildren().remove(gear); // Remove the gear
+                }
+            }
+            System.out.println("All remaining gears have been removed from the game board.");
+        });
+    }
+
+
+    public void addClientIDRobotID(int ClientID , int RobotID){
+        ClientIDRobotID.put(ClientID , RobotID);
+    }
 }
