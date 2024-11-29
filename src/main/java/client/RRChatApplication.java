@@ -33,6 +33,14 @@ public class RRChatApplication extends Application {
         client.setGameBoardController(gameBoardController);
         gameBoardController.setClient(client);
 
+        //creating register loader
+        FXMLLoader registerLoader = new FXMLLoader(RRChatApplication.class.getResource("RegisterCard.fxml"));
+        Parent registerRoot = registerLoader.load();
+        RegisterController registerController = registerLoader.getController();
+        client.setRegisterController(registerController);
+        registerController.setClient(client);
+
+
         //creating mainLoader
         FXMLLoader mainLoader = new FXMLLoader(RRChatApplication.class.getResource("Main.fxml"));
         Parent mainRoot = mainLoader.load();
@@ -40,6 +48,7 @@ public class RRChatApplication extends Application {
         mainController.setClient(client);
         mainController.setChatRoot(chatRoot);
         mainController.setGameBoardRoot(gameBoardRoot);
+        mainController.setRegisterRoot(registerRoot);
 
 
 

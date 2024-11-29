@@ -13,6 +13,9 @@ import java.util.ResourceBundle;
 
 
 public class MainController implements Initializable {
+
+    @FXML
+    private VBox registerContainer;
     @FXML
     private VBox gameBoardContainer;
     @FXML
@@ -42,5 +45,10 @@ public class MainController implements Initializable {
 
     public void setGameBoardRoot(Parent gameBoardRoot) {
         gameBoardContainer.getChildren().add(gameBoardRoot);  // Add the game board to the VBox
+    }
+
+    public void setRegisterRoot(Parent registerRoot){
+        registerContainer.getChildren().add(registerRoot);
+
     }
 }

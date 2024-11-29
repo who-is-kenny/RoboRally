@@ -167,7 +167,7 @@ public class RobotSelectionController implements Initializable {
 
     public void switchToChatScene(){
         Platform.runLater(()->{
-            Scene chatScene = new Scene(chatRoot, 600, 400);
+            Scene chatScene = new Scene(chatRoot, 850, 600);
             stage.setScene(chatScene);
 
         });

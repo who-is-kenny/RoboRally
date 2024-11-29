@@ -60,7 +60,14 @@ public class Client {
         this.gameBoardController = gameBoardController;
     }
 
-
+    // register controller getter and setter
+    private RegisterController registerController;
+    public RegisterController getRegisterController() {
+        return registerController;
+    }
+    public void setRegisterController(RegisterController registerController) {
+        this.registerController = registerController;
+    }
 
     public Client(Socket socket){
 
