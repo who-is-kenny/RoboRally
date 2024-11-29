@@ -1,0 +1,74 @@
+.pane {
+    -fx-background-color: #3e4147;
+    -fx-border-color: #292b2f;
+    -fx-border-width: 2px;
+    -fx-border-radius: 4px;
+}
+
+#selectedCard1, #selectedCard2, #selectedCard3, #selectedCard4, #selectedCard5 {
+    -fx-background-color: #2b6fa3;
+    -fx-border-color: #1f5078;
+}
+
+#card1, #card2, #card3, #card4, #card5, #card6, #card7, #card8, #card9 {
+    -fx-background-color: #d68f0e;
+    -fx-border-color: #b8730c;
+}
+
+#submitButton {
+    -fx-background-color: #3f9c35;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-radius: 4px;
+    -fx-border-color: #347c2b;
+}
+
+#submitButton {
+    -fx-background-color: #445c93; /* Steel blue */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 6px;
+    -fx-border-color: #354870;
+    -fx-padding: 8px 12px;
+}
+
+#submitButton:hover {
+    -fx-background-color: #354870; /* Darker blue on hover */
+}
+
+#resetButton {
+    -fx-background-color: #b04f4f; /* Muted red */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 6px;
+    -fx-border-color: #8a3c3c;
+    -fx-padding: 8px 12px;
+}
+
+#resetButton:hover {
+    -fx-background-color: #8a3c3c; /* Darker red on hover */
+}
+
+.hbox {
+    -fx-spacing: 12px;
+}
+
+.vbox {
+    -fx-spacing: 18px;
+}
+
+#timer {
+    -fx-background-color: #3e4147;
+    -fx-border-color: #292b2f;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
+
+#gameState {
+    -fx-background-color: #3e4147;
+    -fx-border-color: #292b2f;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+}
