@@ -183,6 +183,9 @@ public class ClientHandler implements Runnable{
             pmb.setPrivate(false);
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
+            broadcastMessage(createMovementMessage(1,6,6)); // TODO remove this test later
+            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
+
         }else{
             //create private message from server
             Message dm = new Message();
@@ -275,6 +278,30 @@ public class ClientHandler implements Runnable{
 
     }
 
+    // (8)
+    //movement
+    private String createMovementMessage(int ClientID , int x, int y){
+        Message MovementMessage = new Message();
+        MovementMessage.setMessageType("Movement");
+        MessageBody MovementMessageBody = new MessageBody();
+        MovementMessageBody.setClientID(ClientID);
+        MovementMessageBody.setX(x);
+        MovementMessageBody.setY(y);
+        MovementMessage.setMessageBody(MovementMessageBody);
+        return gson.toJson(MovementMessage);
+    }
+
+    //rotation
+    private String createRotationMessage(int ClientID , String rotation){
+        Message RotationMessage = new Message();
+        RotationMessage.setMessageType("PlayerTurning");
+        MessageBody RotationMessageBody = new MessageBody();
+        RotationMessageBody.setClientID(ClientID);
+        RotationMessageBody.setRotation(rotation);
+        RotationMessage.setMessageBody(RotationMessageBody);
+        return gson.toJson(RotationMessage);
+    }
+
     // broadcasting messages
     public static void broadcastMessage(String message){
         for (ClientHandler ch : clientHandlers){
@@ -290,8 +317,6 @@ public class ClientHandler implements Runnable{
             }
         }
     }
-
-
 
 
     //error message

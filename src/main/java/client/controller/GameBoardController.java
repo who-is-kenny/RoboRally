@@ -183,6 +183,71 @@ public class GameBoardController implements Initializable {
         });
     }
 
+    //move robot function
+    public void handleRobotMovement(MessageBody messageBody){
+        int new_x = messageBody.getX();
+        int new_y = messageBody.getY();
+        int clientID = messageBody.getClientID();
+
+        Platform.runLater(() -> {
+            // Find the robot image by its ID
+            ImageView robotImage = null;
+            for (javafx.scene.Node node : game_grid.getChildren()) {
+                if (node instanceof ImageView && clientID == Integer.parseInt(node.getId())) {
+                    robotImage = (ImageView) node;
+                    break;
+                }
+            }
+
+            if (robotImage != null) {
+                // Update the robot's position by setting new GridPane row and column constraints
+                GridPane.setColumnIndex(robotImage, new_x);
+                GridPane.setRowIndex(robotImage, new_y);
+                System.out.println("Robot for client ID " + clientID + " moved to (" + new_x + ", " + new_y + ")");
+            } else {
+                System.err.println("Robot for client ID " + clientID + " not found on the game board.");
+            }
+        });
+
+    }
+
+    public void handleRobotTurn(MessageBody messageBody){
+        int clientID = messageBody.getClientID();
+        String rotation = messageBody.getRotation();
+
+        Platform.runLater(() -> {
+            // Find the robot image by its ID
+            ImageView robotImage = null;
+            for (javafx.scene.Node node : game_grid.getChildren()) {
+                if (node instanceof ImageView && clientID == Integer.parseInt(node.getId())) {
+                    robotImage = (ImageView) node;
+                    break;
+                }
+            }
+
+            if (robotImage != null) {
+                // Adjust the rotation based on the message
+                double currentRotation = robotImage.getRotate(); // Get the current rotation angle
+                double newRotation;
+
+                if ("clockwise".equalsIgnoreCase(rotation)) {
+                    newRotation = currentRotation + 90; // Rotate 90 degrees clockwise
+                } else if ("counterclockwise".equalsIgnoreCase(rotation)) {
+                    newRotation = currentRotation - 90; // Rotate 90 degrees counterclockwise
+                } else {
+                    System.err.println("Invalid rotation direction: " + rotation);
+                    return;
+                }
+
+                // Set the new rotation value
+                robotImage.setRotate(newRotation);
+                System.out.println("Robot for client ID " + clientID + " turned " + rotation + " to angle: " + newRotation);
+            } else {
+                System.err.println("Robot for client ID " + clientID + " not found on the game board.");
+            }
+        });
+    }
+
 
     public void addClientIDRobotID(int ClientID , int RobotID){
         ClientIDRobotID.put(ClientID , RobotID);

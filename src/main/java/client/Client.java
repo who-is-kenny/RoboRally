@@ -207,6 +207,12 @@ public class Client {
                             case "StartingPointTaken":
                                 gameBoardController.handleStartingPointTaken(messageFromHandlerBody);
                                 break;
+                            case "Movement":
+                                gameBoardController.handleRobotMovement(messageFromHandlerBody);
+                                break;
+                            case "PlayerTurning":
+                                gameBoardController.handleRobotTurn(messageFromHandlerBody);
+                                break;
                         }
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");
