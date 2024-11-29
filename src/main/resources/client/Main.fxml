@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<?import javafx.scene.layout.VBox?>
+<SplitPane dividerPositions="0.7035175879396985" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.MainController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+         <children>
+            <SplitPane dividerPositions="0.6808035714285714" prefHeight="418.0" prefWidth="848.0">
+              <items>
+<!--                  <fx:include source="DizzyHighway.fxml" />-->
+<!--                  <fx:include source="clientview.fxml" />-->
+                  <VBox fx:id="gameBoardContainer">
+                      <!-- This is the area for your chat UI components -->
+                  </VBox>
+
+                  <!-- Right side for Game Board -->
+                  <VBox fx:id="chatContainer">
+                  </VBox>
+              </items>
+            </SplitPane>
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="900.0" />
+  </items>
+</SplitPane>

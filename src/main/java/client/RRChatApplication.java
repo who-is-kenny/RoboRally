@@ -17,6 +17,8 @@ public class RRChatApplication extends Application {
         Client client = new Client(socket);
         System.out.println("connected to server");
 
+
+
         // creating chatloader
         FXMLLoader chatLoader = new FXMLLoader(RRChatApplication.class.getResource("clientview.fxml"));
         Parent chatRoot = chatLoader.load();
@@ -31,22 +33,23 @@ public class RRChatApplication extends Application {
         client.setGameBoardController(gameBoardController);
         gameBoardController.setClient(client);
 
+        //creating mainLoader
+        FXMLLoader mainLoader = new FXMLLoader(RRChatApplication.class.getResource("Main.fxml"));
+        Parent mainRoot = mainLoader.load();
+        MainController mainController = mainLoader.getController();
+        mainController.setClient(client);
+        mainController.setChatRoot(chatRoot);
+        mainController.setGameBoardRoot(gameBoardRoot);
+
 
 
         //creating robotselectionLoader
         FXMLLoader robotSelectionLoader = new FXMLLoader(RRChatApplication.class.getResource("chooserobot.fxml"));
-
         Parent root = robotSelectionLoader.load();
-
-// Retrieve the controller instance created by FXMLLoader
         RobotSelectionController robotSelectionController = robotSelectionLoader.getController();
-
-// Pass the client to the controller
-        robotSelectionController.setClient(client); // Add a `setClient` method to RobotSelectionController
+        robotSelectionController.setClient(client);
         robotSelectionController.setStage(stage);
-        //pass chat root to chat controller to be called later when switching scenes
-        robotSelectionController.setChatRoot(gameBoardRoot);     // TODO was chat root before
-// Save the controller in the client for later use
+        robotSelectionController.setChatRoot(mainRoot);     // TODO was chat root before
         client.setRobotSelectionController(robotSelectionController);
 
 

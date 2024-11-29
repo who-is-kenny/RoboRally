@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ClientController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="380.0" prefWidth="330.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ClientController">
    <center>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -21,12 +21,12 @@
             </Label>
             <ScrollPane fx:id="sp_message" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                <content>
-                  <VBox fx:id="vbox_message" prefHeight="341.0" prefWidth="584.0" />
+                  <VBox fx:id="vbox_message" prefHeight="340.0" prefWidth="327.0" />
                </content>
             </ScrollPane>
             <HBox prefHeight="27.0" prefWidth="600.0" spacing="10.0">
                <children>
-                  <ChoiceBox fx:id="name_dropdown" prefWidth="150.0" />
+                  <ChoiceBox fx:id="name_dropdown" prefHeight="25.0" prefWidth="102.0" />
                   <TextField fx:id="text_input" promptText="type message" HBox.hgrow="ALWAYS" />
                   <Button fx:id="button_send" mnemonicParsing="false" onAction="#sendMessage" text="Button" />
                </children>
