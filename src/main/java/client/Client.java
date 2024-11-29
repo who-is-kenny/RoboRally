@@ -1,6 +1,10 @@
 package client;
 
 
+import client.controller.ClientController;
+import client.controller.GameBoardController;
+import client.controller.RegisterController;
+import client.controller.RobotSelectionController;
 import com.google.gson.Gson;
 import server.message.Message;
 import server.message.MessageBody;
@@ -9,7 +13,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public class Client {
@@ -23,6 +26,8 @@ public class Client {
     private List<Integer> readyClientIDs = new ArrayList<>();
     private boolean mapSelected;
     private String selectedMap;
+
+    private int currentPlayerID;
 
     //clientID getter and setter
     private int clientID = 0;

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="200.0" prefWidth="850.0" stylesheets="@style/RegisterCard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.RegisterController">
+<VBox prefHeight="200.0" prefWidth="850.0" stylesheets="@style/RegisterCard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.RegisterController">
     <!-- Top Row (Selected Cards) -->
     <HBox alignment="TOP_LEFT" prefHeight="150.0" prefWidth="900.0" spacing="10.0">
         <Pane prefHeight="200.0" prefWidth="220.0" HBox.hgrow="NEVER" />

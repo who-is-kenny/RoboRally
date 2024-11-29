@@ -1,5 +1,6 @@
-package client;
+package client.controller;
 
+import client.Client;
 import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;

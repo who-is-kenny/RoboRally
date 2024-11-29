@@ -1,5 +1,6 @@
-package client;
+package client.controller;
 
+import client.Client;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.ImageView;

@@ -6,7 +6,11 @@ module com.example.roborally {
 
 
     opens client to javafx.fxml;
-    opens server to com.google.gson; // updated this
+    // updated this
     exports client;
     opens server.message to com.google.gson;
+    exports server;
+    opens server to com.google.gson, javafx.fxml;
+    exports client.controller;
+    opens client.controller to javafx.fxml;
 }

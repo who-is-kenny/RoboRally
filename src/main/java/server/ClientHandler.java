@@ -1,4 +1,4 @@
-package client;
+package server;
 
 import com.google.gson.Gson;
 import server.message.Message;
@@ -27,6 +27,7 @@ public class ClientHandler implements Runnable{
     private int robotID = -1;
     private boolean isReady;
     static List<String> availableMaps = List.of("Dizzy Highway");
+    private String selectedMap;
 
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
@@ -111,13 +112,15 @@ public class ClientHandler implements Runnable{
                         handleSetStatus(clientMessageBody);
                         break;
                     case "MapSelected":
+                        selectedMap = clientMessageBody.getMap();
+                        // sends client message to other clients
                         broadcastMessage(clientInput);
+                        // sends currentplayer message to start selection
+                        broadcastMessage(createCurrentPlayerMessage());
                         break;
                     case "SendChat":
                         handleSendChat(clientMessageBody);
                         break;
-
-
 
                 }
             }
@@ -209,6 +212,21 @@ public class ClientHandler implements Runnable{
         playerAddedMessageBody.setFigure(robotID);
         playerAddedMessage.setMessageBody(playerAddedMessageBody);
         return gson.toJson(playerAddedMessage);
+    }
+
+    //(7)
+    // current player message
+    int counter = 0;
+    private String createCurrentPlayerMessage(){
+        int currentID = clientHandlers.get(counter).clientID;
+        counter++;
+
+        Message currentPlayerMessage = new Message();
+        currentPlayerMessage.setMessageType("CurrentPlayer");
+        MessageBody currentPlayerMessageBody = new MessageBody();
+        currentPlayerMessageBody.setClientID(currentID);
+        currentPlayerMessage.setMessageBody(currentPlayerMessageBody);
+        return gson.toJson(currentPlayerMessage);
     }
 
     // broadcasting messages
