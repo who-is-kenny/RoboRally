@@ -6,6 +6,7 @@ import client.controller.GameBoardController;
 import client.controller.RegisterController;
 import client.controller.RobotSelectionController;
 import com.google.gson.Gson;
+import javafx.scene.paint.Color;
 import server.message.Message;
 import server.message.MessageBody;
 
@@ -218,6 +219,12 @@ public class Client {
                                 if(clientID == messageFromHandlerBody.getClientID()){
                                     gameBoardController.sendRebootPopup();
                                 }
+                                break;
+                            case "Energy":
+                                gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.ORANGE,1.0);
+                                break;
+                            case "CheckPointReached":
+                                gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.YELLOW,1.0);
                                 break;
                         }
                     } catch (IOException e) {

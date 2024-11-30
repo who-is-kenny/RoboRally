@@ -2,13 +2,17 @@ package client.controller;
 
 import client.Client;
 import com.google.gson.Gson;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import server.message.Message;
 import server.message.MessageBody;
 
@@ -293,6 +297,29 @@ public class GameBoardController implements Initializable {
 
                 client.sendToClientHandler(gson.toJson(rebootMessage));
             });
+        });
+    }
+
+    public void applyGlowToRobot(int clientID, Color glowColor, double durationInSeconds) {
+        Platform.runLater(() -> {
+            // Find the robot image by its ID
+            ImageView robotImage = (ImageView) game_grid.getChildren().stream().filter(node -> node instanceof ImageView && clientID == Integer.parseInt(node.getId())).findFirst().orElse(null);
+
+            if (robotImage != null) {
+                // Create a DropShadow for the glow effect
+                DropShadow glowEffect = new DropShadow();
+                glowEffect.setColor(glowColor);    // Set the glow color
+                glowEffect.setRadius(20);         // Set the glow radius
+                glowEffect.setSpread(0.6);        // Set intensity of the glow
+                robotImage.setEffect(glowEffect); // Apply the effect to the robot
+
+                // Use PauseTransition to remove the glow after the specified duration
+                PauseTransition pause = new PauseTransition(Duration.seconds(durationInSeconds));
+                pause.setOnFinished(event -> robotImage.setEffect(null)); // Remove glow
+                pause.play();
+            } else {
+                System.err.println("Robot for client ID " + clientID + " not found on the game board.");
+            }
         });
     }
 

@@ -206,8 +206,8 @@ public class ClientHandler implements Runnable{
             broadcastMessage(gson.toJson(pm));
             broadcastMessage(createMovementMessage(1,6,6)); // TODO remove this test later
 //            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
-            broadcastMessage(createRebootMessage(2));
-            broadcastMessage(createMovementMessage(2,9,9));
+//            broadcastMessage(createRebootMessage(2));
+            broadcastMessage(createCheckPointMessage(2,1));
 
 
         }else{
