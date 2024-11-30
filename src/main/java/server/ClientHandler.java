@@ -278,7 +278,7 @@ public class ClientHandler implements Runnable{
 
     }
 
-    // (8)
+    // (8) //TODO use these methods in game logic
     //movement
     private String createMovementMessage(int ClientID , int x, int y){
         Message MovementMessage = new Message();
@@ -301,6 +301,58 @@ public class ClientHandler implements Runnable{
         RotationMessage.setMessageBody(RotationMessageBody);
         return gson.toJson(RotationMessage);
     }
+    // animation
+    private String createAnimationMessage (String animationType){
+        Message animationMessage = new Message();
+        animationMessage.setMessageType("Animation");
+        MessageBody animationMessageBody = new MessageBody();
+        animationMessageBody.setType(animationType);
+        animationMessage.setMessageBody(animationMessageBody);
+        return gson.toJson(animationMessage);
+    }
+    // reboot
+    private String createRobootMessage (int ClientID){
+        Message rebootMessage = new Message();
+        rebootMessage.setMessageType("Reboot");
+        MessageBody rebootMessageBody = new MessageBody();
+        rebootMessageBody.setClientID(ClientID);
+        rebootMessage.setMessageBody(rebootMessageBody);
+        return gson.toJson(rebootMessage);
+    }
+    // energy
+    private String createEnergyMessage (int ClientID, int count, String source){
+        Message energyMessage = new Message();
+        energyMessage.setMessageType("Energy");
+        MessageBody energyMessageBody = new MessageBody();
+        energyMessageBody.setClientID(ClientID);
+        energyMessageBody.setCount(count);
+        energyMessageBody.setSource(source);
+        energyMessage.setMessageBody(energyMessageBody);
+        return gson.toJson(energyMessage);
+    }
+
+    // checkpoint reached
+    private String createCheckPointMessage(int ClientID, int number){
+        Message checkPointMessage = new Message();
+        checkPointMessage.setMessageType("CheckPointReached");
+        MessageBody checkPointMessageBody = new MessageBody();
+        checkPointMessageBody.setClientID(ClientID);
+        checkPointMessageBody.setNumber(number);
+        checkPointMessage.setMessageBody(checkPointMessageBody);
+        return gson.toJson(checkPointMessage);
+    }
+
+    // game over
+    private String createGameOverMessage (int ClientID){
+        Message gameOverMessage = new Message();
+        gameOverMessage.setMessageType("GameFinished");
+        MessageBody gameOverMessageBody = new MessageBody();
+        gameOverMessageBody.setClientID(ClientID);
+        gameOverMessage.setMessageBody(gameOverMessageBody);
+        return gson.toJson(gameOverMessage);
+    }
+
+
 
     // broadcasting messages
     public static void broadcastMessage(String message){
