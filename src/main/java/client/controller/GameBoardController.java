@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -12,10 +13,7 @@ import server.message.Message;
 import server.message.MessageBody;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class GameBoardController implements Initializable {
 
@@ -156,6 +154,8 @@ public class GameBoardController implements Initializable {
 //                // No rotation needed for "up"
 //                break;
 //        }
+        //TODO change this to else if when there are more maps
+        robotImage.setRotate(90);
 
         Platform.runLater(() -> {
             // Update the grid with the robot image
@@ -211,6 +211,7 @@ public class GameBoardController implements Initializable {
 
     }
 
+    // robot turn function
     public void handleRobotTurn(MessageBody messageBody){
         int clientID = messageBody.getClientID();
         String rotation = messageBody.getRotation();
@@ -248,8 +249,58 @@ public class GameBoardController implements Initializable {
         });
     }
 
+    // robot reboot
+    public void handleReboot(MessageBody messageFromHandlerBody){
+        Platform.runLater(() -> {
+
+            // reset robot direction back to default
+            ImageView robotImage = null;
+            for (javafx.scene.Node node : game_grid.getChildren()) {
+                if (node instanceof ImageView && messageFromHandlerBody.getClientID() == Integer.parseInt(node.getId())) {
+                    robotImage = (ImageView) node;
+                    break;
+                }
+            }
+            assert robotImage != null;
+            robotImage.setRotate(0);
+        });
+    }
+    // pop up for rebooting client
+    public void sendRebootPopup() {
+        Platform.runLater(() -> {
+            // Define the reboot direction options
+            String[] directions = {"Up", "Down", "Left", "Right"};
+
+            // Create a ChoiceDialog with the options
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(directions[0], directions);
+            dialog.setTitle("Reboot Direction");
+            dialog.setHeaderText("Reboot Required!");
+            dialog.setContentText("Choose a direction to reboot:");
+
+            // Show the dialog and wait for user input
+            Optional<String> result = dialog.showAndWait();
+
+            // Handle the user's choice
+            result.ifPresent(chosenDirection -> {
+                System.out.println("User chose to reboot in the direction: " + chosenDirection);
+
+                // Send the chosen direction back to the server
+                Message rebootMessage = new Message();
+                rebootMessage.setMessageType("RebootDirection");
+                MessageBody rebootMessageBody = new MessageBody();
+                rebootMessageBody.setDirection(chosenDirection);
+                rebootMessage.setMessageBody(rebootMessageBody);
+
+                client.sendToClientHandler(gson.toJson(rebootMessage));
+            });
+        });
+    }
+
+
 
     public void addClientIDRobotID(int ClientID , int RobotID){
         ClientIDRobotID.put(ClientID , RobotID);
     }
+
+
 }

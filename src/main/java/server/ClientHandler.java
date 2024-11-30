@@ -129,6 +129,27 @@ public class ClientHandler implements Runnable{
                     case "SetStartingPoint":
                         handleSetStartingPoint(clientMessageBody);
                         break;
+                    case "RebootDirection":
+                        String direction = clientMessageBody.getDirection();
+                        switch (direction){
+                            case "Right":
+                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
+                                break;
+                            case "Left":
+                                broadcastMessage(createRotationMessage(clientID, "counterclockwise"));
+                                break;
+                            case "Up":
+                                break;
+                            case "Down":
+                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
+                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
+                                break;
+                            default:
+                                System.out.println("direction invalid for reboot");
+                        }
+                        // TODO send robot move message so that robot moves to reboot square
+                        // TODO send rotate message based on direction of choice sent by user in this switch case. ( access through client message body)
+                        break;
 
                 }
             }
@@ -184,7 +205,10 @@ public class ClientHandler implements Runnable{
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
             broadcastMessage(createMovementMessage(1,6,6)); // TODO remove this test later
-            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
+//            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
+            broadcastMessage(createRebootMessage(2));
+            broadcastMessage(createMovementMessage(2,9,9));
+
 
         }else{
             //create private message from server
@@ -311,7 +335,7 @@ public class ClientHandler implements Runnable{
         return gson.toJson(animationMessage);
     }
     // reboot
-    private String createRobootMessage (int ClientID){
+    private String createRebootMessage (int ClientID){
         Message rebootMessage = new Message();
         rebootMessage.setMessageType("Reboot");
         MessageBody rebootMessageBody = new MessageBody();

@@ -213,6 +213,12 @@ public class Client {
                             case "PlayerTurning":
                                 gameBoardController.handleRobotTurn(messageFromHandlerBody);
                                 break;
+                            case "Reboot":
+                                gameBoardController.handleReboot(messageFromHandlerBody);
+                                if(clientID == messageFromHandlerBody.getClientID()){
+                                    gameBoardController.sendRebootPopup();
+                                }
+                                break;
                         }
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");
