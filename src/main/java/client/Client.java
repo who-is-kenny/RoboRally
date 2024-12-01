@@ -148,6 +148,9 @@ public class Client {
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
                         switch (messageFromHandler.getMessageType()){
+                            case "Alive":
+                                sendAliveResponse();
+                                break;
                             case "PlayerAdded":
                                 robotSelectionController.handlePlayerAdded(messageFromHandlerBody , clientID);
                                 String playerName = messageFromHandlerBody.getName();
@@ -236,6 +239,14 @@ public class Client {
                 }
             }
         }).start();
+    }
+
+    private void sendAliveResponse() {
+        Message aliveMessage = new Message();
+        aliveMessage.setMessageType("Alive");
+        aliveMessage.setMessageBody(new MessageBody());
+        out.println(gson.toJson(aliveMessage));
+        System.out.println("Sent 'Alive' response to handler.");    // TODO remove print
     }
 
     public void closeClient(){   //Socket socket, PrintWriter out, BufferedReader in

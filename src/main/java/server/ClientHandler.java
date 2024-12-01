@@ -6,9 +6,23 @@ import server.message.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ClientHandler implements Runnable{
+
+    //connection
+    private volatile boolean running = true;
+    private static final long PING_INTERVAL = 5000; // 5 seconds
+    private static final long PING_TIMEOUT = 5000; // 5 seconds to wait for response
+
+    // To store the time of the last "Alive" response from each client
+    private Map<Integer, Long> lastAliveResponseTime = new HashMap<>();
+
+
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
@@ -26,7 +40,7 @@ public class ClientHandler implements Runnable{
     private final int clientID;
     private int robotID = -1;
     private boolean isReady;
-    static List<String> availableMaps = List.of("Dizzy Highway");
+    static List<String> availableMaps = List.of("DizzyHighway");
     private String selectedMap;
     private int startingPointX;
     private int startingPointY;
@@ -101,12 +115,18 @@ public class ClientHandler implements Runnable{
 
             System.out.println("waiting for client messages");
 
+            startAlivePingThread();
+
             // receiving messages
             while(socket.isConnected()) {
                 String clientInput = in.readLine();
                 Message clientMessage = gson.fromJson(clientInput , Message.class);
                 MessageBody clientMessageBody = clientMessage.getMessageBody();
                 switch (clientMessage.getMessageType()){
+                    case "Alive":
+                        lastAliveResponseTime.replace(clientID, System.currentTimeMillis());
+                        System.out.println("Received 'Alive' response from client " + clientID);
+                        break;
                     case "PlayerValue":
                         handlePlayerValue(clientMessageBody);
                         broadcastMessage(createPlayerAddedMessage());
@@ -116,8 +136,10 @@ public class ClientHandler implements Runnable{
                         break;
                     case "MapSelected":
                         selectedMap = clientMessageBody.getMap();
+                        System.out.println(selectedMap);
                         // sends client message to other clients
                         broadcastMessage(clientInput);
+//                        broadcastMessage(readJsonFile()); // TODO enable when fixed function
                         // initiates first phase
                         broadcastMessage(createActivePhaseMessage(0));
                         // sends currentplayer message to start selection
@@ -251,6 +273,29 @@ public class ClientHandler implements Runnable{
         selectMapMessageBody.setAvailableMaps(availableMaps);
         selectMapMessage.setMessageBody(selectMapMessageBody);
         return gson.toJson(selectMapMessage);
+    }
+
+
+    //todo fix this
+    private String readTextFile(String fileName) {
+        // Adjust the file path to point to your .txt directory
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("client/json/" + fileName + ".json");
+        if (inputStream == null) {
+            System.out.println("File not found: " + fileName);
+            return null;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            StringBuilder fileContent = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                fileContent.append(line).append("\n");
+            }
+            return fileContent.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -405,10 +450,46 @@ public class ClientHandler implements Runnable{
         out.println(gson.toJson(errorMessage));
     }
 
+    private void startAlivePingThread() {
+        // This thread will send an "Alive" message every 5 seconds
+        new Thread(() -> {
+            while (running && socket.isConnected()) {
+                try {
+                    sendAlivePing();
+                    checkForClientTimeout();
+                    Thread.sleep(PING_INTERVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    closeEverything();
+                }
+            }
+            System.out.println("Ping thread stopped for client " + clientID);
+        }).start();
+    }
 
+    private void sendAlivePing() {
+        // Send an "Alive" message to the client
+        Message aliveMessage = new Message();
+        aliveMessage.setMessageType("Alive");
+        aliveMessage.setMessageBody(new MessageBody());
+        out.println(gson.toJson(aliveMessage));
+        System.out.println("Sent 'Alive' message to client " + clientID);
+    }
+
+    private void checkForClientTimeout() {
+        // Check if the client has failed to respond to the last "Alive" message within the timeout period
+        if (lastAliveResponseTime.containsKey(clientID)) {
+            long lastResponseTime = lastAliveResponseTime.get(clientID);
+            if (System.currentTimeMillis() - lastResponseTime > PING_TIMEOUT) {
+                System.out.println("Client " + clientID + " timed out. Disconnecting.");
+                closeEverything();
+            }
+        }
+    }
 
 
     public void closeEverything(){
+        running = false;
         out.println("closing client handler");
         clientHandlers.remove(this);
         try {
