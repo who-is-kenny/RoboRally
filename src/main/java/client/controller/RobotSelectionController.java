@@ -45,6 +45,8 @@ public class RobotSelectionController implements Initializable {
     @FXML
     private ToggleButton ready_button;
     @FXML
+    private RadioButton robot_0;
+    @FXML
     private RadioButton robot_1;
     @FXML
     private RadioButton robot_2;
@@ -52,8 +54,6 @@ public class RobotSelectionController implements Initializable {
     private RadioButton robot_3;
     @FXML
     private RadioButton robot_4;
-    @FXML
-    private RadioButton robot_6;
     @FXML
     private RadioButton robot_5;
 
@@ -158,12 +158,12 @@ public class RobotSelectionController implements Initializable {
     }
 
     public void disableChosenRobot(int robotID){
+        if (Integer.parseInt(robot_0.getId()) == robotID) robot_0.setDisable(true);
         if (Integer.parseInt(robot_1.getId()) == robotID) robot_1.setDisable(true);
         if (Integer.parseInt(robot_2.getId()) == robotID) robot_2.setDisable(true);
         if (Integer.parseInt(robot_3.getId()) == robotID) robot_3.setDisable(true);
         if (Integer.parseInt(robot_4.getId()) == robotID) robot_4.setDisable(true);
         if (Integer.parseInt(robot_5.getId()) == robotID) robot_5.setDisable(true);
-        if (Integer.parseInt(robot_6.getId()) == robotID) robot_6.setDisable(true);
     }
 
     public void switchToChatScene(){

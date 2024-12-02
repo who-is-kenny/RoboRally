@@ -191,6 +191,10 @@ public class Client {
                             case "MapSelected":
                                 mapSelected = true;
                                 selectedMap = messageFromHandlerBody.getMap();
+                                if (mapSelected && readyClientIDs.size() == totalClients) {
+                                    robotSelectionController.switchToChatScene();
+                                    clientController.updateClientList();
+                                }
                                 break;
                             case "ReceivedChat":
                                 if(messageFromHandlerBody.getFrom() != clientID){

@@ -6,6 +6,7 @@ import server.message.MessageBody;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -139,7 +140,7 @@ public class ClientHandler implements Runnable{
                         System.out.println(selectedMap);
                         // sends client message to other clients
                         broadcastMessage(clientInput);
-//                        broadcastMessage(readJsonFile()); // TODO enable when fixed function
+//                        broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
                         // initiates first phase
                         broadcastMessage(createActivePhaseMessage(0));
                         // sends currentplayer message to start selection
@@ -204,6 +205,8 @@ public class ClientHandler implements Runnable{
         if (counter < clientHandlers.size()){
             broadcastMessage(createCurrentPlayerMessage());
         }else{
+            // swtich to next phase
+            // TODO maybe game loop starts here
             broadcastMessage(createActivePhaseMessage(2));
         }
 
@@ -277,9 +280,14 @@ public class ClientHandler implements Runnable{
 
 
     //todo fix this
-    private String readTextFile(String fileName) {
-        // Adjust the file path to point to your .txt directory
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("client/json/" + fileName + ".json");
+    private String readJsonFile(String fileName) {
+        URL fileUrl = getClass().getClassLoader().getResource("client/json/" + fileName + ".json");
+        if (fileUrl == null) {
+            System.out.println("File not found at: client/json/" + fileName + ".json");
+            return null;
+        }
+
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("client/json/" + fileName + ".json");
         if (inputStream == null) {
             System.out.println("File not found: " + fileName);
             return null;

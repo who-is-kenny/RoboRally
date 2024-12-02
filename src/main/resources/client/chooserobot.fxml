@@ -12,16 +12,16 @@
    <children>
       <TextField fx:id="player_name" layoutX="24.0" layoutY="316.0" promptText="enter name" />
       <Button fx:id="confirm_robot" disable="true" layoutX="229.0" layoutY="316.0" mnemonicParsing="false" onAction="#confirmRobot" text="confirm" />
-      <RadioButton id="1" fx:id="robot_1" layoutX="58.0" layoutY="147.0" mnemonicParsing="false" text="bot 1">
+      <RadioButton id="0" fx:id="robot_0" layoutX="58.0" layoutY="147.0" mnemonicParsing="false" text="bot 0">
          <toggleGroup>
             <ToggleGroup fx:id="robots" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton id="2" fx:id="robot_2" layoutX="257.0" layoutY="147.0" mnemonicParsing="false" text="bot 2" toggleGroup="$robots" />
-      <RadioButton id="3" fx:id="robot_3" layoutX="453.0" layoutY="147.0" mnemonicParsing="false" text="bot 3" toggleGroup="$robots" />
-      <RadioButton id="4" fx:id="robot_4" layoutX="58.0" layoutY="282.0" mnemonicParsing="false" text="bot 4" toggleGroup="$robots" />
-      <RadioButton id="5" fx:id="robot_5" layoutX="257.0" layoutY="282.0" mnemonicParsing="false" text="bot 5" toggleGroup="$robots" />
-      <RadioButton id="6" fx:id="robot_6" layoutX="453.0" layoutY="282.0" mnemonicParsing="false" text="bot 6" toggleGroup="$robots" />
+      <RadioButton id="1" fx:id="robot_1" layoutX="257.0" layoutY="147.0" mnemonicParsing="false" text="bot 1" toggleGroup="$robots" />
+      <RadioButton id="2" fx:id="robot_2" layoutX="453.0" layoutY="147.0" mnemonicParsing="false" text="bot 2" toggleGroup="$robots" />
+      <RadioButton id="3" fx:id="robot_3" layoutX="58.0" layoutY="282.0" mnemonicParsing="false" text="bot 3" toggleGroup="$robots" />
+      <RadioButton id="4" fx:id="robot_4" layoutX="257.0" layoutY="282.0" mnemonicParsing="false" text="bot 4" toggleGroup="$robots" />
+      <RadioButton id="5" fx:id="robot_5" layoutX="453.0" layoutY="282.0" mnemonicParsing="false" text="bot 5" toggleGroup="$robots" />
       <ToggleButton fx:id="ready_button" disable="true" layoutX="99.0" layoutY="355.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
          <toggleGroup>
             <ToggleGroup fx:id="ready" />
