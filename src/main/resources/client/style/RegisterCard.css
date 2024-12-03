@@ -1,74 +1,82 @@
 .pane {
-    -fx-background-color: #3e4147;
-    -fx-border-color: #292b2f;
+    -fx-background-color: #1a1a1a;
+    -fx-border-color: #ffcc00;
     -fx-border-width: 2px;
-    -fx-border-radius: 4px;
+    -fx-border-radius: 6px;
 }
 
 #selectedCard1, #selectedCard2, #selectedCard3, #selectedCard4, #selectedCard5 {
-    -fx-background-color: #2b6fa3;
-    -fx-border-color: #1f5078;
-}
-
-#card1, #card2, #card3, #card4, #card5, #card6, #card7, #card8, #card9 {
-    -fx-background-color: #d68f0e;
-    -fx-border-color: #b8730c;
-}
-
-#submitButton {
-    -fx-background-color: #3f9c35;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-border-radius: 4px;
-    -fx-border-color: #347c2b;
-}
-
-#submitButton {
-    -fx-background-color: #445c93; /* Steel blue */
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-border-radius: 6px;
-    -fx-border-color: #354870;
-    -fx-padding: 8px 12px;
-}
-
-#submitButton:hover {
-    -fx-background-color: #354870; /* Darker blue on hover */
-}
-
-#resetButton {
-    -fx-background-color: #b04f4f; /* Muted red */
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-border-radius: 6px;
-    -fx-border-color: #8a3c3c;
-    -fx-padding: 8px 12px;
-}
-
-#resetButton:hover {
-    -fx-background-color: #8a3c3c; /* Darker red on hover */
-}
-
-.hbox {
-    -fx-spacing: 12px;
-}
-
-.vbox {
-    -fx-spacing: 18px;
-}
-
-#timer {
-    -fx-background-color: #3e4147;
-    -fx-border-color: #292b2f;
+    -fx-background-color: #ffcc00;
+    -fx-border-color: #ffcc00;
     -fx-border-width: 2px;
-    -fx-border-radius: 5px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+#selectedCard1:hover, #selectedCard2:hover, #selectedCard3:hover, #selectedCard4:hover, #selectedCard5:hover {
+    -fx-background-color: #ffdd33;
+    -fx-cursor: hand;
 }
 
 #gameState {
-    -fx-background-color: #3e4147;
-    -fx-border-color: #292b2f;
+    -fx-background-color: #d90000;
+    -fx-border-color: #d90000;
     -fx-border-width: 2px;
-    -fx-border-radius: 5px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+#timer {
+    -fx-background-color: #0051a1;
+    -fx-border-color: #0051a1;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+#card1, #card2, #card3, #card4, #card5, #card6, #card7, #card8, #card9 {
+    -fx-background-color: #800080;
+    -fx-border-color: #800080;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+#card1:hover, #card2:hover, #card3:hover, #card4:hover, #card5:hover,
+#card6:hover, #card7:hover, #card8:hover, #card9:hover {
+    -fx-background-color: #4b0082;
+    -fx-cursor: hand;
+}
+
+#submitButton, #resetButton {
+    -fx-background-color: #d90000;
+    -fx-border-color: #d90000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+#submitButton:hover, #resetButton:hover {
+    -fx-background-color: #aa0000;
+    -fx-cursor: hand;
+}
+
+.hbox, .vbox {
+    -fx-spacing: 0;
+    -fx-padding: 0;
 }

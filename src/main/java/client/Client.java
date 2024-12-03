@@ -201,6 +201,15 @@ public class Client {
                                     clientController.addMessage(messageFromHandlerBody);
                                 }
                                 break;
+                            case "YourCards":
+                                List<String> cardsInHand = messageFromHandlerBody.getCardsInHand();
+                                registerController.handleYourCards(cardsInHand);
+                                break;
+                            case "StartTimer":
+                                if (registerController != null) {
+                                    registerController.startTimer(30);
+                                }
+                                break;
                             case "ActivePhase":
                                 activePhase = messageFromHandlerBody.getPhase();
                                 if(messageFromHandlerBody.getPhase() == 2){
