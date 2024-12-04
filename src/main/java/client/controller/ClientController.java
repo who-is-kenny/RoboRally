@@ -2,6 +2,7 @@ package client.controller;
 
 import client.Client;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -16,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import server.message.Message;
 import server.message.MessageBody;
+import server.message.MessageSerializer;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -51,7 +53,9 @@ public class ClientController implements Initializable {
         this.clientIdName = clientIdName;
     }
 
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
+
+//    private static final Gson gson = new Gson();
 
     public ClientController() {
 

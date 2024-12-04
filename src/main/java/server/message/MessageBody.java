@@ -17,6 +17,7 @@ public class MessageBody {
     private boolean ready;
     private String map;
     private List<String> availableMaps;
+
     // extra attributes (3)
     //current player status used when new client connects
     private Map<Integer, Boolean> currentPlayerStatuses;
@@ -43,6 +44,27 @@ public class MessageBody {
         this.selectedRobots = selectedRobots;
     }
 
+
+    // for long gameboard message:
+    private Integer energy;
+    private List<List<List<Tile>>> gameMap;
+
+    public Integer getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(Integer energy) {
+        this.energy = energy;
+    }
+
+    public List<List<List<Tile>>> getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(List<List<List<Tile>>> gameMap) {
+        this.gameMap = gameMap;
+    }
+
     // chatnachrichten (4)
     private String message;
     private int to;
@@ -63,7 +85,7 @@ public class MessageBody {
     private int y;
     private String direction;
     // Programmierphase (7.3)
-    private List<String> cardsInHand;
+    private Object cardsInHand;
     private int register;
     private boolean filled;
     private List<Integer> clientIDs;
@@ -267,11 +289,21 @@ public class MessageBody {
 
     // Programmierphase (7.3)
 
-    public List<String> getCardsInHand() {
-        return cardsInHand;
+    public List<String> getCardsInHandAsList() {
+        if (cardsInHand instanceof List<?>) {
+            return (List<String>) cardsInHand;
+        }
+        return null;
     }
 
-    public void setCardsInHand(List<String> cardsInHand) {
+    public Integer getCardsInHandAsInteger() {
+        if (cardsInHand instanceof Integer) {
+            return (Integer) cardsInHand;
+        }
+        return null;
+    }
+
+    public void setCardsInHand(Object cardsInHand) {
         this.cardsInHand = cardsInHand;
     }
 

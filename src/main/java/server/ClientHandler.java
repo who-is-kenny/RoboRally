@@ -1,8 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import server.message.ActiveCard;
 import server.message.Message;
 import server.message.MessageBody;
+import server.message.MessageSerializer;
 
 import java.io.*;
 import java.net.Socket;
@@ -11,7 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class ClientHandler implements Runnable{
 
@@ -33,7 +40,7 @@ public class ClientHandler implements Runnable{
     private final Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
 
     // attributes for game.
 
@@ -46,7 +53,11 @@ public class ClientHandler implements Runnable{
     private int startingPointX;
     private int startingPointY;
 
+    ArrayList<String> cardsInHand = new ArrayList<>(Collections.nCopies(5, "Null"));
 
+
+    static List<String> sampleCards = new ArrayList<>(List.of("MoveI", "TurnLeft", "UTurn", "BackUp", "PowerUp",
+            "Again", "TurnLeft", "TurnLeft", "TurnRight"));
 
     public ClientHandler(Socket socket , int clientID , Map<Integer, ClientHandler> clients ){
 
@@ -74,6 +85,7 @@ public class ClientHandler implements Runnable{
             helloClientBody.setProtocol("Version 0.1");
             helloClient.setMessageBody(helloClientBody);
             out.println(gson.toJson(helloClient));
+            System.out.println(gson.toJson(helloClient));
 
             // wait for client response to establish connection
             boolean connectionEstablished = false;
@@ -128,7 +140,7 @@ public class ClientHandler implements Runnable{
                         lastAliveResponseTime.replace(clientID, System.currentTimeMillis());
                         System.out.println("Received 'Alive' response from client " + clientID);
                         break;
-                    case "PlayerValue":
+                    case "PlayerValues":
                         handlePlayerValue(clientMessageBody);
                         broadcastMessage(createPlayerAddedMessage());
                         break;
@@ -136,11 +148,14 @@ public class ClientHandler implements Runnable{
                         handleSetStatus(clientMessageBody);
                         break;
                     case "MapSelected":
-                        selectedMap = clientMessageBody.getMap();
+                        for (ClientHandler clientHandler : clientHandlers){
+                            clientHandler.selectedMap = clientMessageBody.getMap();
+                        }
                         System.out.println(selectedMap);
                         // sends client message to other clients
                         broadcastMessage(clientInput);
-//                        broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
+//                        broadcastMessage(DizzyHighway);
+                        //broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
                         // initiates first phase
                         broadcastMessage(createActivePhaseMessage(0));
                         // sends currentplayer message to start selection
@@ -156,16 +171,16 @@ public class ClientHandler implements Runnable{
                         String direction = clientMessageBody.getDirection();
                         switch (direction){
                             case "Right":
-                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
+                                sendRotationMessage(clientID, "clockwise");
                                 break;
                             case "Left":
-                                broadcastMessage(createRotationMessage(clientID, "counterclockwise"));
+                                sendRotationMessage(clientID, "counterclockwise");
                                 break;
                             case "Up":
                                 break;
                             case "Down":
-                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
-                                broadcastMessage(createRotationMessage(clientID, "clockwise"));
+                                sendRotationMessage(clientID, "clockwise");
+                                sendRotationMessage(clientID, "clockwise");
                                 break;
                             default:
                                 System.out.println("direction invalid for reboot");
@@ -173,6 +188,19 @@ public class ClientHandler implements Runnable{
                         // TODO send robot move message so that robot moves to reboot square
                         // TODO send rotate message based on direction of choice sent by user in this switch case. ( access through client message body)
                         break;
+                    case "SelectedCard":
+                        System.out.println("Handling SelectedCard..."); // todo remove
+                        handleSelectedCard(clientMessageBody);
+                        break;
+                    case "SelectionFinished":
+                        //handleSelectionFinished();
+                        broadcastMessage(createTimerStartMessage());
+                        startServerTimer();
+                        break;
+                    case "PlayCard":
+                        sendCardPlayed(clientMessageBody);
+                        break;
+
 
                 }
             }
@@ -183,6 +211,21 @@ public class ClientHandler implements Runnable{
 
 
 
+    }
+
+
+
+    private void handleSelectedCard(MessageBody clientMessageBody) {
+        int register = clientMessageBody.getRegister();
+        String card = clientMessageBody.getCard();
+
+        if (register < 0 || register >= cardsInHand.size()) {
+            System.out.println("Invalid register index.");
+        }else{
+            cardsInHand.set(register,card);
+            sendCardSelected(register, !card.equals("Null"));
+            System.out.println(cardsInHand);
+        }
     }
 
     private void handleSetStartingPoint(MessageBody clientMessageBody) {
@@ -204,10 +247,15 @@ public class ClientHandler implements Runnable{
         // update current player to the next player
         if (counter < clientHandlers.size()){
             broadcastMessage(createCurrentPlayerMessage());
+            sendYourCards(sampleCards);
         }else{
             // swtich to next phase
-            // TODO maybe game loop starts here
-            broadcastMessage(createActivePhaseMessage(2));
+            // TODO GAME LOGIC create instance of game in server class
+            // TODO GAME LOGIC maybe game loop starts here
+            // TODO GAME LOGIC loop through clienthandlers, create a player instance for each client handler and add to game.
+            switchToProgrammingPhase();
+            sendYourCards(sampleCards);
+
         }
 
 
@@ -229,10 +277,10 @@ public class ClientHandler implements Runnable{
             pmb.setPrivate(false);
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
-            broadcastMessage(createMovementMessage(1,6,6)); // TODO remove this test later
+            sendMovementMessage(1,6,6);// TODO remove this test later
 //            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
 //            broadcastMessage(createRebootMessage(2));
-            broadcastMessage(createCheckPointMessage(2,1));
+            sendCheckPointMessage(2,1);
 
 
         }else{
@@ -329,6 +377,18 @@ public class ClientHandler implements Runnable{
         return gson.toJson(playerAddedMessage);
     }
 
+    //(6)
+    public void sendCardPlayed (MessageBody messageBody){
+        String card = messageBody.getCard();
+        Message cardPlayed = new Message();
+        cardPlayed.setMessageType("CardPlayed");
+        MessageBody cardPlayedBody = new MessageBody();
+        cardPlayedBody.setClientID(clientID);
+        cardPlayedBody.setCard(card);
+        cardPlayed.setMessageBody(cardPlayedBody);
+        broadcastMessage(gson.toJson(cardPlayed));
+    }
+
     //(7)
     // current player message
     private static int counter = 0;
@@ -355,9 +415,112 @@ public class ClientHandler implements Runnable{
 
     }
 
+    public void switchToProgrammingPhase(){
+        broadcastMessage(createActivePhaseMessage(2));
+    }
+
+    public void switchToAktivierungPhase(){
+        System.out.println("switching to aktivierungsphase");
+        broadcastMessage(createActivePhaseMessage(3));
+    }
+
+    public void resetCardsInHand() {
+        for (int i = 0; i < cardsInHand.size(); i++) {
+            cardsInHand.set(i, "Null");
+        }
+    }
+
+    public void sendYourCards (List<String> cards){
+        System.out.println("sending cards to players");
+        Message yourCards = new Message();
+        yourCards.setMessageType("YourCards");
+        MessageBody yourCardsBody = new MessageBody();
+        yourCardsBody.setCardsInHand(cards);
+        yourCards.setMessageBody(yourCardsBody);
+        out.println(gson.toJson(yourCards));
+
+    }
+
+    public void sendNotYourCards (int clientID){
+        Message notYourCards = new Message();
+        notYourCards.setMessageType("NotYourCards");
+        MessageBody notYourCardsBody = new MessageBody();
+        notYourCardsBody.setClientID(clientID);
+        notYourCardsBody.setCardsInHand(9);
+        notYourCards.setMessageBody(notYourCardsBody);
+        broadcastMessage(gson.toJson(notYourCards));
+    }
+
+    public void sendShuffleCoding (){
+        Message shuffleCoding = new Message();
+        shuffleCoding.setMessageType("ShuffleCoding");
+        MessageBody shuffleCodingBody = new MessageBody();
+        shuffleCodingBody.setClientID(clientID);
+        shuffleCoding.setMessageBody(shuffleCodingBody);
+        out.println(gson.toJson(shuffleCoding));
+    }
+
+    public void sendCardSelected(int register , boolean filled){
+        Message cardSelected = new Message();
+        cardSelected.setMessageType("CardSelected");
+        MessageBody cardSelectedBody = new MessageBody();
+        cardSelectedBody.setClientID(clientID);
+        cardSelectedBody.setRegister(register);
+        cardSelectedBody.setFilled(filled);
+        cardSelected.setMessageBody(cardSelectedBody);
+        broadcastMessage(gson.toJson(cardSelected));
+        System.out.println("sending card selected message to other clients");
+    }
+
+    private String createTimerStartMessage (){
+        Message timerStart = new Message();
+        timerStart.setMessageType("TimerStarted");
+        timerStart.setMessageBody(new MessageBody());
+        return gson.toJson(timerStart);
+    }
+
+    public void sendTimerEnded (List<Integer> clientsWithNullCards){
+        Message timerEnded = new Message();
+        timerEnded.setMessageType("TimerEnded");
+        MessageBody timerEndedMB = new MessageBody();
+        timerEndedMB.setClientIDs(clientsWithNullCards);
+        timerEnded.setMessageBody(timerEndedMB);
+        out.println(gson.toJson(timerEnded));
+    }
+
+    public void sendCardsYouGotNow (List<String> cards){
+        Message cardsYouGotNow = new Message();
+        cardsYouGotNow.setMessageType("CardsYouGotNow");
+        MessageBody cardsYouGotNowBody = new MessageBody();
+        cardsYouGotNowBody.setCards(cards);
+        cardsYouGotNow.setMessageBody(cardsYouGotNowBody);
+        out.println(gson.toJson(cardsYouGotNow));
+    }
+
+    public void sendCurrentCards (List<ActiveCard> activeCards){
+        Message currentCards = new Message();
+        currentCards.setMessageType("CurrentCards");
+        MessageBody currentCardsBody = new MessageBody();
+        currentCardsBody.setActiveCards(activeCards);
+        currentCards.setMessageBody(currentCardsBody);
+        broadcastMessage(gson.toJson(currentCards));
+
+    }
+
+    public void sendReplaceCard(int register , String newCard , int clientID){
+        Message replaceCard = new Message();
+        replaceCard.setMessageType("ReplaceCard");
+        MessageBody replaceCardBody = new MessageBody();
+        replaceCardBody.setRegister(register);
+        replaceCardBody.setNewCard(newCard);
+        replaceCardBody.setClientID(clientID);
+        replaceCard.setMessageBody(replaceCardBody);
+        broadcastMessage(gson.toJson(replaceCard));
+    }
+
     // (8) //TODO use these methods in game logic
     //movement
-    private String createMovementMessage(int ClientID , int x, int y){
+    public void sendMovementMessage(int ClientID , int x, int y){
         Message MovementMessage = new Message();
         MovementMessage.setMessageType("Movement");
         MessageBody MovementMessageBody = new MessageBody();
@@ -365,39 +528,39 @@ public class ClientHandler implements Runnable{
         MovementMessageBody.setX(x);
         MovementMessageBody.setY(y);
         MovementMessage.setMessageBody(MovementMessageBody);
-        return gson.toJson(MovementMessage);
+        broadcastMessage(gson.toJson(MovementMessage));
     }
 
     //rotation
-    private String createRotationMessage(int ClientID , String rotation){
+    public void sendRotationMessage(int ClientID , String rotation){
         Message RotationMessage = new Message();
         RotationMessage.setMessageType("PlayerTurning");
         MessageBody RotationMessageBody = new MessageBody();
         RotationMessageBody.setClientID(ClientID);
         RotationMessageBody.setRotation(rotation);
         RotationMessage.setMessageBody(RotationMessageBody);
-        return gson.toJson(RotationMessage);
+        broadcastMessage(gson.toJson(RotationMessage));
     }
     // animation
-    private String createAnimationMessage (String animationType){
+    public void sendAnimationMessage (String animationType){
         Message animationMessage = new Message();
         animationMessage.setMessageType("Animation");
         MessageBody animationMessageBody = new MessageBody();
         animationMessageBody.setType(animationType);
         animationMessage.setMessageBody(animationMessageBody);
-        return gson.toJson(animationMessage);
+        broadcastMessage(gson.toJson(animationMessage));
     }
     // reboot
-    private String createRebootMessage (int ClientID){
+    public void sendRebootMessage (int ClientID){
         Message rebootMessage = new Message();
         rebootMessage.setMessageType("Reboot");
         MessageBody rebootMessageBody = new MessageBody();
         rebootMessageBody.setClientID(ClientID);
         rebootMessage.setMessageBody(rebootMessageBody);
-        return gson.toJson(rebootMessage);
+        broadcastMessage(gson.toJson(rebootMessage));
     }
     // energy
-    private String createEnergyMessage (int ClientID, int count, String source){
+    public void sendEnergyMessage (int ClientID, int count, String source){
         Message energyMessage = new Message();
         energyMessage.setMessageType("Energy");
         MessageBody energyMessageBody = new MessageBody();
@@ -405,28 +568,29 @@ public class ClientHandler implements Runnable{
         energyMessageBody.setCount(count);
         energyMessageBody.setSource(source);
         energyMessage.setMessageBody(energyMessageBody);
-        return gson.toJson(energyMessage);
+        broadcastMessage(gson.toJson(energyMessage));
     }
 
     // checkpoint reached
-    private String createCheckPointMessage(int ClientID, int number){
+    public void sendCheckPointMessage(int ClientID, int number){
         Message checkPointMessage = new Message();
         checkPointMessage.setMessageType("CheckPointReached");
         MessageBody checkPointMessageBody = new MessageBody();
         checkPointMessageBody.setClientID(ClientID);
         checkPointMessageBody.setNumber(number);
         checkPointMessage.setMessageBody(checkPointMessageBody);
-        return gson.toJson(checkPointMessage);
+        broadcastMessage(gson.toJson(checkPointMessage));
     }
 
     // game over
-    private String createGameOverMessage (int ClientID){
+    public void sendGameOverMessage (int ClientID){
         Message gameOverMessage = new Message();
         gameOverMessage.setMessageType("GameFinished");
         MessageBody gameOverMessageBody = new MessageBody();
         gameOverMessageBody.setClientID(ClientID);
         gameOverMessage.setMessageBody(gameOverMessageBody);
-        return gson.toJson(gameOverMessage);
+        broadcastMessage(gson.toJson(gameOverMessage));
+
     }
 
 
@@ -495,6 +659,40 @@ public class ClientHandler implements Runnable{
         }
     }
 
+    private void startServerTimer(){
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(() -> {
+            // Action to perform after 30 seconds
+            List<Integer> clientsWithNullCards = new ArrayList<>();
+            for (ClientHandler clientHandler : clientHandlers){
+                if (clientHandler.cardsInHand.contains("Null")){
+                    clientsWithNullCards.add(clientID);
+                }
+            }
+            sendTimerEnded(clientsWithNullCards);
+
+            String[] moves = {"MoveI", "MoveII"};
+
+            for (ClientHandler clientHandler : clientHandlers){
+                if (clientHandler.cardsInHand.contains("Null")){
+                    Message cardyougot = new Message();
+                    cardyougot.setMessageType("CardsYouGotNow");
+                    MessageBody aasefase = new MessageBody();
+                    aasefase.setCards(List.of(moves));
+                    cardyougot.setMessageBody(aasefase);
+                    clientHandler.out.println(gson.toJson(cardyougot));
+                    System.out.println(gson.toJson(cardyougot));
+                }
+            }
+        }, 30, TimeUnit.SECONDS);
+        scheduler.schedule(() -> {
+            switchToAktivierungPhase();
+            switchToProgrammingPhase();
+            resetCardsInHand();
+            Collections.shuffle(sampleCards);
+            sendYourCards(sampleCards);
+        }, 35, TimeUnit.SECONDS);
+    }
 
     public void closeEverything(){
         running = false;
@@ -509,8 +707,8 @@ public class ClientHandler implements Runnable{
         }
     }
 
-//    public static void main(String[] args) {
-//        Gson gson = new Gson();
+    public static void main(String[] args) {
+        Gson gson1 = new Gson();
 //
 //        MessageBody body = new MessageBody();
 //        body.setProtocol("Version 0.1");
@@ -519,6 +717,184 @@ public class ClientHandler implements Runnable{
 //        message.setMessageType("HelloClient");
 //        message.setMessageBody(body);
 //        System.out.println(gson.toJson(message));
-//    }
+
+//        Collections.shuffle(sampleCards);
+//        System.out.println(sampleCards);
+//        Collections.shuffle(sampleCards);
+//        System.out.println(sampleCards);
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Message.class, new MessageSerializer())
+                .create();
+
+        Message helloClient = new Message();
+        helloClient.setMessageType("HelloClient");
+        MessageBody helloClientBody = new MessageBody();
+        helloClientBody.setProtocol("Version 0.1");
+        helloClient.setMessageBody(helloClientBody);
+        System.out.println(gson.toJson(helloClient));
+
+        System.out.println(gson1.toJson(helloClient));
+
+
+
+    }
+    String DizzyHighway = """
+            {"messageType": "GameStarted", "messageBody": {"gameMap": [
+              [
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"orientations":["right"],"type":"Antenna","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"orientations":["top"],"type":"Wall","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],[{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"orientations":["bottom"],"type":"Wall","isOnBoard":"Start A"}],
+                [{"type":"StartPoint","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}]
+              ],
+              [
+                [{"speed":1,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"orientations":["right"],"type":"Wall","isOnBoard":"Start A"}],
+                [{"orientations":["right"],"type":"Wall","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"type":"Empty","isOnBoard":"Start A"}],
+                [{"speed":1,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"Start A"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}]
+              ],
+              [
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["bottom","left","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","top","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"orientations":["top"],"type":"Wall","isOnBoard":"5B"}],
+                [{"count":1,"orientations":["top"],"type":"Laser","isOnBoard":"5B"},{"orientations":["bottom"],"type":"Wall","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"orientations":["left"],"type":"Wall","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"},{"orientations":["bottom"],"type":"RestartPoint","isOnBoard":"DizzyHighway"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
+                [{"count":1,"orientations":["left"],"type":"Laser","isOnBoard":"5B"},{"orientations":["right"],"type":"Wall","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"count":1,"orientations":["right"],"type":"Laser","isOnBoard":"5B"},{"orientations":["left"],"type":"Wall","isOnBoard":"5B"}],
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"orientations":["right"],"type":"Wall","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"count":1,"orientations":["bottom"],"type":"Laser","isOnBoard":"5B"},{"orientations":["top"],"type":"Wall","isOnBoard":"5B"}],
+                [{"orientations":["bottom"],"type":"Wall","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["right","bottom","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}]
+              ],
+              [
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","right","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}]
+              ],
+              [
+                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"},{"count":1,"type":"CheckPoint","isOnBoard":"DizzyHighway"}],
+                [{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}],
+                [{"type":"Empty","isOnBoard":"5B"}]
+              ]
+            ]}}""";
 }
+
+
 

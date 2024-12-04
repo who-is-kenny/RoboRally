@@ -6,9 +6,11 @@ import client.controller.GameBoardController;
 import client.controller.RegisterController;
 import client.controller.RobotSelectionController;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.scene.paint.Color;
 import server.message.Message;
 import server.message.MessageBody;
+import server.message.MessageSerializer;
 
 import java.io.*;
 import java.net.Socket;
@@ -21,7 +23,8 @@ public class Client {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
-    private final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
+//    private final Gson gson = new Gson();
 
     private int totalClients = 0;
     private List<Integer> readyClientIDs = new ArrayList<>();
@@ -146,6 +149,9 @@ public class Client {
                     try {
                         inputFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
+                        if ("GameStarted".equals(messageFromHandler.getMessageType())) {
+                            continue; // Skip this message and go to the next iteration
+                        }
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
                         switch (messageFromHandler.getMessageType()){
                             case "Alive":
@@ -202,10 +208,10 @@ public class Client {
                                 }
                                 break;
                             case "YourCards":
-                                List<String> cardsInHand = messageFromHandlerBody.getCardsInHand();
+                                List<String> cardsInHand = messageFromHandlerBody.getCardsInHandAsList();
                                 registerController.handleYourCards(cardsInHand);
                                 break;
-                            case "StartTimer":
+                            case "TimerStarted":
                                 if (registerController != null) {
                                     registerController.startTimer(30);
                                 }
@@ -214,6 +220,7 @@ public class Client {
                                 activePhase = messageFromHandlerBody.getPhase();
                                 if(messageFromHandlerBody.getPhase() == 2){
                                     gameBoardController.handleactivephase2();
+                                    registerController.handleactivephase2();
                                 }
                                 System.out.println("active phase: " + activePhase);  //TODO remove print
                                 break;
@@ -241,6 +248,9 @@ public class Client {
                                 break;
                             case "CheckPointReached":
                                 gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.YELLOW,1.0);
+                                break;
+                            case "CardsYouGotNow":
+                                registerController.fillEmptyRegistersFromMessage(messageFromHandlerBody);
                                 break;
                         }
                     } catch (IOException e) {

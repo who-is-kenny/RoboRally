@@ -2,6 +2,7 @@ package client.controller;
 
 import client.Client;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,13 +16,15 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import server.message.Message;
 import server.message.MessageBody;
+import server.message.MessageSerializer;
 
 import java.net.URL;
 import java.util.*;
 
 public class GameBoardController implements Initializable {
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
 
-    private static final Gson gson = new Gson();
+//    private static final Gson gson = new Gson();
 
     @FXML
     private ImageView DizzyHighway;

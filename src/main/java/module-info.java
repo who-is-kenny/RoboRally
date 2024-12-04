@@ -4,6 +4,7 @@ module com.example.roborally {
     requires com.fasterxml.jackson.databind;
     requires com.google.gson;
     requires java.desktop;
+    requires java.sql;
 
 
     opens client to javafx.fxml;

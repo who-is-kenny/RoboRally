@@ -2,6 +2,7 @@ package client.controller;
 
 import client.Client;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -13,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import server.message.Message;
 import server.message.MessageBody;
+import server.message.MessageSerializer;
 
 import java.net.URL;
 import java.util.List;
@@ -71,7 +73,9 @@ public class RobotSelectionController implements Initializable {
 
     private int selectedRobotId;
 
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
+
+//    private static final Gson gson = new Gson();
 
     public RobotSelectionController() {
     }
@@ -99,7 +103,7 @@ public class RobotSelectionController implements Initializable {
         String playerName = player_name.getText();
         //create Json message
         Message robotSelectionMessage = new Message();
-        robotSelectionMessage.setMessageType("PlayerValue");
+        robotSelectionMessage.setMessageType("PlayerValues");
         MessageBody robotSelectionMessageBody = new MessageBody();
         robotSelectionMessageBody.setName(playerName);
         robotSelectionMessageBody.setFigure(selectedRobotID);
