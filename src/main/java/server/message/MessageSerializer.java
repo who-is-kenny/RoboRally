@@ -210,6 +210,31 @@ public class MessageSerializer implements JsonSerializer<Message> {
                         messageBodyJson.addProperty("rotation", messageBody.getRotation());
                     }
                     break;
+                case "DrawDamage":
+                    // Handle DrawDamage case
+                    if (messageBody.getClientID() != -1) {
+                        messageBodyJson.addProperty("clientID", messageBody.getClientID());
+                    }
+                    if (messageBody.getCards() != null && !messageBody.getCards().isEmpty()) {
+                        messageBodyJson.add("cards", context.serialize(messageBody.getCards()));
+                    }
+                    break;
+
+                case "PickDamage":
+                    // Handle PickDamage case
+                    messageBodyJson.addProperty("count", messageBody.getCount());
+                    if (messageBody.getAvailablePiles() != null && !messageBody.getAvailablePiles().isEmpty()) {
+                        messageBodyJson.add("availablePiles", context.serialize(messageBody.getAvailablePiles()));
+                    }
+                    break;
+
+                case "SelectedDamage":
+                    // Handle SelectedDamage case
+                    if (messageBody.getCards() != null && !messageBody.getCards().isEmpty()) {
+                        messageBodyJson.add("cards", context.serialize(messageBody.getCards()));
+                    }
+                    break;
+
 
                 case "Animation":
                     if (messageBody.getType() != null) {
@@ -242,6 +267,11 @@ public class MessageSerializer implements JsonSerializer<Message> {
 
                 case "GameFinished":
                     messageBodyJson.addProperty("clientID", messageBody.getClientID());
+                    break;
+                case "GameStarted":
+                    if (messageBody.getGameMap() != null) {
+                        messageBodyJson.add("gameMap", context.serialize(messageBody.getGameMap()));
+                    }
                     break;
 
 

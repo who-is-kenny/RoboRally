@@ -7,11 +7,13 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import server.message.Message;
@@ -20,6 +22,7 @@ import server.message.MessageSerializer;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GameBoardController implements Initializable {
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
@@ -370,9 +373,102 @@ public class GameBoardController implements Initializable {
         });
     }
 
+    public void sendDamageSelectionPopup(MessageBody messageBody) {
 
 
+        Platform.runLater(() -> {
+            int requiredCount = (messageBody.getCount());
+            List<String> availablePiles = messageBody.getAvailablePiles();
+            // Example: This count and availablePiles will come from the message
 
+            // Show the dialog for card selection
+            Optional<List<String>> result = showCardSelectionDialog(availablePiles, requiredCount);
+
+            // Handle the user's choice
+            result.ifPresent(selectedCards -> {
+                if (selectedCards.size() == requiredCount) {
+                    // User selected the correct number of cards
+                    System.out.println("User selected the following cards: " + selectedCards);
+
+                    // Send the chosen cards back to the server
+                    Message selectedDamageMessage = new Message();
+                    selectedDamageMessage.setMessageType("SelectedDamage");
+
+                    MessageBody selectedDamageMessageBody = new MessageBody();
+                    selectedDamageMessageBody.setCards(selectedCards);
+
+                    selectedDamageMessage.setMessageBody(selectedDamageMessageBody);
+
+                    // Send the message to the client handler
+                    client.sendToClientHandler(gson.toJson(selectedDamageMessage));
+                } else {
+                    // Show a warning if the user didn't select the required number of cards
+                    showErrorPopup("Invalid Selection", "Please select exactly " + requiredCount + " cards.");
+                }
+            });
+        });
+    }
+
+    private Optional<List<String>> showCardSelectionDialog(List<String> availablePiles, int requiredCount) {
+        // Create a dialog to allow the user to select cards from available piles
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Select Damage Cards");
+        alert.setHeaderText("Please choose " + requiredCount + " damage cards");
+
+        // Use a VBox to hold the ComboBoxes for each selection
+        VBox vbox = new VBox();
+        List<ComboBox<String>> comboBoxes = new ArrayList<>();
+
+        // Create a ComboBox for each required card selection
+        for (int i = 0; i < requiredCount; i++) {
+            // Create a horizontal box (HBox) to hold the label and combo box side by side
+            HBox hbox = new HBox();
+
+            // Label for "Card X"
+            Label label = new Label("Card " + (i + 1) + ": ");
+
+            // ComboBox for selecting damage cards
+            ComboBox<String> comboBox = new ComboBox<>();
+            comboBox.getItems().addAll(availablePiles); // Add available piles to the dropdown
+            comboBox.getSelectionModel().selectFirst(); // Set default selection to the first pile
+
+            comboBoxes.add(comboBox);
+
+            // Add the label and ComboBox to the HBox
+            hbox.getChildren().addAll(label, comboBox);
+
+            // Add the HBox to the VBox
+            vbox.getChildren().add(hbox);
+        }
+
+        alert.getDialogPane().setContent(vbox);
+
+        // Show the dialog and wait for user input
+        alert.showAndWait();
+
+
+        // Collect the selected piles (cards) from each ComboBox
+        List<String> selectedCards = comboBoxes.stream()
+                .map(ComboBox::getValue) // Get selected value from each ComboBox
+                .collect(Collectors.toList());
+
+        // Ensure the number of selected cards matches the required count
+        if (selectedCards.size() != requiredCount) {
+            // If the number of selected cards is incorrect, return empty
+            return Optional.empty();
+        }
+
+        // Return the list of selected cards (from the ComboBox selections)
+        return Optional.of(selectedCards);
+    }
+
+    private void showErrorPopup(String title, String message) {
+        // Display an error popup to inform the user that they selected an incorrect number of cards
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+        alert.showAndWait();
+    }
 
 
     public void addClientIDRobotID(int ClientID , int RobotID){

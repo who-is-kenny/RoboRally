@@ -2,10 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import server.message.ActiveCard;
-import server.message.Message;
-import server.message.MessageBody;
-import server.message.MessageSerializer;
+import server.message.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -155,6 +152,10 @@ public class ClientHandler implements Runnable{
                         // sends client message to other clients
                         broadcastMessage(clientInput);
 //                        broadcastMessage(DizzyHighway);
+                        MapMessages mapMessages = new MapMessages();
+                        if (selectedMap.equals("DizzyHighway")){
+                            broadcastMessage(mapMessages.createDizzyHighway());
+                        }
                         //broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
                         // initiates first phase
                         broadcastMessage(createActivePhaseMessage(0));
@@ -277,10 +278,11 @@ public class ClientHandler implements Runnable{
             pmb.setPrivate(false);
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
-            sendMovementMessage(1,6,6);// TODO remove this test later
+//            sendMovementMessage(1,6,6);// TODO remove this test later
 //            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
 //            broadcastMessage(createRebootMessage(2));
-            sendCheckPointMessage(2,1);
+//            sendCheckPointMessage(2,1);
+            sendPickDamageMessage(5,List.of("Virus","Trojan"));
 
 
         }else{
@@ -541,6 +543,31 @@ public class ClientHandler implements Runnable{
         RotationMessage.setMessageBody(RotationMessageBody);
         broadcastMessage(gson.toJson(RotationMessage));
     }
+
+    // damage
+    public void sendDamageMessage(int clientID, List<String> cards){
+        Message damageMessage = new Message();
+        damageMessage.setMessageType("DrawDamage");
+        MessageBody damageMessageBody = new MessageBody();
+        damageMessageBody.setClientID(clientID);
+        damageMessageBody.setCards(cards);
+        damageMessage.setMessageBody(damageMessageBody);
+        broadcastMessage(gson.toJson(damageMessage));
+    }
+
+    // pick damage
+    public void sendPickDamageMessage (int count , List<String> availablePiles){
+        Message pickDamageMessage = new Message();
+        pickDamageMessage.setMessageType("PickDamage");
+        MessageBody pickDamageMessageBody = new MessageBody();
+        pickDamageMessageBody.setCount(count);
+        pickDamageMessageBody.setAvailablePiles(availablePiles);
+        pickDamageMessage.setMessageBody(pickDamageMessageBody);
+        broadcastMessage(gson.toJson(pickDamageMessage));
+    }
+
+
+
     // animation
     public void sendAnimationMessage (String animationType){
         Message animationMessage = new Message();
@@ -739,161 +766,6 @@ public class ClientHandler implements Runnable{
 
 
     }
-    String DizzyHighway = """
-            {"messageType": "GameStarted", "messageBody": {"gameMap": [
-              [
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"orientations":["right"],"type":"Antenna","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"orientations":["top"],"type":"Wall","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],[{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"orientations":["bottom"],"type":"Wall","isOnBoard":"Start A"}],
-                [{"type":"StartPoint","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}]
-              ],
-              [
-                [{"speed":1,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"orientations":["right"],"type":"Wall","isOnBoard":"Start A"}],
-                [{"orientations":["right"],"type":"Wall","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"type":"Empty","isOnBoard":"Start A"}],
-                [{"speed":1,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"Start A"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}]
-              ],
-              [
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["bottom","left","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"speed":2,"orientations":["bottom","top"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","top","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"orientations":["top"],"type":"Wall","isOnBoard":"5B"}],
-                [{"count":1,"orientations":["top"],"type":"Laser","isOnBoard":"5B"},{"orientations":["bottom"],"type":"Wall","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"orientations":["left"],"type":"Wall","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"},{"orientations":["bottom"],"type":"RestartPoint","isOnBoard":"DizzyHighway"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
-                [{"count":1,"orientations":["left"],"type":"Laser","isOnBoard":"5B"},{"orientations":["right"],"type":"Wall","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"count":1,"orientations":["right"],"type":"Laser","isOnBoard":"5B"},{"orientations":["left"],"type":"Wall","isOnBoard":"5B"}],
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"orientations":["right"],"type":"Wall","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"count":1,"orientations":["bottom"],"type":"Laser","isOnBoard":"5B"},{"orientations":["top"],"type":"Wall","isOnBoard":"5B"}],
-                [{"orientations":["bottom"],"type":"Wall","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["right","bottom","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}]
-              ],
-              [
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","right","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom","left"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["top","bottom"],"type":"ConveyorBelt","isOnBoard":"5B"}]
-              ],
-              [
-                [{"count":1,"type":"EnergySpace","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"speed":2,"orientations":["left","right"],"type":"ConveyorBelt","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"},{"count":1,"type":"CheckPoint","isOnBoard":"DizzyHighway"}],
-                [{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}],[{"type":"Empty","isOnBoard":"5B"}],
-                [{"type":"Empty","isOnBoard":"5B"}]
-              ]
-            ]}}""";
 }
 
 

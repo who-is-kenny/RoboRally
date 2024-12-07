@@ -150,6 +150,7 @@ public class Client {
                         inputFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
                         if ("GameStarted".equals(messageFromHandler.getMessageType())) {
+                            System.out.println("skipping game started message.");
                             continue; // Skip this message and go to the next iteration
                         }
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
@@ -237,6 +238,9 @@ public class Client {
                                 break;
                             case "PlayerTurning":
                                 gameBoardController.handleRobotTurn(messageFromHandlerBody);
+                                break;
+                            case "PickDamage":
+                                gameBoardController.sendDamageSelectionPopup(messageFromHandlerBody);
                                 break;
                             case "Reboot":
                                 gameBoardController.handleReboot(messageFromHandlerBody);

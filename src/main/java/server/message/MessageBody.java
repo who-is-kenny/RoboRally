@@ -98,6 +98,11 @@ public class MessageBody {
     // Bewegung DONE
     // Drehung
     private String rotation;
+
+
+
+    // availablepiles
+    private List<String> availablePiles;
     // Animation
     private String type;
     //neustart DONE
@@ -238,7 +243,7 @@ public class MessageBody {
         this.error = error;
     }
 
-    // cards (6)
+    // card (6)
     public String getCard() {
         return card;
     }
@@ -365,10 +370,18 @@ public class MessageBody {
     public String getRotation() {
         return rotation;
     }
-
     public void setRotation(String rotation) {
         this.rotation = rotation;
     }
+
+    // pick damage
+    public List<String> getAvailablePiles() {
+        return availablePiles;
+    }
+    public void setAvailablePiles(List<String> availablePiles) {
+        this.availablePiles = availablePiles;
+    }
+
     // Animation
     public String getType() {
         return type;
