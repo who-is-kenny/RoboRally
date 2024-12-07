@@ -257,6 +257,10 @@ public class Client {
                             case "CardsYouGotNow":
                                 registerController.fillEmptyRegistersFromMessage(messageFromHandlerBody);
                                 break;
+                            case "ConnectionUpdate":
+                                clientController.handleConnectionUpdate(messageFromHandlerBody);
+                                gameBoardController.handleConnectionUpdate(messageFromHandlerBody);
+                                break;
                         }
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");

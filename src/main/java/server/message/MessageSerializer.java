@@ -96,6 +96,11 @@ public class MessageSerializer implements JsonSerializer<Message> {
                         messageBodyJson.addProperty("error", messageBody.getError());
                     }
                     break;
+                case "ConnectionUpdate":
+                    messageBodyJson.addProperty("clientID" , messageBody.getClientID());
+                    messageBodyJson.addProperty("isConnected" , messageBody.isConnected());
+                    messageBodyJson.addProperty("action" , messageBody.getAction());
+                    break;
 
                 case "PlayCard":
                     if (messageBody.getCard() != null) {

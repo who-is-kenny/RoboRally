@@ -470,10 +470,31 @@ public class GameBoardController implements Initializable {
         alert.showAndWait();
     }
 
+    public void handleConnectionUpdate(MessageBody messageFromHandlerBody) {
+        int clientID = messageFromHandlerBody.getClientID();
+
+        Platform.runLater(() -> {
+            // Find the robot image by its ID
+            ImageView robotImage = null;
+            for (javafx.scene.Node node : game_grid.getChildren()) {
+                if (node instanceof ImageView && Integer.toString(clientID).equals(node.getId())) {
+                    robotImage = (ImageView) node;
+                    break;
+                }
+            }
+
+            if (robotImage != null) {
+                game_grid.getChildren().remove(robotImage); // Remove the robot from the grid
+                System.out.println("Robot with client ID " + clientID + " has been removed from the game board.");
+            } else {
+                System.err.println("Robot with client ID " + clientID + " not found on the game board.");
+            }
+        });
+
+    }
+
 
     public void addClientIDRobotID(int ClientID , int RobotID){
         ClientIDRobotID.put(ClientID , RobotID);
     }
-
-
 }

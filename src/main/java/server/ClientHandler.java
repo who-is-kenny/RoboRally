@@ -648,6 +648,18 @@ public class ClientHandler implements Runnable{
         errorMessage.setMessageBody(errorMessageBody);
         out.println(gson.toJson(errorMessage));
     }
+    // connection update
+    public void sendConnectionUpdateMessage(){
+        Message connectionUpdateMessage = new Message();
+        connectionUpdateMessage.setMessageType("ConnectionUpdate");
+        MessageBody connectionUpdateMessageBody = new MessageBody();
+        connectionUpdateMessageBody.setClientID(clientID);
+        connectionUpdateMessageBody.setConnected(false);
+        connectionUpdateMessageBody.setAction("Remove");
+        connectionUpdateMessage.setMessageBody(connectionUpdateMessageBody);
+        broadcastMessage(gson.toJson(connectionUpdateMessage));
+        System.out.println("sending connection update message.");
+    }
 
     private void startAlivePingThread() {
         // This thread will send an "Alive" message every 5 seconds
@@ -662,6 +674,7 @@ public class ClientHandler implements Runnable{
                     closeEverything();
                 }
             }
+            sendConnectionUpdateMessage();
             System.out.println("Ping thread stopped for client " + clientID);
         }).start();
     }
@@ -681,6 +694,7 @@ public class ClientHandler implements Runnable{
             long lastResponseTime = lastAliveResponseTime.get(clientID);
             if (System.currentTimeMillis() - lastResponseTime > PING_TIMEOUT) {
                 System.out.println("Client " + clientID + " timed out. Disconnecting.");
+                sendConnectionUpdateMessage();
                 closeEverything();
             }
         }
@@ -724,6 +738,7 @@ public class ClientHandler implements Runnable{
     public void closeEverything(){
         running = false;
         out.println("closing client handler");
+        System.out.println("closing client handler" + clientID);
         clientHandlers.remove(this);
         try {
             in.close();

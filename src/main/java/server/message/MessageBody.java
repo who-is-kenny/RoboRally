@@ -74,6 +74,9 @@ public class MessageBody {
     // error message (5)
     private String error;
 
+    private boolean isConnected;
+    private String action;
+
 
     //cards (6)
     private String card;
@@ -241,6 +244,22 @@ public class MessageBody {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
     }
 
     // card (6)

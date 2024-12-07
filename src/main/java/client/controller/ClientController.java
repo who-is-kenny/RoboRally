@@ -169,13 +169,18 @@ public class ClientController implements Initializable {
             name_dropdown.getItems().add(dropdownName);
         }
     }
-
+    public void handleConnectionUpdate(MessageBody messageFromHandlerBody) {
+        int clientID = messageFromHandlerBody.getClientID();
+        if(clientIdName.containsKey(clientID)){
+            String clientName = clientIdName.remove(clientID);
+            String dropdownName = clientName + " (" + clientID + ")";
+            Platform.runLater(() -> name_dropdown.getItems().remove(dropdownName));
+        }
+    }
     // adds clientid and name to map
     public void addClientIDName (String playerName , int clientID) {
         clientIdName.put(clientID,playerName);
     }
-
-
 }
 
 
