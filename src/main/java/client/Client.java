@@ -201,6 +201,7 @@ public class Client {
                                     robotSelectionController.switchToChatScene();
                                     clientController.updateClientList();
                                 }
+                                gameBoardController.changeBackgroundImage(selectedMap);
                                 break;
                             case "ReceivedChat":
                                 if(messageFromHandlerBody.getFrom() != clientID){

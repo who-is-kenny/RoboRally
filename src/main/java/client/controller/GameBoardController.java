@@ -63,6 +63,7 @@ public class GameBoardController implements Initializable {
 
     // stores client id and robot id for starting point selection.
     private Map<Integer , Integer> ClientIDRobotID = new HashMap<>();
+    private String selectedMap;
 
     public GameBoardController(){}
 
@@ -162,7 +163,12 @@ public class GameBoardController implements Initializable {
 //                break;
 //        }
         //TODO change this to else if when there are more maps
-        robotImage.setRotate(90);
+        if (selectedMap.equals("DeathTrap")){
+            robotImage.setRotate(270);
+        }else{
+            robotImage.setRotate(90);
+        }
+
 
         Platform.runLater(() -> {
             // Update the grid with the robot image
@@ -326,7 +332,46 @@ public class GameBoardController implements Initializable {
         });
     }
 
-    
+    public void changeBackgroundImage(String imageName) {
+        Platform.runLater(() -> {
+            try {
+                //change the background image
+                selectedMap = imageName;
+                String imagePath = Objects.requireNonNull(getClass().getResource("/client/images/" + imageName + ".png")).toExternalForm();
+                DizzyHighway.setImage(new javafx.scene.image.Image(imagePath));
+
+                // move gears for death trap
+                if (imageName.equals("DeathTrap")){
+                    GridPane.setRowIndex(gear1, 1);
+                    GridPane.setColumnIndex(gear1, 11);
+
+                    GridPane.setRowIndex(gear2, 3);
+                    GridPane.setColumnIndex(gear2, 12);
+
+                    GridPane.setRowIndex(gear3, 4);
+                    GridPane.setColumnIndex(gear3, 11);
+
+                    GridPane.setRowIndex(gear4, 5);
+                    GridPane.setColumnIndex(gear4, 11);
+
+                    GridPane.setRowIndex(gear5, 6);
+                    GridPane.setColumnIndex(gear5, 12);
+
+                    GridPane.setRowIndex(gear6, 8);
+                    GridPane.setColumnIndex(gear6, 11);
+
+                    System.out.println("Gears repositioned for map: " + imageName);
+                }
+
+                System.out.println("Background image changed to: " + imageName);
+            } catch (NullPointerException e) {
+                System.err.println("Image not found: " + imageName);
+            }
+        });
+    }
+
+
+
 
 
 

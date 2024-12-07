@@ -48,7 +48,7 @@ public class ClientHandler implements Runnable{
     private final int clientID;
     private int robotID = -1;
     private boolean isReady;
-    static List<String> availableMaps = List.of("DizzyHighway");
+    static List<String> availableMaps = List.of("DizzyHighway" , "LostBearings" , "ExtraCrispy" , "DeathTrap");
     private String selectedMap;
     private int startingPointX;
     private int startingPointY;
