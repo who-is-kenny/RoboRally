@@ -155,6 +155,12 @@ public class ClientHandler implements Runnable{
                         MapMessages mapMessages = new MapMessages();
                         if (selectedMap.equals("DizzyHighway")){
                             broadcastMessage(mapMessages.createDizzyHighway());
+                        } else if (selectedMap.equals("LostBearings")) {
+                            broadcastMessage(mapMessages.createLostBearingsMap());
+                        }else if (selectedMap.equals("DeathTrap")) {
+                            broadcastMessage(mapMessages.createDeathTrap());
+                        }else if (selectedMap.equals("ExtraCrispy")) {
+                            broadcastMessage(mapMessages.createExtraCrispy());
                         }
                         //broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
                         // initiates first phase
