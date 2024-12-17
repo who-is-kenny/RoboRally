@@ -45,6 +45,24 @@ public class ProgrammingDeck {
         return deck.removeLast(); // Remove the last card (top of the deck)
     }
 
+    // Draw 9 cards, ensuring there are enough cards available
+    public ArrayList<Cards> drawPlayerCards(DiscardPile discardPile) {
+        // Ensure there are at least 9 cards in the deck
+        ensureMinimumCards(9, discardPile);
+
+
+        if (deck.size() < 9) {
+            throw new IllegalStateException("Not enough cards in the programming deck to draw 9 cards!");
+        }
+
+        ArrayList<Cards> drawnCards = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            drawnCards.add(drawCard());
+        }
+
+        return drawnCards;
+    }
+
     // Ensure at least 9 cards are in the deck, refilling from discard pile if needed
     public void ensureMinimumCards(int minimum, DiscardPile discardPile) {
         while (deck.size() < minimum) {
