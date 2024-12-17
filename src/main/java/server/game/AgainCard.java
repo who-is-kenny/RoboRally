@@ -2,8 +2,8 @@ package server.game;
 
 public class AgainCard extends Cards{
 
-    public AgainCard(String name) {
-        super(name);
+    public AgainCard() {
+        super("Again");
     }
 
     @Override

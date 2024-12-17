@@ -1,8 +1,8 @@
 package server.game;
 
 public class TurnLeftCard extends Cards {
-    public TurnLeftCard(String name) {
-        super(name);
+    public TurnLeftCard() {
+        super("TurnLeft");
     }
 
     @Override

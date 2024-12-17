@@ -1,8 +1,8 @@
 package server.game;
 
 public class MoveBackCard extends Cards {
-    public MoveBackCard(String name) {
-        super(name);
+    public MoveBackCard() {
+        super("BackUp");
     }
 
     @Override
