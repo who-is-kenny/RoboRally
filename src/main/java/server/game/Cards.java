@@ -15,5 +15,9 @@ public abstract class Cards {
 
     // Abstract method for the card's effect
     public abstract void playCardEffect(Player player);
+
+    public static void main(String[] args) {
+
+    }
 }
 

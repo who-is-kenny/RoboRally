@@ -5,6 +5,7 @@ module com.example.roborally {
     requires com.google.gson;
     requires java.desktop;
     requires java.sql;
+    requires java.smartcardio;
 
 
     opens client to javafx.fxml;

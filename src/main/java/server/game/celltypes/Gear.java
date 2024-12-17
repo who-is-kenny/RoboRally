@@ -1,7 +1,6 @@
 package server.game.celltypes;
 
-import content.OrientationEnum;
-import server.game.Interact;
+
 import server.game.Position;
 import server.game.Robot;
 
