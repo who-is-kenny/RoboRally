@@ -497,4 +497,56 @@ public class GameBoardController implements Initializable {
     public void addClientIDRobotID(int ClientID , int RobotID){
         ClientIDRobotID.put(ClientID , RobotID);
     }
+
+    /** --------------------------------------------------------------------------------------------------------------- **/
+    // AI methods:
+
+    public void AISelectStartingPoint() {
+        Platform.runLater(() -> {
+            // Collect all available gears on the grid
+            List<ImageView> availableGears = new ArrayList<>();
+            for (ImageView gear : new ImageView[]{gear1, gear2, gear3, gear4, gear5, gear6}) {
+                if (game_grid.getChildren().contains(gear)) {
+                    availableGears.add(gear);
+                }
+            }
+
+            // If no gears are available, return
+            if (availableGears.isEmpty()) {
+                System.err.println("No available gears for AI to select as a starting point.");
+                return;
+            }
+
+            // Randomly pick one of the available gears
+            Random random = new Random();
+            ImageView selectedGear = availableGears.get(random.nextInt(availableGears.size()));
+
+            // Get the coordinates of the selected gear
+            Integer row = GridPane.getRowIndex(selectedGear);
+            Integer col = GridPane.getColumnIndex(selectedGear);
+
+            // Handle null cases (default to 0 if no position is explicitly set)
+            row = (row == null) ? 0 : row;
+            col = (col == null) ? 0 : col;
+
+            System.out.println("AI selected starting point at Row: " + row + ", Column: " + col);
+
+            // Simulate the AI selecting the starting point
+            Message setStartingPointMessage = new Message();
+            setStartingPointMessage.setMessageType("SetStartingPoint");
+            MessageBody setStartingPointMessageBody = new MessageBody();
+            setStartingPointMessageBody.setX(col);
+            setStartingPointMessageBody.setY(row);
+            setStartingPointMessage.setMessageBody(setStartingPointMessageBody);
+            System.out.println("AI sending coordinates to client handler");
+            client.sendToClientHandler(gson.toJson(setStartingPointMessage));
+
+            // Send the message to the client handler
+//            if (client.getClientID() == client.getCurrentPlayerID() && client.getActivePhase() == 0) {
+//                System.out.println("AI sending coordinates to client handler");
+//                client.sendToClientHandler(gson.toJson(setStartingPointMessage));
+//            }
+        });
+    }
+
 }

@@ -16,20 +16,75 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class Client {
 
     private Socket socket;
+    private final Random random = new Random();
+
+    public BufferedReader getIn() {
+        return in;
+    }
+
+    public void setIn(BufferedReader in) {
+        this.in = in;
+    }
+
     private BufferedReader in;
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
+    public PrintWriter getOut() {
+        return out;
+    }
+
+    public void setOut(PrintWriter out) {
+        this.out = out;
+    }
+
     private PrintWriter out;
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
 //    private final Gson gson = new Gson();
 
     private int totalClients = 0;
     private List<Integer> readyClientIDs = new ArrayList<>();
+
+    public String getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(String selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    public boolean isMapSelected() {
+        return mapSelected;
+    }
+
+    public void setMapSelected(boolean mapSelected) {
+        this.mapSelected = mapSelected;
+    }
+
     private boolean mapSelected;
     private String selectedMap;
+    private boolean isAI = false;
+
+    private List<String> cardsInHand = new ArrayList<>();
+    public List<String> getCardsInHand() {
+        return cardsInHand;
+    }
+    public void setCardsInHand(List<String> cardsInHand) {
+        this.cardsInHand = cardsInHand;
+    }
+
 
     private int activePhase;
     public int getActivePhase() {
@@ -101,24 +156,24 @@ public class Client {
 
             // establish connection with server/client handler
 
-            while (clientID == 0){
-                String connectionMessage = in.readLine();
-                Message handlerMessage = gson.fromJson(connectionMessage, Message.class);
-                if (handlerMessage.getMessageType().equals("HelloClient")){
-                    // creating message and sending it back to the handler to establish connection.
-                    Message helloServer = new Message();
-                    helloServer.setMessageType("HelloServer");
-                    MessageBody helloServerBody = new MessageBody();
-                    helloServerBody.setProtocol("Version 0.1");
-                    helloServerBody.setAI(false);
-                    helloServerBody.setGroup("Neidische Narwahl");
-                    helloServer.setMessageBody(helloServerBody);
-                    out.println(gson.toJson(helloServer));
-                    // handle welcome message
-                } else if (handlerMessage.getMessageType().equals("Welcome")) {
-                    setClientID(handlerMessage.getMessageBody().getClientID());
-                }
-            }
+//            while (clientID == 0){
+//                String connectionMessage = in.readLine();
+//                Message handlerMessage = gson.fromJson(connectionMessage, Message.class);
+//                if (handlerMessage.getMessageType().equals("HelloClient")){
+//                    // creating message and sending it back to the handler to establish connection.
+//                    Message helloServer = new Message();
+//                    helloServer.setMessageType("HelloServer");
+//                    MessageBody helloServerBody = new MessageBody();
+//                    helloServerBody.setProtocol("Version 0.1");
+//                    helloServerBody.setAI(false);
+//                    helloServerBody.setGroup("Neidische Narwahl");
+//                    helloServer.setMessageBody(helloServerBody);
+//                    out.println(gson.toJson(helloServer));
+//                    // handle welcome message
+//                } else if (handlerMessage.getMessageType().equals("Welcome")) {
+//                    setClientID(handlerMessage.getMessageBody().getClientID());
+//                }
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -155,6 +210,14 @@ public class Client {
                         }
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
                         switch (messageFromHandler.getMessageType()){
+                            case "HelloClient":
+                                break;
+                            case "Welcome":
+                                setClientID(messageFromHandlerBody.getClientID());
+                                if (isAI){
+                                    robotSelectionController.AIChooseRandomRobotAndReady();
+                                }
+                                break;
                             case "Alive":
                                 sendAliveResponse();
                                 break;
@@ -163,34 +226,42 @@ public class Client {
                                 String playerName = messageFromHandlerBody.getName();
                                 int ClientID = messageFromHandlerBody.getClientID();
                                 int RobotID =messageFromHandlerBody.getFigure();
+                                System.out.println("adding robot to player" + ClientID + ","+ RobotID);
                                 gameBoardController.addClientIDRobotID(ClientID,RobotID);
                                 clientController.addClientIDName(playerName,ClientID);
                                 // counts the number of clients to be compared later with number of ready players
                                 totalClients++;
                                 break;
                             case "PlayerStatus": // TODO remove prints from this case when not needed
-                                if (messageFromHandlerBody.isReady()){
-                                    if(!readyClientIDs.contains(messageFromHandlerBody.getClientID())){
-                                        readyClientIDs.add(messageFromHandlerBody.getClientID());
-                                        if(readyClientIDs.getFirst() == clientID){
-                                            robotSelectionController.setDisableMap(false);
+                                if (!isAI){
+                                    if (messageFromHandlerBody.isReady()){
+                                        if(!readyClientIDs.contains(messageFromHandlerBody.getClientID())){
+                                            readyClientIDs.add(messageFromHandlerBody.getClientID());
+                                            if(readyClientIDs.getFirst() == clientID){
+                                                // allows the first client to select map
+                                                robotSelectionController.setDisableMap(false);
+                                            }
                                         }
-                                    }
-                                    if (mapSelected && readyClientIDs.size() == totalClients){
-                                        robotSelectionController.switchToChatScene();
-                                        clientController.updateClientList();
+//                                    if (mapSelected && readyClientIDs.size() == totalClients){
+//                                        robotSelectionController.switchToChatScene();
+//                                        clientController.updateClientList();
+//                                    }
+                                    }else{
+                                        if(readyClientIDs.contains(messageFromHandlerBody.getClientID())){
+                                            if (messageFromHandlerBody.getClientID() == clientID){
+                                                robotSelectionController.setDisableMap(true);
+                                            }
+                                            readyClientIDs.remove((Integer) messageFromHandlerBody.getClientID());
+                                            if(!readyClientIDs.isEmpty() && readyClientIDs.getFirst() == clientID){
+                                                robotSelectionController.setDisableMap(false);
+                                            }
+                                        }
                                     }
                                 }else{
-                                    if(readyClientIDs.contains(messageFromHandlerBody.getClientID())){
-                                        if (messageFromHandlerBody.getClientID() == clientID){
-                                            robotSelectionController.setDisableMap(true);
-                                        }
-                                        readyClientIDs.remove((Integer) messageFromHandlerBody.getClientID());
-                                        if(!readyClientIDs.isEmpty() && readyClientIDs.getFirst() == clientID){
-                                            robotSelectionController.setDisableMap(false);
-                                        }
-                                    }
+                                    System.out.println("ai not handling player status");
+                                    break;
                                 }
+
                                 break;
                             case "SelectMap":
                                 robotSelectionController.handleSelectMap(messageFromHandlerBody);
@@ -198,11 +269,12 @@ public class Client {
                             case "MapSelected":
                                 mapSelected = true;
                                 selectedMap = messageFromHandlerBody.getMap();
-                                if (mapSelected && readyClientIDs.size() == totalClients) {
-                                    robotSelectionController.switchToChatScene();
-                                    clientController.updateClientList();
-                                }
+//                                if (mapSelected && readyClientIDs.size() == totalClients) {
+//                                    robotSelectionController.switchToChatScene();
+//                                    clientController.updateClientList();
+//                                }
                                 gameBoardController.changeBackgroundImage(selectedMap);
+
                                 break;
                             case "ReceivedChat":
                                 if(messageFromHandlerBody.getFrom() != clientID){
@@ -210,8 +282,11 @@ public class Client {
                                 }
                                 break;
                             case "YourCards":
-                                List<String> cardsInHand = messageFromHandlerBody.getCardsInHandAsList();
+                                cardsInHand = messageFromHandlerBody.getCardsInHandAsList();
                                 registerController.handleYourCards(cardsInHand);
+//                                if (isAI){
+//                                    AIHandleYourCards(messageFromHandlerBody);
+//                                }
                                 break;
                             case "TimerStarted":
                                 if (registerController != null) {
@@ -220,15 +295,28 @@ public class Client {
                                 break;
                             case "ActivePhase":
                                 activePhase = messageFromHandlerBody.getPhase();
+                                System.out.println("active phase: " + activePhase);  //TODO remove print
+                                if (messageFromHandlerBody.getPhase() == 0){
+                                    robotSelectionController.switchToChatScene();
+                                    clientController.updateClientList();
+                                }
                                 if(messageFromHandlerBody.getPhase() == 2){
                                     gameBoardController.handleactivephase2();
                                     registerController.handleactivephase2();
+
+                                    if (isAI){
+                                        AIprocessCards();
+                                    }
                                 }
-                                System.out.println("active phase: " + activePhase);  //TODO remove print
                                 break;
                             case "CurrentPlayer":
                                 currentPlayerID = messageFromHandlerBody.getClientID();
                                 System.out.println("currentplayer : " + currentPlayerID);  //TODO remove print
+                                if(isAI){
+                                    if (currentPlayerID == clientID){
+                                        gameBoardController.AISelectStartingPoint();
+                                    }
+                                }
                                 break;
                             case "StartingPointTaken":
                                 gameBoardController.handleStartingPointTaken(messageFromHandlerBody);
@@ -278,7 +366,7 @@ public class Client {
         aliveMessage.setMessageType("Alive");
         aliveMessage.setMessageBody(new MessageBody());
         out.println(gson.toJson(aliveMessage));
-        System.out.println("Sent 'Alive' response to handler.");    // TODO remove print
+//        System.out.println("Sent 'Alive' response to handler.");    // TODO remove print
     }
 
     public void closeClient(){   //Socket socket, PrintWriter out, BufferedReader in
@@ -298,4 +386,57 @@ public class Client {
         }
     }
 
+    /** --------------------------------------------------------------------------------------------------------------- **/
+    // AI methods:
+
+
+
+
+//    private void AIHandleYourCards(MessageBody messageBody) {
+//        List<String> cardsInHand = messageBody.getCardsInHandAsList();
+//        System.out.println("cards in hand" + cardsInHand);
+//        AICards = AISelectRandomCards(cardsInHand);
+//        System.out.println("AI cards:" + AICards);
+//    }
+
+    private void AIprocessCards(){
+
+        List <String> AICards;
+        AICards = AISelectRandomCards(cardsInHand);
+        System.out.println("AI cards:" + AICards);
+        for (int i = 0; i< AICards.size(); i++){
+            //fill the card in the register
+            registerController.AIFillRegister(AICards.get(i));
+            // send message to server
+            Message cardSelectionMessage = new Message();
+            cardSelectionMessage.setMessageType("SelectedCard");
+            MessageBody cardSelectionBody = new MessageBody();
+            cardSelectionBody.setCard(AICards.get(i));
+            cardSelectionBody.setRegister(i);
+            cardSelectionMessage.setMessageBody(cardSelectionBody);
+            sendToClientHandler(gson.toJson(cardSelectionMessage));
+
+    }
+        }
+
+    private List<String> AISelectRandomCards(List<String> cardsInHand) {
+        List<String> selectedCards = new ArrayList<>();
+        int cardsToSelect = Math.min(5, cardsInHand.size()); // Limit to the number of available cards
+
+        for (int i = 0; i < cardsToSelect; i++) {
+            int randomIndex = random.nextInt(cardsInHand.size());
+            selectedCards.add(cardsInHand.get(randomIndex));
+            cardsInHand.remove(randomIndex);
+        }
+
+        return selectedCards;
+    }
+
+    public boolean isAI() {
+        return isAI;
+    }
+
+    public void setAI(boolean AI) {
+        isAI = AI;
+    }
 }

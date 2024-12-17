@@ -1,5 +1,6 @@
 package client.controller;
 
+import client.AIClient;
 import client.Client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,9 +17,10 @@ import server.message.Message;
 import server.message.MessageBody;
 import server.message.MessageSerializer;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class RobotSelectionController implements Initializable {
 
@@ -36,6 +38,10 @@ public class RobotSelectionController implements Initializable {
     }
 
 
+    @FXML
+    private Button player_button;
+    @FXML
+    private Button AI_button;
     @FXML
     private Button select_map_button;
     @FXML
@@ -72,6 +78,7 @@ public class RobotSelectionController implements Initializable {
     }
 
     private int selectedRobotId;
+    private static List<Integer> figureList = new ArrayList<>(Arrays.asList(0,1,2,3,4,5));
 
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
 
@@ -153,11 +160,32 @@ public class RobotSelectionController implements Initializable {
         mapSelectedMessage.setMessageBody(mapSelectedMessageBody);
         client.sendToClientHandler(gson.toJson(mapSelectedMessage));
     }
+    @FXML
+    private void playAsPerson(ActionEvent e){
+        Message helloServer = new Message();
+        helloServer.setMessageType("HelloServer");
+        MessageBody helloServerBody = new MessageBody();
+        helloServerBody.setProtocol("Version 0.1");
+        helloServerBody.setAI(false);
+        helloServerBody.setGroup("Neidische Narwahl");
+        helloServer.setMessageBody(helloServerBody);
+        client.sendToClientHandler(gson.toJson(helloServer));
+        client.sendToClientHandler(gson.toJson(helloServer));
+        robot_0.setDisable(false);
+        robot_1.setDisable(false);
+        robot_2.setDisable(false);
+        robot_3.setDisable(false);
+        robot_4.setDisable(false);
+        robot_5.setDisable(false);
+    }
+
+
 
     public void handlePlayerAdded(MessageBody ms , int clientID){
         int robotID = ms.getFigure();
         if (ms.getClientID() != clientID){
             disableChosenRobot(robotID);
+            figureList.remove((Integer) robotID);
         }
     }
 
@@ -174,7 +202,6 @@ public class RobotSelectionController implements Initializable {
         Platform.runLater(()->{
             Scene chatScene = new Scene(chatRoot, 850, 600);
             stage.setScene(chatScene);
-
         });
     }
 
@@ -204,5 +231,88 @@ public class RobotSelectionController implements Initializable {
     public void setDisableMap(boolean b){
         available_maps.setDisable(b);
     }
+
+    /** --------------------------------------------------------------------------------------------------------------- **/
+    // AI methods:
+
+    @FXML
+    private void playAsAI(ActionEvent e) throws IOException {
+//        // Close current client connection
+//        client.closeClient();
+//
+//        // Create a new AIClient and connect to the same server
+//        Socket socket = new Socket("localhost", 8888);
+//        AIClient aiClient = new AIClient(socket);
+//
+//        // Update references in the controllers to use the new AIClient
+//        aiClient.setClientController(client.getClientController());
+//        aiClient.getClientController().setClient(aiClient);
+//
+//        aiClient.setGameBoardController(client.getGameBoardController());
+//        aiClient.getGameBoardController().setClient(aiClient);
+//
+//        aiClient.setRegisterController(client.getRegisterController());
+//        aiClient.getRegisterController().setClient(aiClient);
+//
+//        aiClient.setRobotSelectionController(this);
+//        this.client = aiClient;
+//
+//        // Start listening for messages with the AI
+//        aiClient.receiveFromClientHandler();
+//
+//        System.out.println("Switched to AI client.");
+
+        client.setAI(true);
+        Message helloServer = new Message();
+        helloServer.setMessageType("HelloServer");
+        MessageBody helloServerBody = new MessageBody();
+        helloServerBody.setProtocol("Version 0.1");
+        helloServerBody.setAI(true);
+        helloServerBody.setGroup("Neidische Narwahl");
+        helloServer.setMessageBody(helloServerBody);
+        client.sendToClientHandler(gson.toJson(helloServer));
+    }
+
+
+    public void AIChooseRandomRobotAndReady(){
+
+        // Select a random robot from the enabled ones
+        Random random = new Random();
+        System.out.println("choosing from" + figureList);
+        int selectedRobotID = figureList.get(random.nextInt(figureList.size()));
+        String AIName = "";
+        if (selectedRobotID == 0 ){AIName = "ZoomBotAI";}
+        if (selectedRobotID == 1) {AIName = "HammerBotAI";}
+        if (selectedRobotID == 2) {AIName = "SpinBotAI";}
+        if (selectedRobotID == 3) {AIName = "TwonkyAI";}
+        if (selectedRobotID == 4) {AIName = "HulkX90AI";}
+        if (selectedRobotID == 5) {AIName = "SmashBotAI";}
+
+        // send robot selection message
+
+        Message robotSelectionMessage = new Message();
+        robotSelectionMessage.setMessageType("PlayerValues");
+        MessageBody robotSelectionMessageBody = new MessageBody();
+        robotSelectionMessageBody.setName(AIName);
+        robotSelectionMessageBody.setFigure(selectedRobotID);
+        robotSelectionMessage.setMessageBody(robotSelectionMessageBody);
+        client.sendToClientHandler(gson.toJson(robotSelectionMessage));
+        System.out.println(gson.toJson(robotSelectionMessage));
+
+        Message readyMessage = new Message();
+        readyMessage.setMessageType("SetStatus");
+        MessageBody readyMessageBody = new MessageBody();
+        readyMessageBody.setReady(true);
+        readyMessage.setMessageBody(readyMessageBody);
+        client.sendToClientHandler(gson.toJson(readyMessage));
+    }
+
+    public static void main(String[] args) {
+        System.out.println(figureList);
+        figureList.remove(2);
+        System.out.println(figureList);
+    }
+
+
 }
 

@@ -395,4 +395,59 @@ public class RegisterController implements Initializable {
         playCard.setMessageBody(playCardBody);
         client.sendToClientHandler(gson.toJson(playCard));
     }
+
+    /** --------------------------------------------------------------------------------------------------------------- **/
+    // AI methods:
+
+    public void AIFillRegister(String cardName){
+        Platform.runLater(() -> {
+            System.out.println("filliing register for AI");
+
+
+            // Loop through cards and fill empty registers
+                Button emptyRegister = getFirstEmptyRegister(); // Find the first empty register
+                if (emptyRegister != null) {
+                    // Create an image for the card and place it in the register
+                    String imagePath = "/client/images/" + cardName + ".png";
+                    URL imageURL = getClass().getResource(imagePath);
+
+                    if (imageURL != null) {
+                        try {
+                            Image cardImage = new Image(imageURL.toExternalForm());
+                            ImageView registerImageView = new ImageView(cardImage);
+                            registerImageView.setFitWidth(80); // Adjust as needed
+                            registerImageView.setFitHeight(100);
+                            registerImageView.setPreserveRatio(true);
+
+                            // Place the image in the register
+
+                            emptyRegister.setGraphic(registerImageView);
+                            emptyRegister.getStyleClass().add("selected-card");
+
+                            // Mark the register as filled
+                            int registerIndex = getRegisterIndex(emptyRegister);
+                            registersFilled[registerIndex] = true;
+
+                            System.out.println("Filled register " + registerIndex + " with card: " + cardName);
+
+                            if (areAllRegistersFilled()) {
+                                resetButton.setDisable(true);
+                                for (Button register : getRegisterButtons()) {
+                                    register.setDisable(true);
+                                    register.setOpacity(0.75);
+                                }
+                                System.out.println("All registers are filled.");
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Error loading image for card: " + cardName);
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.err.println("Image not found for card: " + cardName + " at " + imagePath);
+                    }
+                } else {
+                    System.out.println("No empty register available for card: " + cardName);
+                }
+            });
+    }
 }

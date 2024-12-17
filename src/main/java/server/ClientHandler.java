@@ -49,6 +49,8 @@ public class ClientHandler implements Runnable{
     private String selectedMap;
     private int startingPointX;
     private int startingPointY;
+    private boolean isAI = false;
+    private boolean timerStarted = false;
 
     ArrayList<String> cardsInHand = new ArrayList<>(Collections.nCopies(5, "Null"));
 
@@ -86,16 +88,28 @@ public class ClientHandler implements Runnable{
 
             // wait for client response to establish connection
             boolean connectionEstablished = false;
-            while (!connectionEstablished){
-                String clientInput = in.readLine();
-                Message clientMessage = gson.fromJson(clientInput, Message.class);
-                if(clientMessage.getMessageType().equals("HelloServer") && clientMessage.getMessageBody().getProtocol().equals("Version 0.1")){
-                    connectionEstablished = true;
-                }else{
-                    sendErrorMessage();
+            while (!connectionEstablished) {
+                try {
+                    String clientInput = in.readLine();
+                    if (clientInput == null) {
+                        throw new IOException("Client disconnected or sent invalid input.");
+                    }
+                    Message clientMessage = gson.fromJson(clientInput, Message.class);
+
+                    if (clientMessage.getMessageType().equals("HelloServer") &&
+                            "Version 0.1".equals(clientMessage.getMessageBody().getProtocol())) {
+                        connectionEstablished = true;
+                        this.isAI = clientMessage.getMessageBody().getAI();
+                    } else {
+                        sendErrorMessage();
+                    }
+                } catch (NullPointerException e) {
+                    System.err.println("NullPointerException: " + e.getMessage());
+                    closeEverything();
+                    break; // Exit the loop
                 }
             }
-            System.out.println("connection established sending welcome message");
+            System.out.println("Connection established, sending welcome message");
 
             // send welcome message
             Message welcomeMessage = new Message();
@@ -115,7 +129,7 @@ public class ClientHandler implements Runnable{
             }
             // loops through clienthandlers and sends isready status of clients that are ready
             for (ClientHandler ch : clientHandlers){
-                if(ch.isReady){
+                if(ch.isReady && !ch.isAI){
                     out.println(ch.createPlayerStatusMessage(true));
                 }
             }
@@ -135,7 +149,7 @@ public class ClientHandler implements Runnable{
                 switch (clientMessage.getMessageType()){
                     case "Alive":
                         lastAliveResponseTime.replace(clientID, System.currentTimeMillis());
-                        System.out.println("Received 'Alive' response from client " + clientID);
+//                        System.out.println("Received 'Alive' response from client " + clientID);
                         break;
                     case "PlayerValues":
                         handlePlayerValue(clientMessageBody);
@@ -143,6 +157,22 @@ public class ClientHandler implements Runnable{
                         break;
                     case "SetStatus":
                         handleSetStatus(clientMessageBody);
+                        if(areAllClientsReadyAndMapSelected()){
+                            MapMessages mapMessages = new MapMessages();
+                            if (selectedMap.equals("DizzyHighway")){
+                                broadcastMessage(mapMessages.createDizzyHighway());
+                            } else if (selectedMap.equals("LostBearings")) {
+                                broadcastMessage(mapMessages.createLostBearingsMap());
+                            }else if (selectedMap.equals("DeathTrap")) {
+                                broadcastMessage(mapMessages.createDeathTrap());
+                            }else if (selectedMap.equals("ExtraCrispy")) {
+                                broadcastMessage(mapMessages.createExtraCrispy());
+                            }
+                            // initiates first phase
+                            broadcastMessage(createActivePhaseMessage(0));
+                            // sends currentplayer message to start selection
+                            broadcastMessage(createCurrentPlayerMessage());
+                        }
                         break;
                     case "MapSelected":
                         for (ClientHandler clientHandler : clientHandlers){
@@ -152,21 +182,22 @@ public class ClientHandler implements Runnable{
                         // sends client message to other clients
                         broadcastMessage(clientInput);
 //                        broadcastMessage(DizzyHighway);
-                        MapMessages mapMessages = new MapMessages();
-                        if (selectedMap.equals("DizzyHighway")){
-                            broadcastMessage(mapMessages.createDizzyHighway());
-                        } else if (selectedMap.equals("LostBearings")) {
-                            broadcastMessage(mapMessages.createLostBearingsMap());
-                        }else if (selectedMap.equals("DeathTrap")) {
-                            broadcastMessage(mapMessages.createDeathTrap());
-                        }else if (selectedMap.equals("ExtraCrispy")) {
-                            broadcastMessage(mapMessages.createExtraCrispy());
+                        if(areAllClientsReadyAndMapSelected()){
+                            MapMessages mapMessages = new MapMessages();
+                            if (selectedMap.equals("DizzyHighway")){
+                                broadcastMessage(mapMessages.createDizzyHighway());
+                            } else if (selectedMap.equals("LostBearings")) {
+                                broadcastMessage(mapMessages.createLostBearingsMap());
+                            }else if (selectedMap.equals("DeathTrap")) {
+                                broadcastMessage(mapMessages.createDeathTrap());
+                            }else if (selectedMap.equals("ExtraCrispy")) {
+                                broadcastMessage(mapMessages.createExtraCrispy());
+                            }
+                            // initiates first phase
+                            broadcastMessage(createActivePhaseMessage(0));
+                            // sends currentplayer message to start selection
+                            broadcastMessage(createCurrentPlayerMessage());
                         }
-                        //broadcastMessage(readJsonFile(selectedMap)); // TODO enable when fixed function
-                        // initiates first phase
-                        broadcastMessage(createActivePhaseMessage(0));
-                        // sends currentplayer message to start selection
-                        broadcastMessage(createCurrentPlayerMessage());
                         break;
                     case "SendChat":
                         handleSendChat(clientMessageBody);
@@ -201,8 +232,14 @@ public class ClientHandler implements Runnable{
                         break;
                     case "SelectionFinished":
                         //handleSelectionFinished();
-                        broadcastMessage(createTimerStartMessage());
-                        startServerTimer();
+                        if (!timerStarted){
+                            for (ClientHandler clientHandler : clientHandlers){
+                                clientHandler.timerStarted = true;
+                            }
+                            broadcastMessage(createTimerStartMessage());
+                            startServerTimer();
+                        }
+
                         break;
                     case "PlayCard":
                         sendCardPlayed(clientMessageBody);
@@ -217,10 +254,25 @@ public class ClientHandler implements Runnable{
         }
 
 
-
     }
 
 
+
+    private boolean areAllClientsReadyAndMapSelected() {
+        // Check if the selected map is set
+        if (selectedMap == null || selectedMap.isEmpty()) {
+            return false;
+        }
+        // Check if all clientHandlers are ready
+        synchronized (clientHandlers) {
+            for (ClientHandler client : clientHandlers) {
+                if (!client.isReady) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     private void handleSelectedCard(MessageBody clientMessageBody) {
         int register = clientMessageBody.getRegister();
@@ -236,6 +288,7 @@ public class ClientHandler implements Runnable{
     }
 
     private void handleSetStartingPoint(MessageBody clientMessageBody) {
+        boolean Selectionfinished = false;
 
 
         startingPointX = clientMessageBody.getX();
@@ -251,6 +304,12 @@ public class ClientHandler implements Runnable{
         startingPointTakenMessage.setMessageBody(startingPointTakenMessageBody);
         broadcastMessage(gson.toJson(startingPointTakenMessage));
 
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
         // update current player to the next player
         if (counter < clientHandlers.size()){
             broadcastMessage(createCurrentPlayerMessage());
@@ -260,9 +319,16 @@ public class ClientHandler implements Runnable{
             // TODO GAME LOGIC create instance of game in server class
             // TODO GAME LOGIC maybe game loop starts here
             // TODO GAME LOGIC loop through clienthandlers, create a player instance for each client handler and add to game.
-            switchToProgrammingPhase();
+            System.out.println("sending cards to last player now");
             sendYourCards(sampleCards);
+            Selectionfinished = true;
 
+
+
+        }
+        if (Selectionfinished){
+            System.out.println("Switching to programming phase now");
+            switchToProgrammingPhase();
         }
 
 
@@ -284,11 +350,11 @@ public class ClientHandler implements Runnable{
             pmb.setPrivate(false);
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
-//            sendMovementMessage(1,6,6);// TODO remove this test later
+            sendMovementMessage(1,6,6);// TODO remove this test later
 //            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
 //            broadcastMessage(createRebootMessage(2));
 //            sendCheckPointMessage(2,1);
-            sendPickDamageMessage(5,List.of("Virus","Trojan"));
+//            sendPickDamageMessage(5,List.of("Virus","Trojan"));
 
 
         }else{
@@ -309,8 +375,11 @@ public class ClientHandler implements Runnable{
 
     private void handleSetStatus(MessageBody messageBody) {
         this.isReady = messageBody.isReady();
-        broadcastMessage(createPlayerStatusMessage(isReady));
-        out.println(createSelectMapMessage());
+        if (!isAI){
+            broadcastMessage(createPlayerStatusMessage(isReady));
+            out.println(createSelectMapMessage());
+        }
+
     }
 
     private String createPlayerStatusMessage(boolean isReady){
@@ -424,6 +493,11 @@ public class ClientHandler implements Runnable{
     }
 
     public void switchToProgrammingPhase(){
+//        try {
+//            Thread.sleep(200);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
         broadcastMessage(createActivePhaseMessage(2));
     }
 
@@ -691,7 +765,7 @@ public class ClientHandler implements Runnable{
         aliveMessage.setMessageType("Alive");
         aliveMessage.setMessageBody(new MessageBody());
         out.println(gson.toJson(aliveMessage));
-        System.out.println("Sent 'Alive' message to client " + clientID);
+//        System.out.println("Sent 'Alive' message to client " + clientID);
     }
 
     private void checkForClientTimeout() {
@@ -707,6 +781,7 @@ public class ClientHandler implements Runnable{
     }
 
     private void startServerTimer(){
+        System.out.println("server timer started.");
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.schedule(() -> {
             // Action to perform after 30 seconds
@@ -735,7 +810,12 @@ public class ClientHandler implements Runnable{
         scheduler.schedule(() -> {
             switchToAktivierungPhase();
             switchToProgrammingPhase();
-            resetCardsInHand();
+            for (ClientHandler ch : clientHandlers){
+                ch.resetCardsInHand();
+                ch.timerStarted = false;
+            }
+//            resetCardsInHand();
+//            timerStarted = false;
             Collections.shuffle(sampleCards);
             sendYourCards(sampleCards);
         }, 35, TimeUnit.SECONDS);
@@ -743,15 +823,23 @@ public class ClientHandler implements Runnable{
 
     public void closeEverything(){
         running = false;
-        out.println("closing client handler");
-        System.out.println("closing client handler" + clientID);
-        clientHandlers.remove(this);
+        System.out.println("Closing connection for client " + clientID);
         try {
-            in.close();
-            out.close();
-            socket.close();
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                in.close();
+            }
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error while closing connection: " + e.getMessage());
+        } finally {
+            clientHandlers.remove(this);
+            clients.remove(clientID);
+            System.out.println("Connection closed for client " + clientID);
         }
     }
 
