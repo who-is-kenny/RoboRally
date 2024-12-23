@@ -396,6 +396,52 @@ public class RegisterController implements Initializable {
         client.sendToClientHandler(gson.toJson(playCard));
     }
 
+    public void handleReplaceCard(MessageBody messageFromHandlerBody) {
+        Platform.runLater(() -> {
+            // Get the register index and new card name from the message body
+            int registerIndex = messageFromHandlerBody.getRegister();
+            String newCardName = messageFromHandlerBody.getNewCard();
+
+            // Find the corresponding register button
+            Button[] registers = getRegisterButtons();
+            if (registerIndex >= 0 && registerIndex < registers.length) {
+                Button targetRegister = registers[registerIndex];
+
+                // Load the new card image
+                String imagePath = "/client/images/" + newCardName + ".png";
+                URL imageURL = getClass().getResource(imagePath);
+
+                if (imageURL != null) {
+                    try {
+                        Image newCardImage = new Image(imageURL.toExternalForm());
+                        ImageView newCardImageView = new ImageView(newCardImage);
+                        newCardImageView.setFitWidth(80); // Adjust as needed
+                        newCardImageView.setFitHeight(100);
+                        newCardImageView.setPreserveRatio(true);
+
+                        // Update the register with the new card image
+                        targetRegister.setGraphic(newCardImageView);
+                        targetRegister.getStyleClass().add("selected-card");
+
+                        // Ensure the register is marked as filled
+                        registersFilled[registerIndex] = true;
+
+                        System.out.println("Replaced register " + registerIndex + " with card: " + newCardName);
+
+                    } catch (Exception e) {
+                        System.err.println("Error loading image for card: " + newCardName);
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.err.println("Image not found for card: " + newCardName + " at " + imagePath);
+                }
+            } else {
+                System.err.println("Invalid register index: " + registerIndex);
+            }
+        });
+    }
+
+
     /** --------------------------------------------------------------------------------------------------------------- **/
     // AI methods:
 
@@ -450,4 +496,6 @@ public class RegisterController implements Initializable {
                 }
             });
     }
+
+
 }

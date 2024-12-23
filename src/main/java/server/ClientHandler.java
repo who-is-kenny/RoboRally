@@ -314,6 +314,7 @@ public class ClientHandler implements Runnable{
         if (counter < clientHandlers.size()){
             broadcastMessage(createCurrentPlayerMessage());
             sendYourCards(sampleCards);
+            sendReplaceCard(1,"MoveI",this.clientID);
         }else{
             // swtich to next phase
             // TODO GAME LOGIC create instance of game in server class
@@ -523,6 +524,8 @@ public class ClientHandler implements Runnable{
 
     }
 
+
+
     public void sendNotYourCards (int clientID){
         Message notYourCards = new Message();
         notYourCards.setMessageType("NotYourCards");
@@ -593,7 +596,7 @@ public class ClientHandler implements Runnable{
         Message replaceCard = new Message();
         replaceCard.setMessageType("ReplaceCard");
         MessageBody replaceCardBody = new MessageBody();
-        replaceCardBody.setRegister(register);
+        replaceCardBody.setRegister(register - 1); // since register starts 0 and in game logic 1
         replaceCardBody.setNewCard(newCard);
         replaceCardBody.setClientID(clientID);
         replaceCard.setMessageBody(replaceCardBody);

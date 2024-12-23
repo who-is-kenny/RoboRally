@@ -1,14 +1,14 @@
 package server.game;
 
 import server.ClientHandler;
-import server.message.ActiveCard;
+
 import java.util.ArrayList;
-import static java.lang.Math.sqrt;
 
 public class Player {
 
     private String playerName;
-    private ProgrammingCardDeck playerProgrammingCards;
+    private ProgrammingDeck programmingDeck;
+    private DiscardPile discardPile;
     private ArrayList<Cards> playerHand = new ArrayList<>();
     private final Register playerRegister = new Register();
     private int checkpoint = 0; // counting up check is it is the next checkpoint
@@ -84,13 +84,22 @@ public class Player {
         this.playerHand = playerHand;
     }
 
-    public ProgrammingCardDeck getPlayerProgrammingCards() {
-        return playerProgrammingCards;
+    public ProgrammingDeck getProgrammingDeck() {
+        return programmingDeck;
     }
 
-    public void setPlayerProgrammingCards(ProgrammingCardDeck playerProgrammingCards) {
-        this.playerProgrammingCards = playerProgrammingCards;
+    public void setProgrammingDeck(ProgrammingDeck programmingDeck) {
+        this.programmingDeck = programmingDeck;
     }
+
+    public DiscardPile getDiscardPile() {
+        return discardPile;
+    }
+
+    public void setDiscardPile(DiscardPile discardPile) {
+        this.discardPile = discardPile;
+    }
+
 
     public String getDirection() {
         return direction;

@@ -349,6 +349,9 @@ public class Client {
                                 clientController.handleConnectionUpdate(messageFromHandlerBody);
                                 gameBoardController.handleConnectionUpdate(messageFromHandlerBody);
                                 break;
+                            case "ReplaceCard":
+                                registerController.handleReplaceCard(messageFromHandlerBody);
+                                break;
                         }
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");

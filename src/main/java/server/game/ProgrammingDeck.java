@@ -88,4 +88,7 @@ public class ProgrammingDeck {
     public int size() {
         return deck.size();
     }
+
+    public static void main(String[] args) {
+    }
 }
