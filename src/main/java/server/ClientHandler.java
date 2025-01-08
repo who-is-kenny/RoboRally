@@ -465,7 +465,8 @@ public class ClientHandler implements Runnable{
 
     public void switchToProgrammingPhase(){
         System.out.println("=====================> Programming Phase <==================================");
-        broadcastMessage(createActivePhaseMessage(2));
+//        broadcastMessage(createActivePhaseMessage(2));
+        out.println(createActivePhaseMessage(2));
     }
 
     public void switchToAktivierungPhase(){
