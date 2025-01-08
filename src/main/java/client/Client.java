@@ -332,8 +332,12 @@ public class Client {
                             case "Reboot":
                                 gameBoardController.handleReboot(messageFromHandlerBody);
                                 registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
-                                if(clientID == messageFromHandlerBody.getClientID()){
-                                    gameBoardController.sendRebootPopup();
+                                if (isAI){
+                                    gameBoardController.AIReboot();
+                                }else{
+                                    if(clientID == messageFromHandlerBody.getClientID()){
+                                        gameBoardController.sendRebootPopup();
+                                    }
                                 }
                                 gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.GREENYELLOW,1.0);
                                 break;
@@ -433,6 +437,13 @@ public class Client {
             sendToClientHandler(gson.toJson(cardSelectionMessage));
 
     }
+
+        Message selectionFinishedMessage = new Message();
+        selectionFinishedMessage.setMessageType("SelectionFinished");
+        MessageBody body = new MessageBody();
+        body.setClientID(clientID);
+        selectionFinishedMessage.setMessageBody(body);
+        sendToClientHandler(gson.toJson(selectionFinishedMessage));
         }
 
     private List<String> AISelectRandomCards(List<String> cardsInHand) {

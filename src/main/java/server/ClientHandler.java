@@ -42,6 +42,8 @@ public class ClientHandler implements Runnable{
 
     // attributes for game.
 
+    private final int minPlayer = 2;
+
     private String name;
     private final int clientID;
     private int robotID = -1;
@@ -146,21 +148,79 @@ public class ClientHandler implements Runnable{
                         break;
                     case "SetStatus":
                         handleSetStatus(clientMessageBody);
-                        if(areAllClientsReadyAndMapSelected()){
-                            MapMessages mapMessages = new MapMessages();
-                            if (selectedMap.equals("DizzyHighway")){
-                                broadcastMessage(mapMessages.createDizzyHighway());
-                            } else if (selectedMap.equals("LostBearings")) {
-                                broadcastMessage(mapMessages.createLostBearingsMap());
-                            }else if (selectedMap.equals("DeathTrap")) {
-                                broadcastMessage(mapMessages.createDeathTrap());
-                            }else if (selectedMap.equals("ExtraCrispy")) {
-                                broadcastMessage(mapMessages.createExtraCrispy());
+                        if (!isAI) {
+                            if(areAllClientsReadyAndMapSelected()){
+                                MapMessages mapMessages = new MapMessages();
+                                if (selectedMap.equals("DizzyHighway")){
+                                    broadcastMessage(mapMessages.createDizzyHighway());
+                                } else if (selectedMap.equals("LostBearings")) {
+                                    broadcastMessage(mapMessages.createLostBearingsMap());
+                                }else if (selectedMap.equals("DeathTrap")) {
+                                    broadcastMessage(mapMessages.createDeathTrap());
+                                }else if (selectedMap.equals("ExtraCrispy")) {
+                                    broadcastMessage(mapMessages.createExtraCrispy());
+                                }
+                                // initiates first phase
+                                broadcastMessage(createActivePhaseMessage(0));
+                                // sends currentplayer message to start selection
+                                broadcastMessage(createCurrentPlayerMessage());
                             }
-                            // initiates first phase
-                            broadcastMessage(createActivePhaseMessage(0));
-                            // sends currentplayer message to start selection
-                            broadcastMessage(createCurrentPlayerMessage());
+                        } else {
+                            // Check if all clients are AIs and minimum players are connected
+                            boolean allAI = true;
+                            int aiCount = 0;
+
+                            synchronized (clientHandlers) {
+                                for (ClientHandler clientHandler : clientHandlers) {
+                                    if (!clientHandler.isAI) {
+                                        allAI = false;
+                                        break;
+                                    }
+                                    if (clientHandler.isAI) {
+                                        aiCount++;
+                                    }
+                                }
+                            }
+
+                            if (allAI && aiCount >= minPlayer) {
+                                // Select a random map from availableMaps
+                                Random random = new Random();
+                                selectedMap = availableMaps.get(random.nextInt(availableMaps.size()));
+
+                                // Assign the selected map to all clients
+                                for (ClientHandler clientHandler : clientHandlers) {
+                                    clientHandler.selectedMap = selectedMap;
+                                }
+
+                                System.out.println("Selected Map: " + selectedMap);
+
+                                // Broadcast the selected map to all clients
+                                Message mapSelectedMessage = new Message();
+                                mapSelectedMessage.setMessageType("MapSelected");
+                                MessageBody mapSelectedBody = new MessageBody();
+                                mapSelectedBody.setMap(selectedMap);
+                                mapSelectedMessage.setMessageBody(mapSelectedBody);
+                                broadcastMessage(gson.toJson(mapSelectedMessage));
+
+                                // Start the game if all clients are ready and a map is selected
+                                if (areAllClientsReadyAndMapSelected()) {
+                                    MapMessages mapMessages = new MapMessages();
+                                    if (selectedMap.equals("DizzyHighway")) {
+                                        broadcastMessage(mapMessages.createDizzyHighway());
+                                    } else if (selectedMap.equals("LostBearings")) {
+                                        broadcastMessage(mapMessages.createLostBearingsMap());
+                                    } else if (selectedMap.equals("DeathTrap")) {
+                                        broadcastMessage(mapMessages.createDeathTrap());
+                                    } else if (selectedMap.equals("ExtraCrispy")) {
+                                        broadcastMessage(mapMessages.createExtraCrispy());
+                                    }
+
+                                    // Initiate the first phase
+                                    broadcastMessage(createActivePhaseMessage(0));
+                                    // Send current player message to start selection
+                                    broadcastMessage(createCurrentPlayerMessage());
+                                }
+                            }
                         }
                         break;
                     case "MapSelected":
@@ -220,12 +280,40 @@ public class ClientHandler implements Runnable{
                         handleSelectedCard(clientMessageBody);
                         break;
                     case "SelectionFinished":
-                        //handleSelectionFinished();
-                        broadcastMessage(createTimerStartMessage());
-                        startServerTimer();
-                        this.finishedProgramming = true;
-                        this.timerEnded = true;
-                        System.out.println("CLIENTHANDLER.run(): got Selection Finished");
+                        if (!finishedProgramming){
+                            boolean allAI = true;
+
+                            synchronized (clientHandlers) {
+                                for (ClientHandler clientHandler : clientHandlers) {
+                                    if (!clientHandler.isAI) {
+                                        allAI = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (allAI) {
+                                // Handle Selection Finished for AIs
+                                out.println(createTimerStartMessage());
+                                startServerTimer();
+                                this.finishedProgramming = true;
+                                this.timerEnded = true;
+                                System.out.println("All AI clients: Starting timer and proceeding.");
+                            } else {
+                                // If not all clients are AIs, ignore this message from AIs
+                                if (!isAI) {
+                                    broadcastMessage(createTimerStartMessage());
+                                    startServerTimer();
+                                    this.finishedProgramming = true;
+                                    this.timerEnded = true;
+                                    System.out.println("Real player detected: Processing 'SelectionFinished' normally.");
+                                } else {
+                                    System.out.println("Ignoring 'SelectionFinished' message from AI client.");
+                                }
+                            }
+                        }
+                        // Check if all clients are AIs
+
                         break;
                     case "PlayCard":
                         sendCardPlayed(clientMessageBody);
@@ -839,6 +927,15 @@ public class ClientHandler implements Runnable{
     public int getClientID(){
         return this.clientID;
     }
+    // -------------------------------------------------------------------------------------------------------------------
+    //Ai methods
+    private String chooseRandomMap(){
+        Random random = new Random();
+        int randomIndex = random.nextInt(availableMaps.size());
+        return availableMaps.get(randomIndex);
+    }
+
+
 }
 
 

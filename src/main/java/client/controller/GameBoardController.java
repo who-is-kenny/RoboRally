@@ -634,4 +634,21 @@ public class GameBoardController implements Initializable {
         });
     }
 
+    public void AIReboot(){
+        List<String> directions = List.of("Up", "Down", "Left", "Right");
+        Random random = new Random();
+        int randomIndex = random.nextInt(directions.size());
+        String chosenDirection = directions.get(randomIndex);
+
+        // Send the chosen direction back to the server
+        Message rebootMessage = new Message();
+        rebootMessage.setMessageType("RebootDirection");
+        MessageBody rebootMessageBody = new MessageBody();
+        rebootMessageBody.setDirection(chosenDirection);
+        rebootMessage.setMessageBody(rebootMessageBody);
+
+        client.sendToClientHandler(gson.toJson(rebootMessage));
+
+    }
+
 }
