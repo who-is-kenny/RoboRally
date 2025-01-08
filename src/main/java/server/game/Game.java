@@ -472,7 +472,7 @@ public class Game implements Runnable {
     private void shootLasers2() {
         for (Player shooter : playersInGame) {
             for (Player target : playersInGame) {
-                if (shooter != target && isShootingAt(shooter, target)) {
+                if (shooter != target && isShootingAt(shooter, target) && !isWallBlocking(shooter, target)) {
                     target.passDrawDamage(); // Apply damage effect to the target
                     givePlayerSpamCard(target); // Give spam card to the target
                 }
@@ -503,6 +503,73 @@ public class Game implements Runnable {
             default:
                 return false; // Invalid orientation
         }
+    }
+    private boolean isWallBlocking(Player shooter, Player target) {
+        int shooterX = shooter.getPlayerRobot().getRobotPosition().getPositionX();
+        int shooterY = shooter.getPlayerRobot().getRobotPosition().getPositionY();
+        int targetX = target.getPlayerRobot().getRobotPosition().getPositionX();
+        int targetY = target.getPlayerRobot().getRobotPosition().getPositionY();
+        OrientationEnum shooterOrientation = shooter.getPlayerRobot().getOrientation();
+
+        // Check for wall on the shooter's current cell
+        if (hasWall(shooterX, shooterY, shooterOrientation)) {
+            return true; // The shooter is standing on a cell with a blocking wall
+        }
+
+        // Check for immediate wall
+        switch (shooterOrientation) {
+            case U:
+                if (hasWall(shooterX, shooterY - 1, OrientationEnum.U)) {
+                    return true;
+                }
+                for (int y = shooterY - 1; y >= targetY; y--) {
+                    if (hasWall(shooterX, y, OrientationEnum.U) || hasWall(shooterX, y, OrientationEnum.D)) {
+                        return true;
+                    }
+                }
+                break;
+            case D:
+                if (hasWall(shooterX, shooterY + 1, OrientationEnum.D)) {
+                    return true;
+                }
+                for (int y = shooterY + 1; y <= targetY; y++) {
+                    if (hasWall(shooterX, y, OrientationEnum.D) || hasWall(shooterX, y, OrientationEnum.U)) {
+                        return true;
+                    }
+                }
+                break;
+            case L:
+                if (hasWall(shooterX - 1, shooterY, OrientationEnum.L)) {
+                    return true;
+                }
+                for (int x = shooterX - 1; x >= targetX; x--) {
+                    if (hasWall(x, shooterY, OrientationEnum.L) || hasWall(x, shooterY, OrientationEnum.R)) {
+                        return true;
+                    }
+                }
+                break;
+            case R:
+                if (hasWall(shooterX + 1, shooterY, OrientationEnum.R)) {
+                    return true;
+                }
+                for (int x = shooterX + 1; x <= targetX; x++) {
+                    if (hasWall(x, shooterY, OrientationEnum.R) || hasWall(x, shooterY, OrientationEnum.L)) {
+                        return true;
+                    }
+                }
+                break;
+        }
+        return false;
+    }
+
+    private boolean hasWall(int x, int y, OrientationEnum direction) {
+        Cell newCell = Course.getInstance().getCellAtPosition(new Position(x,y));
+        if (newCell instanceof Wall || newCell instanceof WallWithLaser){
+            assert newCell instanceof Wall;
+            OrientationEnum wallOrientation = ((Wall) newCell).getOrientation();
+            return wallOrientation == direction;
+        }
+        return false;
     }
 
 
