@@ -5,27 +5,21 @@ import server.game.Player;
 import server.game.Position;
 
 public class Laser extends Cell {
-    private final int damage;
-    private final boolean isVertical;
-
-
-    //constructors
-    public Laser(Position position, int damage, boolean isVertical) {
+    private final int damage = 1;
+     public Laser(Position position, Boolean isVertical){
         super(position);
-        this.damage = damage;
-        this.isVertical = isVertical;
+        create(isVertical);
+    }
+    public Laser(Integer positionX, Integer positionY, Boolean isVertical){
+        this(new Position(positionX, positionY), isVertical);
     }
 
-    public Laser(int positionX, int positionY, int damage, boolean isVertical) {
-        super(positionX, positionY);
-        this.damage = damage;
-        this.isVertical = isVertical;
+    private void create(Boolean isVertical){}
+
+    public void applyEffect(Player player){
+         if(player.getRobot().getRobotPosition().equals(this.getPosition())){
+             Game.getInstance().givePlayerSpamCard(player);
+             player.passDrawDamage(); // for laser effect
+         }
     }
-
-
-//    public void applyEffect(Player player){
-//         if(player.getRobot().getRobotPosition().equals(this.getPosition())){
-//             Game.getInstance().givePlayerSpamCard(player);
-//         }
-//    }
 }

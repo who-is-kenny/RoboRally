@@ -64,13 +64,7 @@ public class ClientController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-//        try{
-//            Socket socket = new Socket("localhost" , 8888);
-//            client = new Client(socket);
-//            System.out.println("connected to server");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+
         vbox_message.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
@@ -78,7 +72,6 @@ public class ClientController implements Initializable {
             }
         });
 
-//        client.receiveFromClientHandler(vbox_message);
     }
 
     /**
@@ -181,6 +174,8 @@ public class ClientController implements Initializable {
     public void addClientIDName (String playerName , int clientID) {
         clientIdName.put(clientID,playerName);
     }
+
+
 }
 
 

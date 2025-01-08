@@ -1,6 +1,5 @@
 package client.controller;
 
-import client.AIClient;
 import client.Client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import server.message.Message;
 import server.message.MessageBody;
@@ -39,9 +40,7 @@ public class RobotSelectionController implements Initializable {
 
 
     @FXML
-    private Button player_button;
-    @FXML
-    private Button AI_button;
+    private ImageView profilepic;
     @FXML
     private Button select_map_button;
     @FXML
@@ -64,6 +63,10 @@ public class RobotSelectionController implements Initializable {
     private RadioButton robot_4;
     @FXML
     private RadioButton robot_5;
+    @FXML
+    private Button player_button;
+    @FXML
+    private Button AI_button;
 
     @FXML
     private ToggleGroup robots;
@@ -81,8 +84,6 @@ public class RobotSelectionController implements Initializable {
     private static List<Integer> figureList = new ArrayList<>(Arrays.asList(0,1,2,3,4,5));
 
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
-
-//    private static final Gson gson = new Gson();
 
     public RobotSelectionController() {
     }
@@ -106,6 +107,18 @@ public class RobotSelectionController implements Initializable {
         RadioButton selectedRobot = (RadioButton) robots.getSelectedToggle();
         // get Id of selected robot
         int selectedRobotID = Integer.parseInt(selectedRobot.getId());
+        // Map robot ID to robot image file
+        String imagePath = switch (selectedRobotID) {
+            case 0 -> getClass().getResource("/client/images/Robot_0.png").toExternalForm();
+            case 1 -> getClass().getResource("/client/images/Robot_1.png").toExternalForm();
+            case 2 -> getClass().getResource("/client/images/Robot_2.png").toExternalForm();
+            case 3 -> getClass().getResource("/client/images/Robot_3.png").toExternalForm();
+            case 4 -> getClass().getResource("/client/images/Robot_4.png").toExternalForm();
+            case 5 -> getClass().getResource("/client/images/Robot_5.png").toExternalForm();
+            default -> null;
+        };
+        // Update the profile picture with the selected robot's image
+        profilepic.setImage(new Image(imagePath));
         // get player name
         String playerName = player_name.getText();
         //create Json message
@@ -126,6 +139,7 @@ public class RobotSelectionController implements Initializable {
         ready_button.setDisable(false);
         not_ready_button.setDisable(false);
     }
+
     @FXML
     private void confirmReady(ActionEvent e){
         //create ready message
@@ -200,7 +214,7 @@ public class RobotSelectionController implements Initializable {
 
     public void switchToChatScene(){
         Platform.runLater(()->{
-            Scene chatScene = new Scene(chatRoot, 850, 600);
+            Scene chatScene = new Scene(chatRoot, 860, 640);
             stage.setScene(chatScene);
         });
     }
@@ -314,5 +328,19 @@ public class RobotSelectionController implements Initializable {
     }
 
 
-}
+    public Button getPlayer_button() {
+        return player_button;
+    }
 
+    public void setPlayer_button(Button player_button) {
+        this.player_button = player_button;
+    }
+
+    public Button getAI_button() {
+        return AI_button;
+    }
+
+    public void setAI_button(Button AI_button) {
+        this.AI_button = AI_button;
+    }
+}

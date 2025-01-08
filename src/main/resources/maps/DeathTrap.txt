@@ -1,0 +1,10 @@
+Nothing,Nothing,LeftOne,LeftOne,LeftOne,Nothing,Nothing,Nothing,Nothing,Nothing,LeftOne,Nothing,Nothing
+CheckPoint5,PushPanelUpOdd,Nothing,WallDown,UpOne,LeftOne,Nothing,Pit,PushPanelRightOdd,UpOne,Nothing,StartPoint,Nothing
+Nothing,Pit,PushPanelLeftEven,Pit,EnergySpace,Nothing,EnergySpace,PushPanelUpEven,CheckPoint4,UpOne,Nothing,WallUp,Nothing
+Nothing,Nothing,EnergySpace,Nothing,PushPanelDownEven,Nothing,Nothing,Pit,WallLeft,UpOne,Nothing,Nothing,StartPoint
+Nothing,DownOne,Nothing,Pit,CheckPoint2,Nothing,PushPanelUpOdd,Nothing,RightOne,UpOne,WallLeft,StartPoint,Nothing
+DownOne,LeftOne,Nothing,PushPanelDownOdd,PushPanelUpEven,WallDown,Pit,Nothing,UpOne,Nothing,WallLeft,StartPoint,Antenna
+DownOne,WallRight,Pit,Nothing,EnergySpace,Nothing,Nothing,EnergySpace,Nothing,Nothing,Nothing,Nothing,StartPoint
+DownOne,CheckPoint1,PushPanelDownEven,EnergySpace,Nothing,Nothing,Pit,PushPanelRightEven,Pit,Nothing,Nothing,WallDown,Nothing
+DownOne,PushPanelLeftOdd,Pit,Nothing,RightOne,DownOne,Nothing,CheckPoint3,PushPanelDownOdd,Nothing,Nothing,StartPoint,Nothing
+Nothing,Nothing,Nothing,Nothing,Nothing,RightOne,RightOne,RightOne,RightOne,Nothing,LeftOne,Nothing,RebootPoint

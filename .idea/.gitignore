@@ -1,3 +1,9 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Ignore compiled Java class files
+*.class
+target/

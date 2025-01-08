@@ -1,10 +1,12 @@
 module com.example.roborally {
     requires javafx.controls;
     requires javafx.fxml;
+    requires jdk.jfr;
+    requires static lombok;
     requires com.fasterxml.jackson.databind;
     requires com.google.gson;
     requires java.desktop;
-    requires java.sql;
+    requires org.testng;
     requires java.smartcardio;
 
 

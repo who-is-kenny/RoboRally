@@ -1,25 +1,27 @@
 package server.game.celltypes;
 
+import content.OrientationEnum;
 import server.game.Position;
 
 
 public class Wall extends Cell{
 
-    private final String orientation;
+    private OrientationEnum orientation;
 
-    //constructors
-    public Wall(Position position, String orientation) {
+    public Wall(Position position, OrientationEnum orientation){
         super(position);
+        this.create(orientation);
+    }
+
+    public Wall(Integer positionX, Integer positionY, OrientationEnum orientation){
+        this(new Position(positionX,positionY), orientation);
+    }
+
+    private void create(OrientationEnum orientation){
         this.orientation = orientation;
     }
 
-    public Wall(int positionX, int positionY, String orientation) {
-        super(positionX, positionY);
-        this.orientation = orientation;
-    }
-
-    //getter
-    public String getOrientation() {
+    public OrientationEnum getOrientation() {
         return orientation;
     }
 }

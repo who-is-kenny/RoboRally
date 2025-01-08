@@ -7,10 +7,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox prefHeight="215.0" prefWidth="850.0" stylesheets="@style/RegisterCard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.RegisterController">
+<VBox prefHeight="220.0" prefWidth="850.0" stylesheets="@style/RegisterCard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.RegisterController">
 
-          <!-- Top Row (Selected Cards, Game State, Timer) -->
+    <!-- Top Row (Selected Cards, Game State, Timer) -->
     <HBox alignment="CENTER_LEFT" prefHeight="110.0" prefWidth="840.0" spacing="5.0">
         <!-- Selected Cards -->
         <HBox prefHeight="100.0" prefWidth="460.0" spacing="10.0">
@@ -22,24 +23,33 @@
                 <Button fx:id="selectedCard5" alignment="CENTER" contentDisplay="CENTER" maxHeight="105.0" maxWidth="82.0" minHeight="105.0" minWidth="82.0" onMouseClicked="#handleRegisterClick" prefHeight="105.0" prefWidth="82.0" />
             </children>
         </HBox>
-      <Pane prefHeight="103.0" prefWidth="245.0">
-         <children>
-              <!-- Placeholder for Game State -->
-              <Label fx:id="gameState" alignment="CENTER" contentDisplay="CENTER" layoutX="-5.0" prefHeight="101.0" prefWidth="249.0" styleClass="game-state-placeholder" />
-         </children>
-      </Pane>
-      <Pane>
-         <children>
-              <!-- Placeholder for Timer -->
-              <Label fx:id="timer" alignment="CENTER" layoutX="6.0" prefHeight="101.0" prefWidth="118.0" styleClass="timer-placeholder" text="00:30" />
-         </children>
-      </Pane>
+        <VBox spacing="10.0">
+            <children>
+                <Pane prefHeight="103.0" prefWidth="245.0">
+                    <children>
+                        <!-- Placeholder for Game State -->
+                        <Label fx:id="gamePhase" alignment="CENTER" contentDisplay="CENTER" layoutX="-5.0" prefHeight="40.0" prefWidth="253.0" textAlignment="CENTER" wrapText="true" />
+                    </children>
+                </Pane>
+                <Pane layoutX="10.0" layoutY="10.0" prefHeight="103.0" prefWidth="245.0">
+                    <children>
+                        <Label fx:id="gameState" alignment="CENTER" contentDisplay="CENTER" layoutX="-5.0" layoutY="-12.0" prefHeight="58.0" prefWidth="253.0" textAlignment="CENTER" wrapText="true" />
+                    </children>
+                </Pane>
+            </children>
+        </VBox>
+        <Pane>
+            <children>
+                <!-- Placeholder for Timer -->
+                <Label fx:id="timer" alignment="CENTER" layoutX="7.0" prefHeight="105.0" prefWidth="117.0" styleClass="timer-placeholder" text="00:30" />
+            </children>
+        </Pane>
     </HBox>
 
-          <!-- Bottom Row (Card Selection and Buttons) -->
-    <HBox fx:id="cardContainer" alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="850.0" spacing="5.0">
+    <!-- Bottom Row (Card Selection and Buttons) -->
+    <HBox fx:id="cardContainer" alignment="CENTER_LEFT" prefHeight="80.0" prefWidth="814.0" spacing="5.0">
         <!-- Card Selection -->
-        <HBox alignment="CENTER" prefHeight="101.0" prefWidth="716.0" spacing="10.0">
+        <HBox alignment="CENTER" prefHeight="90.0" prefWidth="732.0" spacing="10.0">
             <children>
                 <Button fx:id="card1" alignment="CENTER" maxHeight="90.0" maxWidth="70.0" minHeight="90.0" minWidth="70.0" onAction="#handleCardSelection" prefHeight="90.0" prefWidth="70.0">
                     <graphic>
@@ -88,23 +98,25 @@
                 </Button>
             </children>
         </HBox>
-      <VBox prefHeight="90.0" prefWidth="119.0" spacing="10.0">
-         <children>
-                <Button fx:id="submitButton" contentDisplay="CENTER" onAction="#handleSubmit" prefHeight="44.0" prefWidth="118.0" text="Submit" />
-                <Button fx:id="resetButton" onAction="#handleReset" prefHeight="42.0" prefWidth="117.0" text="Reset" />
-         </children>
-      </VBox>
-      <VBox.margin>
-         <Insets />
-      </VBox.margin>
-      <padding>
-         <Insets top="4.0" />
-      </padding>
+        <VBox alignment="CENTER" prefHeight="90.0" prefWidth="93.0" spacing="10.0">
+            <children>
+                <Button fx:id="resetButton" alignment="CENTER" contentDisplay="CENTER" onAction="#handleReset" prefHeight="75.0" prefWidth="75.0" text="Reset" textAlignment="CENTER">
+               <font>
+                  <Font size="20.0" />
+               </font></Button>
+            </children>
+        </VBox>
+        <VBox.margin>
+            <Insets />
+        </VBox.margin>
+        <padding>
+            <Insets top="4.0" />
+        </padding>
     </HBox>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
-   <opaqueInsets>
-      <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
-   </opaqueInsets>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+    </padding>
+    <opaqueInsets>
+        <Insets bottom="2.5" left="2.5" right="2.5" top="2.5" />
+    </opaqueInsets>
 </VBox>

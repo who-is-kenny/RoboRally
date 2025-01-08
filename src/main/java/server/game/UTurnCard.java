@@ -1,12 +1,7 @@
 package server.game;
 
-public class UTurnCard extends Cards{
+public class UTurnCard extends ChangeDirectionCard{
     public UTurnCard() {
-        super("UTurn");
-    }
-
-    @Override
-    public void playCardEffect(Player player) {
-
+        super(2);
     }
 }

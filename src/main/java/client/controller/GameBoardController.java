@@ -3,12 +3,17 @@ package client.controller;
 import client.Client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -406,6 +411,86 @@ public class GameBoardController implements Initializable {
                     showErrorPopup("Invalid Selection", "Please select exactly " + requiredCount + " cards.");
                 }
             });
+        });
+    }
+
+    public void showGameWinnerPopup(MessageBody messageBody) {
+        Platform.runLater(() -> {
+            // Extract the winner's client ID from the message body
+            int winnerClientID = messageBody.getClientID();
+
+            // Create an information alert to display the winner
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText("We Have a Winner!");
+            alert.setContentText("Congratulations Player " + winnerClientID + " , YOU WIN!");
+
+            // Show the alert and wait for user to close it
+            alert.showAndWait();
+        });
+    }
+
+    public void makeRobotVibrate(int clientID, double durationInSeconds) {
+        Platform.runLater(() -> {
+            // Find the robot image by its ID
+            ImageView robotImage = (ImageView) game_grid.getChildren().stream().filter(node -> node instanceof ImageView && Integer.toString(clientID).equals(node.getId())).findFirst().orElse(null);
+
+            if (robotImage != null) {
+                double originalRotate = robotImage.getRotate();
+
+                Timeline rotationTimeline = new Timeline(
+                        new KeyFrame(Duration.millis(50), e -> robotImage.setRotate(originalRotate - 15)),
+                        new KeyFrame(Duration.millis(100), e -> robotImage.setRotate(originalRotate + 15)),
+                        new KeyFrame(Duration.millis(150), e -> robotImage.setRotate(originalRotate))
+                );
+
+                rotationTimeline.setCycleCount((int) (durationInSeconds * 1000 / 150));
+                rotationTimeline.setOnFinished(e -> {
+                    robotImage.setRotate(originalRotate);
+                    System.out.println("Rotation completed for robot of Client ID: " + clientID);
+                });
+                rotationTimeline.play();
+            } else {
+                System.err.println("Robot for client ID " + clientID + " not found on the game board.");
+            }
+        });
+    }
+
+    public void makeAllRobotsShootLaser(double durationInSeconds) {
+        Platform.runLater(() -> {
+            // Iterate over all nodes in the game grid
+            for (javafx.scene.Node node : game_grid.getChildren()) {
+                if (node instanceof ImageView) {
+                    ImageView robotImage = (ImageView) node;
+
+                    // Create a red tint effect at the tip
+                    DropShadow laserGlow = new DropShadow();
+                    laserGlow.setColor(Color.WHITE);
+                    laserGlow.setRadius(10); // Intensity of the glow
+                    laserGlow.setSpread(0.8); // Concentrate the glow effect
+
+                    // Offset to the "tip" of the robot (assume the top side as the tip)
+                    laserGlow.setOffsetX(0);
+                    laserGlow.setOffsetY(-5); // Adjust for the tip; tune as per robot image size
+
+                    // Apply the effect to the robot image
+                    robotImage.setEffect(laserGlow);
+                }
+            }
+
+            // Create a Timeline to remove the effect from all robots after the duration
+            Timeline laserTimeline = new Timeline(
+                    new KeyFrame(Duration.seconds(durationInSeconds), e -> {
+                        for (javafx.scene.Node node : game_grid.getChildren()) {
+                            if (node instanceof ImageView) {
+                                ((ImageView) node).setEffect(null); // Remove the effect
+                            }
+                        }
+                        System.out.println("Laser effect completed for all robots.");
+                    })
+            );
+
+            laserTimeline.play();
         });
     }
 

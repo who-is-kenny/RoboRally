@@ -6,10 +6,14 @@ import com.google.gson.GsonBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Duration;
 import server.message.Message;
 import server.message.MessageBody;
@@ -29,16 +33,16 @@ public class RegisterController implements Initializable {
     @FXML private Button card1, card2, card3, card4, card5, card6, card7, card8, card9;
     @FXML private Button selectedCard1, selectedCard2, selectedCard3, selectedCard4, selectedCard5;
     @FXML private Button resetButton;
-    @FXML
-    private Label timer;
+    @FXML private Label gameState;
+    @FXML private Label gamePhase;
+    @FXML private Label timer;
 
     @FXML
     private Timeline timerAnimation;
     private final boolean[] cardsSelected = new boolean[9];
     private final boolean[] registersFilled = new boolean[5];
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
-//    private static final Gson gson = new Gson();
-    private boolean isTimerRunning = false;
+    private final boolean isTimerRunning = false;
     private int timeRemaining = 30;
 
     // For connection to client
@@ -119,7 +123,7 @@ public class RegisterController implements Initializable {
     }
 
     @FXML
-    public void handleCardSelection(javafx.event.ActionEvent actionEvent) {
+    public void handleCardSelection(ActionEvent actionEvent) {
         Button cardButton = (Button) actionEvent.getSource();
         int cardIndex = Integer.parseInt(cardButton.getId().replace("card", "")) - 1;
         if (cardsSelected[cardIndex]) return;
@@ -150,7 +154,7 @@ public class RegisterController implements Initializable {
             Message selectedCardMessage = new Message();
             selectedCardMessage.setMessageType("SelectedCard");
             MessageBody body = new MessageBody();
-            body.setCard(cardName);// needs to be fixed
+            body.setCard(cardName);
             body.setRegister(registerIndex);
             selectedCardMessage.setMessageBody(body);
             System.out.println(gson.toJson(selectedCardMessage)); // Todo remove kenny
@@ -178,7 +182,7 @@ public class RegisterController implements Initializable {
     }
 
     @FXML
-    public void handleRegisterClick(javafx.scene.input.MouseEvent mouseEvent) {
+    public void handleRegisterClick(MouseEvent mouseEvent) {
             Button register = (Button) mouseEvent.getSource();
             int registerIndex = getRegisterIndex(register);
 
@@ -210,14 +214,12 @@ public class RegisterController implements Initializable {
                 registersFilled[registerIndex] = false;
 
                 // TODO set card to Null message
-                // this was wrong b4
                 Message cardRemovedMessage = new Message();
                 cardRemovedMessage.setMessageType("SelectedCard");
                 MessageBody body = new MessageBody();
                 body.setRegister(registerIndex);
                 body.setCard("Null");
                 cardRemovedMessage.setMessageBody(body);
-                System.out.println(gson.toJson(cardRemovedMessage));
                 client.sendToClientHandler(gson.toJson(cardRemovedMessage));
             }
         }
@@ -243,6 +245,8 @@ public class RegisterController implements Initializable {
                         cardButtons[i].setDisable(false);
                         cardButtons[i].setOpacity(1.0);
                         cardButtons[i].setGraphic(cardImages[i]);
+                        cardButtons[i].setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+                        cardButtons[i].setAlignment(Pos.CENTER);
                         //added this
                         cardButtons[i].setText(cardName);
                     } catch (Exception e) {
@@ -346,18 +350,6 @@ public class RegisterController implements Initializable {
     }
 
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // Simulate receiving a card list from the server
-//        List<String> sampleCards = List.of(
-//                "MoveI", "TurnLeft", "UTurn", "BackUp", "PowerUp",
-//                "Again", "TurnLeft", "TurnLeft", "TurnRight"
-//        );
-//
-//        // Call the handleYourCards method with the simulated card list
-//        handleYourCards(sampleCards);
-    }
-
     public void handleactivephase2() {
         // Reset registers
         Button[] registers = getRegisterButtons();
@@ -385,7 +377,98 @@ public class RegisterController implements Initializable {
 
     }
 
-    
+
+
+    public void setGamePhase(int phaseID) {
+        String phaseText = switch (phaseID) {
+            case 0 -> "Starting point selection";
+            case 1 -> "Upgrade Phase";
+            case 2 -> "Programming Phase";
+            case 3 -> "Activation Phase";
+            default -> "Unknown Phase";
+        };
+
+        // Update the game state to reflect the phase change
+        String phaseStateText = switch (phaseID) {
+            case 0 -> "Pick a gear tile to start your journey!";
+            case 1 -> "Upgrade time! \n Boost your robot’s powers!";
+            case 2 -> "Decide your next steps";
+            case 3 -> "Robots are rolling! \n Let’s see your plan in action!";
+            default -> "???";
+        };
+
+        Platform.runLater(() -> {
+            gamePhase.setText(phaseText);
+            gameState.setText(phaseStateText);
+            System.out.println("Game phase updated to: " + phaseText);
+            System.out.println("Game state updated to: " + phaseStateText);
+        });
+    }
+
+    public void setGameState(String messageType, MessageBody messageBody, int clientID, int currentPlayerID) {
+        String stateText;
+
+        switch (messageType) {
+
+
+            case "CurrentPlayer": //DONE
+                if (currentPlayerID == clientID) {
+                    stateText = "Your turn!";
+                } else {
+                    stateText = "It's Player " + currentPlayerID + "'s turn";
+                }
+                break;
+
+            case "Reboot":
+                if (messageBody.getClientID() == clientID) {
+                    stateText = "Your robot is rebooting.";
+                } else {
+                    stateText = "Player " + messageBody.getClientID() + "'s robot is rebooting.";
+                }
+                break;
+
+            case "CheckPointReached":
+                if (messageBody.getClientID() == clientID) {
+                    stateText = "You reached a checkpoint!";
+                } else {
+                    stateText = "Player " + messageBody.getClientID() + " reached a checkpoint.";
+                }
+                break;
+
+//            case "PlayerAdded":
+//                stateText = "Player " + messageBody.getName() + " has joined the game.";
+//                break;
+
+            case "TimerStarted":
+                stateText = "Timer started";
+                break;
+
+            default:
+                stateText = "todo";
+        }
+
+        Platform.runLater(() -> {
+            gameState.setText(stateText);
+            System.out.println("Game state updated to: " + stateText);
+        });
+    }
+
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Simulate receiving a card list from the server
+//        List<String> sampleCards = List.of(
+//                "MoveI", "TurnLeft", "UTurn", "BackUp", "PowerUp",
+//                "Again", "TurnLeft", "TurnLeft", "TurnRight"
+//        );
+//
+//        // Call the handleYourCards method with the simulated card list
+//        handleYourCards(sampleCards);
+    }
+
+
+
+
     // use for temporary cards or something??
     public void sendPlayCard (String card){
         Message playCard = new Message();
@@ -441,7 +524,6 @@ public class RegisterController implements Initializable {
         });
     }
 
-
     /** --------------------------------------------------------------------------------------------------------------- **/
     // AI methods:
 
@@ -496,6 +578,4 @@ public class RegisterController implements Initializable {
                 }
             });
     }
-
-
 }

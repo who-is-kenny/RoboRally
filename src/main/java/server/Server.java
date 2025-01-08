@@ -10,9 +10,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
 
     private static final int PORT = 8888;
-    private ServerSocket serversocket;
-    private static Map<Integer, ClientHandler> clients = new ConcurrentHashMap<>();
-    private static AtomicInteger clientIdCounter = new AtomicInteger(1);
+    private final ServerSocket serversocket;
+    private static final Map<Integer, ClientHandler> clients = new ConcurrentHashMap<>();
+    private static final AtomicInteger clientIdCounter = new AtomicInteger(1);
 
 
     public Server(ServerSocket serversocket) {

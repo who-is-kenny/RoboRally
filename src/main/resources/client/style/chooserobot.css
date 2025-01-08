@@ -1,0 +1,143 @@
+.root {
+    -fx-background-color: linear-gradient(to bottom, #cbcacc, #cbcacc);
+    -fx-padding: 10px;
+}
+
+VBox, HBox {
+    -fx-spacing: 10px;
+}
+
+Label {
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;
+    -fx-text-fill: #ffffff;
+    -fx-wrap-text: true;
+    -fx-alignment: center;
+}
+
+#instruction, #instruction2 {
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+    -fx-background-color: #4a2485;
+    -fx-border-color: #4e2381;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+}
+
+#profile, #robotpane, #mappane {
+    -fx-background-color: linear-gradient(to bottom, #ffcc00, #ffcc00);
+    -fx-border-color: #836c00;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+}
+
+#ready_button, #not_ready_button {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+    -fx-border-radius: 50px;
+    -fx-background-radius: 50px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+}
+
+#ready_button {
+    -fx-background-color: linear-gradient(to bottom, #28a745, #218838);
+    -fx-border-color: #1e7e34;
+    -fx-text-fill: white;
+}
+
+#not_ready_button {
+    -fx-background-color: linear-gradient(to bottom, #dc3545, #c82333);
+    -fx-border-color: #bd2130;
+    -fx-text-fill: white;
+}
+
+#ready_button:hover, #not_ready_button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 10, 0, 0, 4);
+}
+
+#ready_button:pressed, #not_ready_button:pressed {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+.button {
+    -fx-font-family: "Arial";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #6f5796, linear-gradient(to bottom, #6f5796, #6f5796);
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 8px;
+}
+
+.button:hover {
+    -fx-background-color: #7a62a8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 15, 0, 0, 4);
+}
+
+.button:pressed {
+    -fx-background-color: #5e4b83;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+#profilepic {
+    -fx-background-color: linear-gradient(to bottom, #ffcc00, #ffcc00);
+    -fx-border-color: #836c00;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 4);
+}
+
+.choice-box {
+    -fx-background-color: linear-gradient(to bottom, #ffcc00, #ffc107);
+    -fx-border-color: #836c00;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 5px;
+    -fx-font-family: "Arial";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #533f00;
+}
+
+.choice-box .arrow {
+    -fx-background-color: #ffffff;
+    -fx-padding: 5px;
+    -fx-border-radius: 5px;
+}
+
+.choice-box .list-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #836c00;
+    -fx-border-width: 2px;
+    -fx-padding: 5px;
+}
+
+.choice-box .list-cell {
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+    -fx-text-fill: #533f00;
+    -fx-background-color: #ffffff;
+    -fx-padding: 10px;
+}
+
+.choice-box .list-cell:hover {
+    -fx-background-color: #ffe066;
+    -fx-text-fill: #000000;
+}
+
+.choice-box .list-cell:selected {
+    -fx-background-color: #ffcc00;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}

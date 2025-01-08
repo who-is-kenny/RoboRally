@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
@@ -7,32 +9,176 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.RobotSelectionController">
+<!-- stylesheets="@style/chooserobot.css" -->
+
+<AnchorPane id="bg" prefHeight="546.0" prefWidth="652.0" stylesheets="@style/chooserobot.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.RobotSelectionController">
    <children>
-      <TextField fx:id="player_name" layoutX="24.0" layoutY="316.0" promptText="enter name" />
-      <Button fx:id="confirm_robot" disable="true" layoutX="229.0" layoutY="316.0" mnemonicParsing="false" onAction="#confirmRobot" text="confirm" />
-      <RadioButton id="0" fx:id="robot_0" disable="true" layoutX="58.0" layoutY="147.0" mnemonicParsing="false" text="bot 0">
-         <toggleGroup>
-            <ToggleGroup fx:id="robots" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton id="1" fx:id="robot_1" disable="true" layoutX="257.0" layoutY="147.0" mnemonicParsing="false" text="bot 1" toggleGroup="$robots" />
-      <RadioButton id="2" fx:id="robot_2" disable="true" layoutX="453.0" layoutY="147.0" mnemonicParsing="false" text="bot 2" toggleGroup="$robots" />
-      <RadioButton id="3" fx:id="robot_3" disable="true" layoutX="58.0" layoutY="282.0" mnemonicParsing="false" text="bot 3" toggleGroup="$robots" />
-      <RadioButton id="4" fx:id="robot_4" disable="true" layoutX="257.0" layoutY="282.0" mnemonicParsing="false" text="bot 4" toggleGroup="$robots" />
-      <RadioButton id="5" fx:id="robot_5" disable="true" layoutX="453.0" layoutY="282.0" mnemonicParsing="false" text="bot 5" toggleGroup="$robots" />
-      <ToggleButton fx:id="ready_button" disable="true" layoutX="99.0" layoutY="355.0" mnemonicParsing="false" onAction="#confirmReady" text="READY!" underline="true">
-         <toggleGroup>
-            <ToggleGroup fx:id="ready" />
-         </toggleGroup>
-      </ToggleButton>
-      <ToggleButton fx:id="not_ready_button" disable="true" layoutX="180.0" layoutY="355.0" mnemonicParsing="false" onAction="#confirmUnready" text="not ready" toggleGroup="$ready" />
-      <ChoiceBox fx:id="available_maps" disable="true" layoutX="334.0" layoutY="341.0" prefWidth="150.0" />
-      <Button fx:id="select_map_button" disable="true" layoutX="502.0" layoutY="343.0" mnemonicParsing="false" onAction="#selectMap" text="select map" />
-      <Label layoutX="24.0" layoutY="21.0" text="Play as: " />
-      <Button fx:id="player_button" layoutX="101.0" layoutY="17.0" mnemonicParsing="false" onAction="#playAsPerson" text="PLAYER" />
-      <Button fx:id="AI_button" layoutX="188.0" layoutY="17.0" mnemonicParsing="false" onAction="#playAsAI" text="AI" />
+      <ImageView fitHeight="169.0" fitWidth="336.0" layoutX="170.0" layoutY="-38.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/RoboRally.png" />
+         </image>
+      </ImageView>
+      <Pane id="box1" layoutX="20.0" layoutY="93.0" prefHeight="338.0" prefWidth="621.0">
+         <children>
+            <ImageView fitHeight="338.0" fitWidth="620.0" layoutX="2.0" opacity="0.77" pickOnBounds="true">
+               <image>
+                  <Image url="@images/4x3Tiles.png" />
+               </image></ImageView>
+            <Pane id="instruction" layoutX="21.0" layoutY="25.0" prefHeight="42.0" prefWidth="313.0">
+               <children>
+                  <Label layoutX="4.0" layoutY="1.0" prefHeight="36.0" prefWidth="302.0" text="Select your robot, enter your name, and choose to play as AI or Player to get started!" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+               </children>
+            </Pane>
+            <Pane id="robotpane" layoutX="358.0" layoutY="18.0" prefHeight="296.0" prefWidth="242.0">
+               <children>
+                  <GridPane layoutX="8.0" layoutY="7.0" prefHeight="282.0" prefWidth="215.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="156.24685668945312" minWidth="10.0" prefWidth="139.816162109375" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.39918518066406" minWidth="10.0" prefWidth="132.183837890625" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                        <children>
+                           <RadioButton id="0" fx:id="robot_0" mnemonicParsing="false" toggleGroup="$robots">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@images/Robot_0.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                              <toggleGroup>
+                                 <ToggleGroup fx:id="robots" />
+                              </toggleGroup>
+                           </RadioButton>
+                           <RadioButton id="1" fx:id="robot_1" mnemonicParsing="false" toggleGroup="$robots" GridPane.columnIndex="1">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true">
+                                    <image>
+                                       <Image url="@images/Robot_1.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                           </RadioButton>
+                           <RadioButton id="2" fx:id="robot_2" mnemonicParsing="false" toggleGroup="$robots" GridPane.rowIndex="1">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@images/Robot_2.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                           </RadioButton>
+                           <RadioButton id="3" fx:id="robot_3" mnemonicParsing="false" toggleGroup="$robots" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@images/Robot_3.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                           </RadioButton>
+                           <RadioButton id="4" fx:id="robot_4" mnemonicParsing="false" toggleGroup="$robots" GridPane.rowIndex="2">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@images/Robot_4.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                           </RadioButton>
+                           <RadioButton id="5" fx:id="robot_5" mnemonicParsing="false" prefHeight="84.0" prefWidth="143.0" toggleGroup="$robots" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <graphic>
+                                 <ImageView fitHeight="90.0" fitWidth="90.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                       <Image url="@images/Robot_5.png" />
+                                    </image>
+                                 </ImageView>
+                              </graphic>
+                           </RadioButton>
+                        </children>
+                     </GridPane>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </Pane>
+            <Pane id="instruction2" layoutX="24.0" layoutY="274.0" prefHeight="1.0" prefWidth="312.0">
+               <children>
+                  <Label layoutX="6.0" layoutY="4.0" prefHeight="27.0" prefWidth="301.0" text="Be the first to click ‘READY!’ to select the game map" textAlignment="CENTER" textFill="WHITE" wrapText="true" />
+               </children>
+            </Pane>
+            <Pane id="profile" layoutX="21.0" layoutY="79.0" prefHeight="180.0" prefWidth="314.0">
+               <children>
+                  <Pane id="profile" layoutX="8.0" layoutY="13.0" prefHeight="154.0" prefWidth="125.0">
+                     <children>
+                        <ImageView fx:id="profilepic" fitHeight="100.0" fitWidth="100.0" layoutX="13.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
+                     </children></Pane>
+                  <VBox fillWidth="false" layoutX="140.0" layoutY="18.0" prefHeight="144.0" prefWidth="159.0">
+                     <children>
+                        <Label prefHeight="14.0" prefWidth="159.0" text="Play as : " />
+                        <HBox alignment="CENTER" fillHeight="false" prefHeight="25.0" prefWidth="159.0" scaleShape="false">
+                           <children>
+                              <Button id="PLAYER" fx:id="player_button" mnemonicParsing="false" onAction="#playAsPerson" prefHeight="26.0" prefWidth="109.0" text="PLAYER" wrapText="true">
+                              </Button>
+                              <Button id="AI" fx:id="AI_button" mnemonicParsing="false" onAction="#playAsAI" prefHeight="28.0" prefWidth="43.0" text="AI" />
+                           </children>
+                        </HBox>
+                        <TextField fx:id="player_name" alignment="CENTER" prefHeight="44.0" prefWidth="159.0" promptText="enter name">
+                           <font>
+                              <Font size="15.0" />
+                           </font></TextField>
+                        <Button fx:id="confirm_robot" disable="true" mnemonicParsing="false" onAction="#confirmRobot" prefHeight="48.0" prefWidth="159.0" text="confirm" wrapText="true">
+                           <font>
+                              <Font size="15.0" />
+                           </font></Button>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </VBox>
+               </children>
+            </Pane>
+         </children>
+      </Pane>
+      <Group layoutX="354.0" layoutY="450.0">
+         <children>
+            <Pane id="mappane" layoutX="1.0" layoutY="7.0" prefHeight="50.0" prefWidth="284.0">
+               <children>
+                  <HBox alignment="CENTER" layoutX="6.0" prefHeight="52.0" prefWidth="272.0">
+                     <children>
+                        <ChoiceBox fx:id="available_maps" disable="true" prefHeight="38.0" prefWidth="168.0" />
+                        <Button fx:id="select_map_button" disable="true" mnemonicParsing="false" onAction="#selectMap" prefHeight="31.0" prefWidth="117.0" text="select map">
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </Pane>
+         </children>
+      </Group>
+      <Group layoutX="93.0" layoutY="444.0">
+         <children>
+            <ToggleButton fx:id="ready_button" disable="true" layoutX="-68.0" layoutY="13.0" mnemonicParsing="false" onAction="#confirmReady" prefHeight="50.0" prefWidth="150.0" text="READY!" underline="true">
+               <toggleGroup>
+                  <ToggleGroup fx:id="ready" />
+               </toggleGroup>
+            </ToggleButton>
+            <ToggleButton fx:id="not_ready_button" disable="true" layoutX="95.0" layoutY="13.0" mnemonicParsing="false" onAction="#confirmUnready" prefHeight="50.0" prefWidth="150.0" text="not ready" toggleGroup="$ready" />
+         </children>
+      </Group>
    </children>
 </AnchorPane>

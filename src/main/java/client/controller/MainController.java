@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.layout.VBox;
+import lombok.Getter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -20,10 +21,9 @@ public class MainController implements Initializable {
     @FXML
     private VBox chatContainer;
 
+    @Getter
     private Client client;
-    public Client getClient() {
-        return client;
-    }
+
     public void setClient(Client client) {
         this.client = client;
         initializeControllers();

@@ -1,16 +1,16 @@
 package server.game.celltypes;
 
-import server.game.Position;
-
 public class Antenna extends Cell {
+        private static Antenna instance;
 
-    //constructors
-    public Antenna(Position position) {
-        super(position);
+        public static Antenna getInstance(){
+            if(instance == null){
+                instance = new Antenna();
+            }
+            return instance;
+        }
+        private Antenna(){
+            super(0,0);
+        }
     }
-
-    public Antenna(int positionX, int positionY) {
-        super(positionX, positionY);
-    }
-}
 

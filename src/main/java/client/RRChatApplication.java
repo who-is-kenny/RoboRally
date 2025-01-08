@@ -67,8 +67,9 @@ public class RRChatApplication extends Application {
         client.receiveFromClientHandler();
 
         // setting scene
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root);
         stage.setTitle("RoboRallyChat");
+        stage.sizeToScene();
         stage.setScene(scene);
         stage.show();
     }

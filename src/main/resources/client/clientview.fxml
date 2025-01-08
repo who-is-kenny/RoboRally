@@ -5,30 +5,43 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="380.0" prefWidth="330.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ClientController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="320.0" stylesheets="@style/chat.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ClientController">
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="3.0" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="chat_title" alignment="CENTER" text="Robo Rally Chat">
+            <!-- Chat title -->
+            <Label fx:id="chat_title" alignment="CENTER" graphicTextGap="5.0" prefHeight="29.0" prefWidth="302.0" text="Robo Rally Chat">
                <font>
-                  <Font size="20.0" />
+                  <Font name="Adelle Sans Devanagari Semibold" size="39.0" />
                </font>
             </Label>
+
+            <!-- ScrollPane to display messages -->
             <ScrollPane fx:id="sp_message" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                <content>
-                  <VBox fx:id="vbox_message" prefHeight="340.0" prefWidth="327.0" />
+                  <!-- VBox to hold chat messages -->
+                  <VBox fx:id="vbox_message" prefHeight="314.0" prefWidth="278.0" spacing="5.0">
+                     <!-- Placeholder for each message -->
+                     <HBox alignment="TOP_LEFT" spacing="10.0">
+                        <ImageView fx:id="profile_image" fitHeight="40" fitWidth="40" preserveRatio="true" />
+                        <VBox />
+                     </HBox>
+                  </VBox>
                </content>
             </ScrollPane>
-            <HBox prefHeight="27.0" prefWidth="600.0" spacing="10.0">
+
+            <!-- Input area for chat -->
+            <HBox prefHeight="27.0" prefWidth="600.0" spacing="3.0">
                <children>
-                  <ChoiceBox fx:id="name_dropdown" prefHeight="25.0" prefWidth="102.0" />
-                  <TextField fx:id="text_input" promptText="type message" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="button_send" mnemonicParsing="false" onAction="#sendMessage" text="Button" />
+                  <ChoiceBox fx:id="name_dropdown" prefHeight="33.0" prefWidth="53.0" />
+                  <TextField fx:id="text_input" prefHeight="32.0" prefWidth="138.0" promptText="type message" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="button_send" mnemonicParsing="false" onAction="#sendMessage" prefHeight="25.0" prefWidth="54.0" text="send" />
                </children>
             </HBox>
          </children>

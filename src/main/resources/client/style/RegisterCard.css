@@ -1,5 +1,5 @@
 .pane {
-    -fx-background-color: #1a1a1a;
+    -fx-background-color: #020202;
     -fx-border-color: #ffcc00;
     -fx-border-width: 2px;
     -fx-border-radius: 6px;
@@ -20,9 +20,25 @@
     -fx-cursor: hand;
 }
 
+
+#gamePhase {
+    -fx-background-color: #d3722b;
+    -fx-background-radius: 6px;
+    -fx-border-color: #d3722b;
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
+}
+
+
 #gameState {
-    -fx-background-color: #d90000;
-    -fx-border-color: #d90000;
+    -fx-background-color: #d3722b;
+    -fx-background-radius: 6px;
+    -fx-border-color: #d3722b;
     -fx-border-width: 2px;
     -fx-border-radius: 6px;
     -fx-text-fill: #ffffff;
@@ -33,8 +49,9 @@
 }
 
 #timer {
-    -fx-background-color: #0051a1;
-    -fx-border-color: #0051a1;
+    -fx-background-color: #12497c;
+    -fx-background-radius: 6px;
+    -fx-border-color: #12497c;
     -fx-border-width: 2px;
     -fx-border-radius: 6px;
     -fx-text-fill: #ffffff;
@@ -45,8 +62,8 @@
 }
 
 #card1, #card2, #card3, #card4, #card5, #card6, #card7, #card8, #card9 {
-    -fx-background-color: #800080;
-    -fx-border-color: #800080;
+    -fx-background-color: #3a275b;
+    -fx-border-color: #3a275b;
     -fx-border-width: 2px;
     -fx-border-radius: 6px;
     -fx-text-fill: #ffffff;
@@ -60,19 +77,19 @@
     -fx-cursor: hand;
 }
 
-#submitButton, #resetButton {
-    -fx-background-color: #d90000;
-    -fx-border-color: #d90000;
+#resetButton {
+    -fx-background-color: #b03715;
+    -fx-border-color: #b03715;
     -fx-border-width: 2px;
-    -fx-border-radius: 6px;
+    -fx-border-radius: 50%; /* Ensures the button is circular */
+    -fx-background-radius: 50%; /* Matches the border radius */
     -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, #000000, 5, 0.5, 0, 2);
 }
-
-#submitButton:hover, #resetButton:hover {
-    -fx-background-color: #aa0000;
+#resetButton:hover {
+    -fx-background-color: #7c260e;
     -fx-cursor: hand;
 }
 

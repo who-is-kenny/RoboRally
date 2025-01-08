@@ -4,28 +4,42 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<SplitPane dividerPositions="0.7035175879396985" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.MainController">
-  <items>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-         <children>
-            <SplitPane dividerPositions="0.6288416075650118" prefHeight="418.0" prefWidth="848.0">
-              <items>
-<!--                  <fx:include source="DizzyHighway.fxml" />-->
-<!--                  <fx:include source="clientview.fxml" />-->
-                  <VBox fx:id="gameBoardContainer">
-                      <!-- This is the area for your chat UI components -->
-                  </VBox>
+<SplitPane dividerPositions="0.606" orientation="VERTICAL" prefHeight="900.0" prefWidth="1050.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.MainController">
+    <items>
+        <!-- Top Section -->
+        <AnchorPane>
+            <children>
+                <SplitPane dividerPositions="0.628" prefHeight="400.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                        <!-- Left Pane: 400h x 520w -->
+                        <AnchorPane>
+                            <children>
+                                <VBox fx:id="gameBoardContainer" prefHeight="400.0" prefWidth="520.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <!-- Game Board Content -->
+                                </VBox>
+                            </children>
+                        </AnchorPane>
 
-                  <!-- Right side for Game Board -->
-                  <VBox fx:id="chatContainer" prefHeight="416.0" prefWidth="280.0">
-                  </VBox>
-              </items>
-            </SplitPane>
-         </children></AnchorPane>
-    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="850.0">
-         <children>
-            <VBox fx:id="registerContainer" layoutY="1.0" prefHeight="200.0" prefWidth="850.0" >
-            </VBox>
-         </children></AnchorPane>
-  </items>
+                        <!-- Right Pane: 380h x 330w -->
+                        <AnchorPane>
+                            <children>
+                                <VBox fx:id="chatContainer" prefHeight="380.0" prefWidth="330.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <!-- Chat Content -->
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </items>
+                </SplitPane>
+            </children>
+        </AnchorPane>
+
+        <!-- Bottom Section -->
+        <AnchorPane>
+            <children>
+                <VBox fx:id="registerContainer" prefHeight="218.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <!-- Registration Content -->
+                </VBox>
+            </children>
+        </AnchorPane>
+    </items>
 </SplitPane>

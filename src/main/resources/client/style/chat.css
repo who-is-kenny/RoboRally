@@ -1,0 +1,107 @@
+.root {
+    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+
+}
+
+#message-container {
+    -fx-spacing: 10;
+    -fx-padding: 5;
+}
+
+.text-bubble-sent {
+    -fx-background-color: #a1dff7;
+    -fx-padding: 10;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+.text-bubble-received {
+    -fx-background-color: #e8e8e8;
+    -fx-padding: 10;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+#chat_title {
+    -fx-text-fill: #ffcc00;
+    -fx-font-family: "Arial Black";
+    -fx-font-size: 20px;
+    -fx-alignment: center;
+}
+
+#sp_message {
+    -fx-background-color: #3E2A4DFF;
+    -fx-padding: 5;
+}
+
+.scroll-pane > .viewport {
+    -fx-background: #ffffff;
+    -fx-padding: 5;
+}
+
+.scroll-pane > .scroll-bar {
+    -fx-background-color: #3E2A4DFF;
+}
+
+.scroll-pane > .scroll-bar > .thumb {
+    -fx-background-color: #ffcc00;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.scroll-pane > .scroll-bar:hover > .thumb {
+    -fx-background-color: #ffdd33;
+}
+
+.scroll-pane > .scroll-bar > .increment-button,
+.scroll-pane > .scroll-bar > .decrement-button {
+    -fx-background-color: #3E2A4DFF;
+    -fx-background-radius: 6px;
+}
+
+.scroll-pane > .scroll-bar > .increment-button:hover,
+.scroll-pane > .scroll-bar > .decrement-button:hover {
+    -fx-background-color: #4b0082;
+}
+
+#name_dropdown {
+    -fx-background-color: #3E2A4DFF;
+    -fx-background-radius: 10px;
+    -fx-border-color: #3E2A4DFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+#text_input {
+    -fx-background-color: #3E2A4DFF;
+    -fx-background-radius: 20px;
+    -fx-border-color: #ffcc00;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-text-fill: #ffcc00;
+    -fx-padding: 5;
+    -fx-font-size: 14px;
+}
+
+#button_send {
+    -fx-background-color: #ffcc00;
+    -fx-background-radius: 22px;
+    -fx-border-color: #3E2A4DFF;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-text-fill: #3E2A4DFF;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+#button_send:hover {
+    -fx-background-color: #ff8c8c;
+    -fx-cursor: hand;
+}

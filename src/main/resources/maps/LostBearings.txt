@@ -1,0 +1,10 @@
+RebootPoint,Nothing,RightOne,Nothing,DownOne,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,UpOne,Nothing
+Nothing,StartPoint,Nothing,LeftOne,LeftOne,Nothing,LeftOne,LeftOne,RightOne,RightOne,Nothing,UpOne,LeftOne
+Nothing,WallUp,Nothing,Nothing,Nothing,EnergySpace,Pit,Nothing,CheckPoint3,Pit,EnergySpace,Nothing,Nothing
+StartPoint,Nothing,Nothing,Nothing,Nothing,DownTwo,WallLeftLaser,LaserHorizontal,LaserHorizontal,WallRightLaser,DownTwo,Nothing,Nothing
+Antenna,StartPoint,WallRight,Nothing,Nothing,GearCounterClockwise,Nothing,EnergySpace,GearCounterClockwise,Nothing,GearClockwise,CheckPoint1,Nothing
+Nothing,StartPoint,WallRight,Nothing,CheckPoint2,GearClockwise,Nothing,GearClockwise,EnergySpace,Nothing,GearCounterClockwise,Nothing,Nothing
+StartPoint,Nothing,Nothing,Nothing,Nothing,UpTwo,WallLeftLaser,LaserHorizontal,LaserHorizontal,WallRightLaser,UpTwo,Nothing,Nothing
+Nothing,WallDown,Nothing,Nothing,Nothing,EnergySpace,Pit,Nothing,CheckPoint4,Pit,EnergySpace,Nothing,Nothing
+Nothing,StartPoint,Nothing,RightOne,DownOne,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,RightOne,RightOne
+Nothing,Nothing,RightOne,Nothing,DownOne,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,UpOne,Nothing

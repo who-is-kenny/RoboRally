@@ -52,7 +52,6 @@ public class Client {
 
     private PrintWriter out;
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
-//    private final Gson gson = new Gson();
 
     private int totalClients = 0;
     private List<Integer> readyClientIDs = new ArrayList<>();
@@ -205,7 +204,6 @@ public class Client {
                         inputFromHandler = in.readLine(); // IO Error after we close everything the first time -> jump to catch -> then break to end thread
                         Message messageFromHandler = gson.fromJson(inputFromHandler , Message.class);
                         if ("GameStarted".equals(messageFromHandler.getMessageType())) {
-                            System.out.println("skipping game started message.");
                             continue; // Skip this message and go to the next iteration
                         }
                         MessageBody messageFromHandlerBody = messageFromHandler.getMessageBody();
@@ -226,7 +224,6 @@ public class Client {
                                 String playerName = messageFromHandlerBody.getName();
                                 int ClientID = messageFromHandlerBody.getClientID();
                                 int RobotID =messageFromHandlerBody.getFigure();
-                                System.out.println("adding robot to player" + ClientID + ","+ RobotID);
                                 gameBoardController.addClientIDRobotID(ClientID,RobotID);
                                 clientController.addClientIDName(playerName,ClientID);
                                 // counts the number of clients to be compared later with number of ready players
@@ -284,11 +281,9 @@ public class Client {
                             case "YourCards":
                                 cardsInHand = messageFromHandlerBody.getCardsInHandAsList();
                                 registerController.handleYourCards(cardsInHand);
-//                                if (isAI){
-//                                    AIHandleYourCards(messageFromHandlerBody);
-//                                }
                                 break;
                             case "TimerStarted":
+                                registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
                                 if (registerController != null) {
                                     registerController.startTimer(30);
                                 }
@@ -296,6 +291,7 @@ public class Client {
                             case "ActivePhase":
                                 activePhase = messageFromHandlerBody.getPhase();
                                 System.out.println("active phase: " + activePhase);  //TODO remove print
+                                registerController.setGamePhase(activePhase);
                                 if (messageFromHandlerBody.getPhase() == 0){
                                     robotSelectionController.switchToChatScene();
                                     clientController.updateClientList();
@@ -311,6 +307,7 @@ public class Client {
                                 break;
                             case "CurrentPlayer":
                                 currentPlayerID = messageFromHandlerBody.getClientID();
+                                registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
                                 System.out.println("currentplayer : " + currentPlayerID);  //TODO remove print
                                 if(isAI){
                                     if (currentPlayerID == clientID){
@@ -319,6 +316,8 @@ public class Client {
                                 }
                                 break;
                             case "StartingPointTaken":
+                                registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
+
                                 gameBoardController.handleStartingPointTaken(messageFromHandlerBody);
                                 break;
                             case "Movement":
@@ -332,14 +331,17 @@ public class Client {
                                 break;
                             case "Reboot":
                                 gameBoardController.handleReboot(messageFromHandlerBody);
+                                registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
                                 if(clientID == messageFromHandlerBody.getClientID()){
                                     gameBoardController.sendRebootPopup();
                                 }
+                                gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.GREENYELLOW,1.0);
                                 break;
                             case "Energy":
                                 gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.ORANGE,1.0);
                                 break;
                             case "CheckPointReached":
+                                registerController.setGameState(messageFromHandler.getMessageType(), messageFromHandlerBody, clientID, currentPlayerID);
                                 gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.YELLOW,1.0);
                                 break;
                             case "CardsYouGotNow":
@@ -351,6 +353,17 @@ public class Client {
                                 break;
                             case "ReplaceCard":
                                 registerController.handleReplaceCard(messageFromHandlerBody);
+                                break;
+                            case "DrawDamage":
+                                gameBoardController.applyGlowToRobot(messageFromHandlerBody.getClientID(), Color.RED,1.0);
+                                break;
+                            case "GameFinished":
+                                gameBoardController.showGameWinnerPopup(messageFromHandlerBody);
+                                break;
+                            case "Animation":
+                                if (messageFromHandlerBody.getType().equals("laser")){
+                                    gameBoardController.makeAllRobotsShootLaser(1.0);
+                                }
                                 break;
                         }
                     } catch (IOException e) {
@@ -369,7 +382,7 @@ public class Client {
         aliveMessage.setMessageType("Alive");
         aliveMessage.setMessageBody(new MessageBody());
         out.println(gson.toJson(aliveMessage));
-//        System.out.println("Sent 'Alive' response to handler.");    // TODO remove print
+        System.out.println("Sent 'Alive' response to handler.");    // TODO remove print
     }
 
     public void closeClient(){   //Socket socket, PrintWriter out, BufferedReader in

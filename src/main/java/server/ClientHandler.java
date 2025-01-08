@@ -2,16 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import server.game.Game;
+import server.game.Robot;
 import server.message.*;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +37,9 @@ public class ClientHandler implements Runnable{
     private PrintWriter out;
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(Message.class , new MessageSerializer()).create();
 
+    //timer handle to stop the timer should all players have passed their cards
+    private ScheduledExecutorService timerScheduler;
+
     // attributes for game.
 
     private String name;
@@ -51,6 +52,9 @@ public class ClientHandler implements Runnable{
     private int startingPointY;
     private boolean isAI = false;
     private boolean timerStarted = false;
+    private boolean finishedProgramming = false;
+    private boolean timerEnded = true;
+    private final String facingDirection = "right";
 
     ArrayList<String> cardsInHand = new ArrayList<>(Collections.nCopies(5, "Null"));
 
@@ -88,28 +92,17 @@ public class ClientHandler implements Runnable{
 
             // wait for client response to establish connection
             boolean connectionEstablished = false;
-            while (!connectionEstablished) {
-                try {
-                    String clientInput = in.readLine();
-                    if (clientInput == null) {
-                        throw new IOException("Client disconnected or sent invalid input.");
-                    }
-                    Message clientMessage = gson.fromJson(clientInput, Message.class);
-
-                    if (clientMessage.getMessageType().equals("HelloServer") &&
-                            "Version 0.1".equals(clientMessage.getMessageBody().getProtocol())) {
-                        connectionEstablished = true;
-                        this.isAI = clientMessage.getMessageBody().getAI();
-                    } else {
-                        sendErrorMessage();
-                    }
-                } catch (NullPointerException e) {
-                    System.err.println("NullPointerException: " + e.getMessage());
-                    closeEverything();
-                    break; // Exit the loop
+            while (!connectionEstablished){
+                String clientInput = in.readLine();
+                Message clientMessage = gson.fromJson(clientInput, Message.class);
+                if(clientMessage.getMessageType().equals("HelloServer") && clientMessage.getMessageBody().getProtocol().equals("Version 0.1")){
+                    connectionEstablished = true;
+                    this.isAI = clientMessage.getMessageBody().getAI();
+                }else{
+                    sendErrorMessage();
                 }
             }
-            System.out.println("Connection established, sending welcome message");
+            System.out.println("connection established sending welcome message");
 
             // send welcome message
             Message welcomeMessage = new Message();
@@ -119,8 +112,7 @@ public class ClientHandler implements Runnable{
             welcomeMessage.setMessageBody(welcomeMessageBody);
             out.println(gson.toJson(welcomeMessage));
 
-            // send information about selected robots
-//            sendCurrentSelections();
+
             // loops through clienthandlers and sends information about name and selected robot
             for (ClientHandler ch : clientHandlers){
                 if (ch.robotID != -1){
@@ -133,9 +125,6 @@ public class ClientHandler implements Runnable{
                     out.println(ch.createPlayerStatusMessage(true));
                 }
             }
-            // TODO send player statuses
-            // send information about player status
-
 
             System.out.println("waiting for client messages");
 
@@ -149,7 +138,7 @@ public class ClientHandler implements Runnable{
                 switch (clientMessage.getMessageType()){
                     case "Alive":
                         lastAliveResponseTime.replace(clientID, System.currentTimeMillis());
-//                        System.out.println("Received 'Alive' response from client " + clientID);
+                        //System.out.println("Received 'Alive' response from client " + clientID);
                         break;
                     case "PlayerValues":
                         handlePlayerValue(clientMessageBody);
@@ -207,6 +196,7 @@ public class ClientHandler implements Runnable{
                         break;
                     case "RebootDirection":
                         String direction = clientMessageBody.getDirection();
+                        Game.getInstance().passRebootDirection(clientID , direction);
                         switch (direction){
                             case "Right":
                                 sendRotationMessage(clientID, "clockwise");
@@ -223,26 +213,25 @@ public class ClientHandler implements Runnable{
                             default:
                                 System.out.println("direction invalid for reboot");
                         }
-                        // TODO send robot move message so that robot moves to reboot square
-                        // TODO send rotate message based on direction of choice sent by user in this switch case. ( access through client message body)
+                        // TODO GAME LOGIC send robot move message so that robot moves to reboot square
+                        // TODO GAME LOGIC send rotate message based on direction of choice sent by user in this switch case. ( access through client message body)
                         break;
                     case "SelectedCard":
-                        System.out.println("Handling SelectedCard..."); // todo remove
                         handleSelectedCard(clientMessageBody);
                         break;
                     case "SelectionFinished":
                         //handleSelectionFinished();
-                        if (!timerStarted){
-                            for (ClientHandler clientHandler : clientHandlers){
-                                clientHandler.timerStarted = true;
-                            }
-                            broadcastMessage(createTimerStartMessage());
-                            startServerTimer();
-                        }
-
+                        broadcastMessage(createTimerStartMessage());
+                        startServerTimer();
+                        this.finishedProgramming = true;
+                        this.timerEnded = true;
+                        System.out.println("CLIENTHANDLER.run(): got Selection Finished");
                         break;
                     case "PlayCard":
                         sendCardPlayed(clientMessageBody);
+                        break;
+                    case "SelectedDamage":
+                        Game.getInstance().givePlayerSelectedDamage(clientMessageBody,clientID);
                         break;
 
 
@@ -252,8 +241,6 @@ public class ClientHandler implements Runnable{
             closeEverything();
             e.printStackTrace();
         }
-
-
     }
 
 
@@ -288,7 +275,6 @@ public class ClientHandler implements Runnable{
     }
 
     private void handleSetStartingPoint(MessageBody clientMessageBody) {
-        boolean Selectionfinished = false;
 
 
         startingPointX = clientMessageBody.getX();
@@ -304,32 +290,23 @@ public class ClientHandler implements Runnable{
         startingPointTakenMessage.setMessageBody(startingPointTakenMessageBody);
         broadcastMessage(gson.toJson(startingPointTakenMessage));
 
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
         // update current player to the next player
         if (counter < clientHandlers.size()){
             broadcastMessage(createCurrentPlayerMessage());
-            sendYourCards(sampleCards);
-            sendReplaceCard(1,"MoveI",this.clientID);
+            //[timo, 6.12., 18:42] sendYourCards(sampleCards); // TODO GAME LOGIC remove
         }else{
-            // swtich to next phase
-            // TODO GAME LOGIC create instance of game in server class
-            // TODO GAME LOGIC maybe game loop starts here
-            // TODO GAME LOGIC loop through clienthandlers, create a player instance for each client handler and add to game.
-            System.out.println("sending cards to last player now");
-            sendYourCards(sampleCards);
-            Selectionfinished = true;
+            // DONE GAME LOGIC create instance of game in server class
+            // DONE GAME LOGIC loop through clienthandlers, create a player instance for each client handler and add to game.
+            Game game = Game.getInstance();
+            game.initialize(clientHandlers);
+            // DONE GAME LOGIC maybe game loop starts here
+            new Thread(game).start();
 
 
+            // DONE GAME LOGIC use send Your Cards method to send cards to client and remove sendyourcards(samplecards)
+            //switchToProgrammingPhase();[timo, 8.12.] implemented in Game.programmingPhase() //needs to be called from game
+            //sendYourCards(sampleCards); -"-
 
-        }
-        if (Selectionfinished){
-            System.out.println("Switching to programming phase now");
-            switchToProgrammingPhase();
         }
 
 
@@ -351,13 +328,6 @@ public class ClientHandler implements Runnable{
             pmb.setPrivate(false);
             pm.setMessageBody(pmb);
             broadcastMessage(gson.toJson(pm));
-            sendMovementMessage(1,6,6);// TODO remove this test later
-//            broadcastMessage(createRotationMessage(2 , "clockwise")); // TODO remove this test later
-//            broadcastMessage(createRebootMessage(2));
-//            sendCheckPointMessage(2,1);
-//            sendPickDamageMessage(5,List.of("Virus","Trojan"));
-
-
         }else{
             //create private message from server
             Message dm = new Message();
@@ -467,7 +437,7 @@ public class ClientHandler implements Runnable{
         broadcastMessage(gson.toJson(cardPlayed));
     }
 
-    //(7)
+    //(7) //TODO GAME LOGIC use these methods in game logic
     // current player message
     private static int counter = 0;
     private String createCurrentPlayerMessage(){
@@ -494,16 +464,12 @@ public class ClientHandler implements Runnable{
     }
 
     public void switchToProgrammingPhase(){
-//        try {
-//            Thread.sleep(200);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+        System.out.println("=====================> Programming Phase <==================================");
         broadcastMessage(createActivePhaseMessage(2));
     }
 
     public void switchToAktivierungPhase(){
-        System.out.println("switching to aktivierungsphase");
+        System.out.println("======================> switching to aktivierungsphase <====================");
         broadcastMessage(createActivePhaseMessage(3));
     }
 
@@ -523,8 +489,6 @@ public class ClientHandler implements Runnable{
         out.println(gson.toJson(yourCards));
 
     }
-
-
 
     public void sendNotYourCards (int clientID){
         Message notYourCards = new Message();
@@ -554,7 +518,7 @@ public class ClientHandler implements Runnable{
         cardSelectedBody.setFilled(filled);
         cardSelected.setMessageBody(cardSelectedBody);
         broadcastMessage(gson.toJson(cardSelected));
-        System.out.println("sending card selected message to other clients");
+        //System.out.println("sending card selected message to other clients");
     }
 
     private String createTimerStartMessage (){
@@ -596,16 +560,17 @@ public class ClientHandler implements Runnable{
         Message replaceCard = new Message();
         replaceCard.setMessageType("ReplaceCard");
         MessageBody replaceCardBody = new MessageBody();
-        replaceCardBody.setRegister(register - 1); // since register starts 0 and in game logic 1
+        replaceCardBody.setRegister(register);
         replaceCardBody.setNewCard(newCard);
         replaceCardBody.setClientID(clientID);
         replaceCard.setMessageBody(replaceCardBody);
         broadcastMessage(gson.toJson(replaceCard));
     }
 
-    // (8) //TODO use these methods in game logic
+    // (8) //TODO GAME LOGIC use these methods in game logic
     //movement
     public void sendMovementMessage(int ClientID , int x, int y){
+        System.out.println("CLIENTHANDLER.sendMovementMessage(" + ClientID + ", " + x + ", " + y + ")");
         Message MovementMessage = new Message();
         MovementMessage.setMessageType("Movement");
         MessageBody MovementMessageBody = new MessageBody();
@@ -768,7 +733,7 @@ public class ClientHandler implements Runnable{
         aliveMessage.setMessageType("Alive");
         aliveMessage.setMessageBody(new MessageBody());
         out.println(gson.toJson(aliveMessage));
-//        System.out.println("Sent 'Alive' message to client " + clientID);
+        //System.out.println("Sent 'Alive' message to client " + clientID);
     }
 
     private void checkForClientTimeout() {
@@ -784,99 +749,94 @@ public class ClientHandler implements Runnable{
     }
 
     private void startServerTimer(){
-        System.out.println("server timer started.");
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.schedule(() -> {
+
+        this.timerScheduler = Executors.newScheduledThreadPool(1);
+        this.timerScheduler.schedule(() -> {
             // Action to perform after 30 seconds
             List<Integer> clientsWithNullCards = new ArrayList<>();
-            for (ClientHandler clientHandler : clientHandlers){
-                if (clientHandler.cardsInHand.contains("Null")){
-                    clientsWithNullCards.add(clientID);
+            if (!this.timerEnded) {
+                for (ClientHandler clientHandler : clientHandlers) {
+                    clientHandler.setTimerStatus(true);
+                    if (clientHandler.cardsInHand.contains("Null")) {
+                        clientsWithNullCards.add(clientID);
+                    }
                 }
             }
             sendTimerEnded(clientsWithNullCards);
-
-            String[] moves = {"MoveI", "MoveII"};
-
-            for (ClientHandler clientHandler : clientHandlers){
-                if (clientHandler.cardsInHand.contains("Null")){
-                    Message cardyougot = new Message();
-                    cardyougot.setMessageType("CardsYouGotNow");
-                    MessageBody aasefase = new MessageBody();
-                    aasefase.setCards(List.of(moves));
-                    cardyougot.setMessageBody(aasefase);
-                    clientHandler.out.println(gson.toJson(cardyougot));
-                    System.out.println(gson.toJson(cardyougot));
-                }
-            }
-        }, 30, TimeUnit.SECONDS);
-        scheduler.schedule(() -> {
-            switchToAktivierungPhase();
-            switchToProgrammingPhase();
-            for (ClientHandler ch : clientHandlers){
-                ch.resetCardsInHand();
-                ch.timerStarted = false;
-            }
-//            resetCardsInHand();
-//            timerStarted = false;
-            Collections.shuffle(sampleCards);
-            sendYourCards(sampleCards);
-        }, 35, TimeUnit.SECONDS);
+        }, 5, TimeUnit.SECONDS);
     }
 
     public void closeEverything(){
         running = false;
-        System.out.println("Closing connection for client " + clientID);
+        out.println("closing client handler");
+        clientHandlers.remove(this);
         try {
-            if (out != null) {
-                out.close();
-            }
-            if (in != null) {
-                in.close();
-            }
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
+            in.close();
+            out.close();
+            socket.close();
         } catch (IOException e) {
-            System.err.println("Error while closing connection: " + e.getMessage());
-        } finally {
-            clientHandlers.remove(this);
-            clients.remove(clientID);
-            System.out.println("Connection closed for client " + clientID);
+            e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        Gson gson1 = new Gson();
-//
-//        MessageBody body = new MessageBody();
-//        body.setProtocol("Version 0.1");
-//
-//        Message message = new Message();
-//        message.setMessageType("HelloClient");
-//        message.setMessageBody(body);
-//        System.out.println(gson.toJson(message));
 
-//        Collections.shuffle(sampleCards);
-//        System.out.println(sampleCards);
-//        Collections.shuffle(sampleCards);
-//        System.out.println(sampleCards);
+    }
+    //[timo, 6.12.] getter for game initialization
+    public String getName(){
+        return this.name;
+    }
+    public int getRobotID(){
+        return this.robotID;
+    }
+    public int[] getStartingPosition(){
+        return new int[]{this.startingPointX, this.startingPointY};
+    }
+    public String getSelectedMap(){
+        return this.selectedMap;
+    }
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Message.class, new MessageSerializer())
-                .create();
+    public boolean isFinishedProgramming(){
+        return this.finishedProgramming;
+    }
 
-        Message helloClient = new Message();
-        helloClient.setMessageType("HelloClient");
-        MessageBody helloClientBody = new MessageBody();
-        helloClientBody.setProtocol("Version 0.1");
-        helloClient.setMessageBody(helloClientBody);
-        System.out.println(gson.toJson(helloClient));
+    /**
+     * sets finishedProgramming = false
+     */
+    public void setProgrammingFlag(){
+        this.finishedProgramming = false;
+        //System.out.println("CLIENTHANDLER.setProgrammingFlag() " + this.finishedProgramming);
+    }
 
-        System.out.println(gson1.toJson(helloClient));
+    public ArrayList<String> getCardsInHand(){
+        return this.cardsInHand;
+    }
 
+    public boolean getTimerStatus(){
+        return this.timerEnded;
+    }
 
+    /**
+     * sets the boolean timerEnded to the provided boolean
+     * @param timerEnded
+     */
+    public void setTimerStatus(boolean timerEnded){
+        this.timerEnded = timerEnded;
+        //System.out.println("CLIENTHANDLER.setTimerStatus("+ this.timerEnded + ")");
+    }
 
+    public void shutdownTimer(){
+        if (this.timerScheduler != null){
+            timerScheduler.shutdown();
+        }
+    }
+
+    public String getFacingDirection(){
+        return this.facingDirection;
+    }
+
+    public int getClientID(){
+        return this.clientID;
     }
 }
 
