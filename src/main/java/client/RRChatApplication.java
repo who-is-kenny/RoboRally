@@ -33,6 +33,7 @@ public class RRChatApplication extends Application {
         GameBoardController gameBoardController = gameBoardLoader.getController();
         client.setGameBoardController(gameBoardController);
         gameBoardController.setClient(client);
+        gameBoardController.setPrimaryStage(stage);
 
         //creating register loader
         FXMLLoader registerLoader = new FXMLLoader(RRChatApplication.class.getResource("RegisterCard.fxml"));

@@ -20,6 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import server.message.Message;
 import server.message.MessageBody;
@@ -67,6 +68,18 @@ public class GameBoardController implements Initializable {
     }
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    private Stage primaryStage;
+
+    // Other fields and methods
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     // stores client id and robot id for starting point selection.
@@ -298,6 +311,13 @@ public class GameBoardController implements Initializable {
             dialog.setHeaderText("Reboot Required!");
             dialog.setContentText("Choose a direction to reboot:");
 
+            // Set the owner of the dialog to ensure it's centered relative to the main window
+            dialog.initOwner(primaryStage);
+
+            // Center the dialog within the window (important if the window moves)
+            dialog.setX(primaryStage.getX() + (primaryStage.getWidth() - dialog.getWidth()) / 2);
+            dialog.setY(primaryStage.getY() + (primaryStage.getHeight() - dialog.getHeight()) / 2);
+
             // Show the dialog and wait for user input
             Optional<String> result = dialog.showAndWait();
 
@@ -425,6 +445,12 @@ public class GameBoardController implements Initializable {
             alert.setHeaderText("We Have a Winner!");
             alert.setContentText("Congratulations Player " + winnerClientID + " , YOU WIN!");
 
+            alert.initOwner(primaryStage); // <-- This will center the popup
+
+            // Center the dialog within the window (important if the window moves)
+            alert.setX(primaryStage.getX() + (primaryStage.getWidth() - alert.getWidth()) / 2);
+            alert.setY(primaryStage.getY() + (primaryStage.getHeight() - alert.getHeight()) / 2);
+
             // Show the alert and wait for user to close it
             alert.showAndWait();
         });
@@ -528,6 +554,11 @@ public class GameBoardController implements Initializable {
 
         alert.getDialogPane().setContent(vbox);
 
+        alert.initOwner(primaryStage);  // This makes sure it follows the primary stage
+        // Center the dialog within the window (important if the window moves)
+        alert.setX(primaryStage.getX() + (primaryStage.getWidth() - alert.getWidth()) / 2);
+        alert.setY(primaryStage.getY() + (primaryStage.getHeight() - alert.getHeight()) / 2);
+
         // Show the dialog and wait for user input
         alert.showAndWait();
 
@@ -552,6 +583,10 @@ public class GameBoardController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(message);
+        alert.initOwner(primaryStage);  // This makes sure it follows the primary stage
+        // Center the dialog within the window (important if the window moves)
+        alert.setX(primaryStage.getX() + (primaryStage.getWidth() - alert.getWidth()) / 2);
+        alert.setY(primaryStage.getY() + (primaryStage.getHeight() - alert.getHeight()) / 2);
         alert.showAndWait();
     }
 
