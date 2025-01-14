@@ -305,6 +305,8 @@ public class Game implements Runnable {
                 ((RebootPoint) cell).applyEffect(player);
             } else if (cell instanceof ConveyerBelt) {
                 ((ConveyerBelt) cell).robotMovement(player.getRobot());
+            } else if (cell instanceof ConveyerBeltWithTurn) {
+                ((ConveyerBeltWithTurn) cell).robotMovement(player.getRobot());
             } else if (cell instanceof ConveyerBeltWithLaser) {
                 ((ConveyerBeltWithLaser) cell).robotMovement(player.getRobot());
             } else if (cell instanceof WallWithLaser) {

@@ -52,6 +52,38 @@ public class MapReader {
                 return createConveyerBelt(positionX, positionY, OrientationEnum.D, 1);
             } else if (str.equals("DownTwo")) {
                 return createConveyerBelt(positionX, positionY, OrientationEnum.D, 2);
+            } else if (str.equals("RTRightOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.R, 1,true);
+            } else if (str.equals("RTRightTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.R, 2,true);
+            } else if (str.equals("RTLeftOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.L, 1,true);
+            } else if (str.equals("RTLeftTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.L, 2,true);
+            } else if (str.equals("RTUpOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.U, 1,true);
+            } else if (str.equals("RTUpTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.U, 2,true);
+            } else if (str.equals("RTDownOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.D, 1,true);
+            } else if (str.equals("RTDownTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.D, 2,true);
+            } else if (str.equals("LTRightOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.R, 1,false);
+            } else if (str.equals("LTRightTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.R, 2,false);
+            } else if (str.equals("LTLeftOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.L, 1,false);
+            } else if (str.equals("LTLeftTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.L, 2,false);
+            } else if (str.equals("LTUpOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.U, 1,false);
+            } else if (str.equals("LTUpTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.U, 2,false);
+            } else if (str.equals("LTDownOne")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.D, 1,false);
+            } else if (str.equals("LTDownTwo")) {
+                return createConveyerBeltWithTurn(positionX, positionY, OrientationEnum.D, 2,false);
             } else if (str.equals("WallRight")) {
                 return createWall(positionX, positionY, OrientationEnum.R);
             } else if (str.equals("WallUp")) {
@@ -162,7 +194,7 @@ public class MapReader {
 
     private static Cell createConveyerBeltWithTurn(int row, int col, OrientationEnum orientation, int distance, boolean isClockwise) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<?> clz = Class.forName(FULLY_QUALIFIED_NAME_OF_CONVEYERBELT_WITH_TURN);
-        ConveyerBeltWithTurn conveyerBeltWithTurn = (ConveyerBeltWithTurn) clz.getDeclaredConstructor(Integer.class, Integer.class, OrientationEnum.class, Integer.class, Boolean.class).newInstance(row, col, orientation, distance);
+        ConveyerBeltWithTurn conveyerBeltWithTurn = (ConveyerBeltWithTurn) clz.getDeclaredConstructor(Integer.class, Integer.class, OrientationEnum.class, Integer.class, Boolean.class).newInstance(row, col, orientation, distance , isClockwise);
         return conveyerBeltWithTurn;
     }
 

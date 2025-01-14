@@ -1,10 +1,10 @@
 Nothing,Nothing,RightOne,Nothing,DownTwo,Nothing,DownTwo,Nothing,Nothing,Nothing,Nothing,Nothing,EnergySpace
-Nothing,StartPoint,Nothing,Nothing,DownTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo
-Nothing,WallUp,Nothing,Nothing,DownTwo,EnergySpace,Nothing,Nothing,Nothing,Nothing,Nothing,UpTwo,LeftTwo
+Nothing,StartPoint,Nothing,Nothing,LTDownTwo,LeftTwo,RTLeftTwo,LeftTwo,LeftTwo,LeftTwo,LeftTwo,LTLeftTwo,LeftTwo
+Nothing,WallUp,Nothing,Nothing,DownTwo,EnergySpace,Nothing,Nothing,Nothing,Nothing,Nothing,RTUpTwo,LeftTwo
 StartPoint,Nothing,Nothing,Nothing,DownTwo,Nothing,WallUpLaser,RebootPoint,WallLeftLaser,WallRightLaser,Nothing,UpTwo,CheckPoint1
 Antenna,StartPoint,WallRight,Nothing,DownTwo,Nothing,WallDownLaser,Nothing,EnergySpace,Nothing,Nothing,UpTwo,Nothing
 Nothing,StartPoint,WallRight,Nothing,DownTwo,Nothing,Nothing,EnergySpace,Nothing,WallUpLaser,Nothing,UpTwo,Nothing
 StartPoint,Nothing,Nothing,Nothing,DownTwo,Nothing,WallLeftLaser,WallRightLaser,Nothing,WallDownLaser,Nothing,UpTwo,Nothing
-Nothing,WallDown,Nothing,RightTwo,DownTwo,Nothing,Nothing,Nothing,Nothing,Nothing,EnergySpace,UpTwo,Nothing
-Nothing,StartPoint,Nothing,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,Nothing
+Nothing,WallDown,Nothing,RightTwo,RTDownTwo,Nothing,Nothing,Nothing,Nothing,Nothing,EnergySpace,UpTwo,Nothing
+Nothing,StartPoint,Nothing,RightTwo,LTRightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RightTwo,RTRightTwo,LTUpTwo,Nothing
 Nothing,Nothing,RightOne,EnergySpace,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,UpTwo,UpTwo,Nothing
