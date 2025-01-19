@@ -1,10 +1,7 @@
 package server.game;
 
 import content.OrientationEnum;
-import server.game.celltypes.Antenna;
-import server.game.celltypes.Cell;
-import server.game.celltypes.Wall;
-import server.game.celltypes.WallWithLaser;
+import server.game.celltypes.*;
 
 public class Move {
     public static Position calculateNewPosition(OrientationEnum orientation, Position currentPos, int amount) {
@@ -89,6 +86,12 @@ public class Move {
                 System.out.println("MOVE.validateMove() detected antenna. Move not allowed.");
                 return false;
             }
+
+        if (newCell instanceof Pit){
+            System.out.println("MOVE.validateMove() detected pit. reboot.");
+            ((Pit) newCell).robotMovement(r);
+            return false;
+        }
         /*if (Math.abs(r.getRobotPosition().getPositionX() - col) > 1 || Math.abs(r.getRobotPosition().getPositionY() - row) > 1) {
             return false;
         }*/
