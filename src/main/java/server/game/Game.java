@@ -473,10 +473,12 @@ public class Game implements Runnable {
 
     private void shootLasers2() {
         for (Player shooter : playersInGame) {
-            for (Player target : playersInGame) {
-                if (shooter != target && isShootingAt(shooter, target) && !isWallBlocking(shooter, target)) {
-                    target.passDrawDamage(); // Apply damage effect to the target
-                    givePlayerSpamCard(target); // Give spam card to the target
+            if (!shooter.getRobot().isRobotRebooting()){
+                for (Player target : playersInGame) {
+                    if (shooter != target && isShootingAt(shooter, target) && !isWallBlocking(shooter, target)) {
+                        target.passDrawDamage(); // Apply damage effect to the target
+                        givePlayerSpamCard(target); // Give spam card to the target
+                    }
                 }
             }
         }
