@@ -9,22 +9,24 @@
         <!-- Top Section -->
         <AnchorPane>
             <children>
-                <SplitPane dividerPositions="0.628" prefHeight="400.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <SplitPane dividerPositions="0.62" prefHeight="400.0" prefWidth="850.0">
                     <items>
-                        <!-- Left Pane: 400h x 520w -->
+                        <!-- Left Pane: Game Board -->
                         <AnchorPane>
                             <children>
-                                <VBox fx:id="gameBoardContainer" prefHeight="400.0" prefWidth="520.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <!-- Game Board Content -->
+                                <VBox fx:id="gameBoardContainer" prefHeight="400.0"
+                                      AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                      AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 </VBox>
                             </children>
                         </AnchorPane>
 
-                        <!-- Right Pane: 380h x 330w -->
+                        <!-- Right Pane: Chat -->
                         <AnchorPane>
                             <children>
-                                <VBox fx:id="chatContainer" prefHeight="380.0" prefWidth="330.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                    <!-- Chat Content -->
+                                <VBox fx:id="chatContainer" prefHeight="370.0"
+                                      AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                      AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 </VBox>
                             </children>
                         </AnchorPane>
