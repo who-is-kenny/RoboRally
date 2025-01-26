@@ -288,6 +288,9 @@ public class Client {
                                     registerController.startTimer(30);
                                 }
                                 break;
+                            case "TimerEnded":
+                                registerController.onAllPlayersFinished();
+                                break;
                             case "ActivePhase":
                                 activePhase = messageFromHandlerBody.getPhase();
                                 System.out.println("active phase: " + activePhase);  //TODO remove print

@@ -288,6 +288,20 @@ public class RegisterController implements Initializable {
         timerAnimation.play();
     }
 
+    public void stopTimer() {
+        Platform.runLater(() -> {
+            if (timerAnimation != null) {
+                timerAnimation.stop();
+            }
+            timeRemaining = 0;
+            timer.setText("00:00"); // Ensure UI update happens on JavaFX thread
+        });
+    }
+
+    public void onAllPlayersFinished() {
+        Platform.runLater(this::stopTimer);
+    }
+
     private void handleTimerEnded() {
         // TODO 'TimerEnded' message ???
     }

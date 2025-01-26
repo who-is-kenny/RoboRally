@@ -9,6 +9,9 @@ import server.message.ActiveCard;
 import server.message.MessageBody;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Game implements Runnable {
     private static final int TURN_DURATION_SECONDS = 30;
@@ -230,36 +233,60 @@ public class Game implements Runnable {
     //next thing DONE
     private void programmingPhase() {
         programmingPhase = true;
-        for (Player p: this.playersInGame) {
+
+        // Initialize players for the programming phase
+        for (Player p : this.playersInGame) {
             p.getRobot().setRebootRobot(false);
             p.drawHandCards();
             p.startProgrammingPhase();
         }
+
         System.out.println("GAME.programmingPhase(): waiting for clients to return their registers");
-        //while (!allFinishedProgramming() && !programmingTimerEnded()){}
-        while (!someoneFinishedProgramming()){}
-        try{
-            Thread.sleep(5050);
-        } catch (InterruptedException e) {}
-        System.out.println("GAME.programmingPhase(): detected finished timer or timer ran out. reading registers...");
-        for (Player p: this.playersInGame){
+
+        // Create a scheduled executor to handle the timer
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        synchronized (this) {
+            while (!someoneFinishedProgramming()) { // Wait for at least one player to finish
+                try {
+                    wait(1000); // Check every second
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        // Start a timer that will execute after 30 seconds
+        scheduler.schedule(() -> {
+            System.out.println("GAME.programmingPhase(): Timer expired!");
+            synchronized (this) {
+                notifyAll(); // Wake up the waiting thread
+            }
+        }, 30, TimeUnit.SECONDS);
+
+        // Wait until either the timer expires or all players finish programming
+        synchronized (this) {
+            while (!allFinishedProgramming()) {
+                try {
+                    wait(1000); // Check every second if all players are done
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        // If all players finished before the timer, cancel the scheduled task
+        scheduler.shutdownNow();
+
+        System.out.println("GAME.programmingPhase(): detected all players finished or timer ran out. Reading registers...");
+
+        for (Player p : this.playersInGame) {
             p.loadRegisterFromClient();
-            System.out.println(p.getName() + ": " +p.getPlayerRegister().toString());
+            System.out.println(p.getName() + ": " + p.getPlayerRegister().toString());
             p.passTimerEndedMessage();
         }
-        programmingPhase = false;
-        /*
-        do {
-            //player programming
-        } while (!someOneFinishedProgramming());
-        // [timo, 8.12.] timer already fully implemented in ClientHandler: startTurnTimer();
-        while (!turnTimerExpired) {
-            //player can still programm
-        }
-        programmingPhase = false;
-        //json data while programming ?
 
-         */
+        programmingPhase = false;
     }
 
     private boolean programmingTimerEnded(){

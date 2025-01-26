@@ -308,7 +308,8 @@ public class ClientHandler implements Runnable{
                                     this.timerEnded = true;
                                     System.out.println("Real player detected: Processing 'SelectionFinished' normally.");
                                 } else {
-                                    System.out.println("Ignoring 'SelectionFinished' message from AI client.");
+//                                    System.out.println("Ignoring 'SelectionFinished' message from AI client.");
+                                    this.finishedProgramming = true;
                                 }
                             }
                         }
