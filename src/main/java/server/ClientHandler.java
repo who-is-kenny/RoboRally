@@ -48,7 +48,7 @@ public class ClientHandler implements Runnable{
     private final int clientID;
     private int robotID = -1;
     private boolean isReady;
-    static List<String> availableMaps = List.of("DizzyHighway" , "LostBearings" , "ExtraCrispy" , "DeathTrap");
+    static List<String> availableMaps = List.of("DizzyHighway" , "LostBearings" , "ExtraCrispy" , "DeathTrap" , "Twister");
     private String selectedMap;
     private int startingPointX;
     private int startingPointY;
@@ -294,16 +294,22 @@ public class ClientHandler implements Runnable{
 
                             if (allAI) {
                                 // Handle Selection Finished for AIs
-                                out.println(createTimerStartMessage());
-                                startServerTimer();
+//                                out.println(createTimerStartMessage());
+//                                startServerTimer();
                                 this.finishedProgramming = true;
                                 this.timerEnded = true;
                                 System.out.println("All AI clients: Starting timer and proceeding.");
                             } else {
                                 // If not all clients are AIs, ignore this message from AIs
                                 if (!isAI) {
-                                    broadcastMessage(createTimerStartMessage());
-                                    startServerTimer();
+                                    if(!timerStarted){
+                                        broadcastMessage(createTimerStartMessage());
+                                        for (ClientHandler clientHandler : clientHandlers){
+                                            clientHandler.timerStarted = true;
+                                        }
+
+                                    }
+//                                    startServerTimer();
                                     this.finishedProgramming = true;
                                     this.timerEnded = true;
                                     System.out.println("Real player detected: Processing 'SelectionFinished' normally.");
