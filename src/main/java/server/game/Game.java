@@ -38,6 +38,21 @@ public class Game implements Runnable {
     private boolean programmingPhase;
     private static Game INSTANCE;
 
+    private int roundCounter = 0;
+
+    public String getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(String selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    private String selectedMap;
+
+    private Position[][] twisterArray = new Position[4][4];
+
+
     public static Game getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Game();
@@ -99,6 +114,8 @@ public class Game implements Runnable {
                 player.getRobot().setOrientation(OrientationEnum.R);
             }
 
+            setSelectedMap(clientHandler.getSelectedMap());
+
             // initialise total number of check points for map
             switch (clientHandler.getSelectedMap()){
                 case "DeathTrap":
@@ -107,9 +124,28 @@ public class Game implements Runnable {
                 case "DizzyHighway":
                     totalCheckPoints = 1;
                     break;
-                case "ExtraCrispy", "LostBearings":
+                case "ExtraCrispy", "LostBearings","Twister":
                     totalCheckPoints = 4;
                     break;
+            }
+
+            if (clientHandler.getSelectedMap().equals("Twister")){
+                twisterArray[0][0] = new Position(10,1);
+                twisterArray[0][1] = new Position(6,7);
+                twisterArray[0][2] = new Position(5,3);
+                twisterArray[0][3] = new Position(9,7);
+                twisterArray[1][0] = new Position(11,2);
+                twisterArray[1][1] = new Position(5,8);
+                twisterArray[1][2] = new Position(4,2);
+                twisterArray[1][3] = new Position(10,6);
+                twisterArray[2][0] = new Position(10,3);
+                twisterArray[2][1] = new Position(4,7);
+                twisterArray[2][2] = new Position(5,1);
+                twisterArray[2][3] = new Position(11,7);
+                twisterArray[3][0] = new Position(9,2);
+                twisterArray[3][1] = new Position(5,6);
+                twisterArray[3][2] = new Position(6,2);
+                twisterArray[3][3] = new Position(10,8);
             }
 //            player.getRobot().setOrientation(OrientationEnum.getFromString(clientHandler.getFacingDirection()));
             this.playersInGame.add(player);
@@ -320,6 +356,17 @@ public class Game implements Runnable {
 
     private void playTileEffect(int registerRound){
         Course course = Course.getInstance();
+        roundCounter++; //for twister
+        if (selectedMap.equals("Twister")){
+            for(Player player : playersInGame){
+                int index = roundCounter % 4;
+                player.passTwisterCheckpoint(1,twisterArray[index][0].getPositionX(),twisterArray[index][0].getPositionY());
+                player.passTwisterCheckpoint(2,twisterArray[index][1].getPositionX(),twisterArray[index][1].getPositionY());
+                player.passTwisterCheckpoint(3,twisterArray[index][2].getPositionX(),twisterArray[index][2].getPositionY());
+                player.passTwisterCheckpoint(4,twisterArray[index][3].getPositionX(),twisterArray[index][3].getPositionY());
+            }
+        }
+
         for(Player player : playersInGame){
             Cell cell = course.getCellAtPosition(player.getRobot().getRobotPosition());
             System.out.println("robot at:" + player.getRobot().getRobotPosition().getPositionX() + ", " + player.getRobot().getRobotPosition().getPositionY());
@@ -350,6 +397,19 @@ public class Game implements Runnable {
             try{
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
+        }
+
+        // check if player i standing on checkpoint on twister
+        if (getSelectedMap().equals("Twister")){
+            for(Player player : playersInGame){
+                for(int i=0; i<4; i++ ){
+                    if (player.getCheckpoint()+1 == i && player.getRobot().getRobotPosition() == twisterArray[roundCounter % 4][i]){
+                        player.addCheckpoint();
+                        player.passCheckPointMessage(i);
+                        Game.getInstance().checkGameOver(player);
+                    }
+                }
+            }
         }
     }
     // If this is part of the game loop

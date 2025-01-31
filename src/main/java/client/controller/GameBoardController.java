@@ -10,16 +10,15 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import server.message.Message;
@@ -61,6 +60,11 @@ public class GameBoardController implements Initializable {
 
     @FXML
     private Pane mainPane;
+
+    private ImageView checkpoint1;
+    private ImageView checkpoint2;
+    private ImageView checkpoint3;
+    private ImageView checkpoint4;
 
     private Client client;
     public Client getClient() {
@@ -391,6 +395,47 @@ public class GameBoardController implements Initializable {
                     System.out.println("Gears repositioned for map: " + imageName);
                 }
 
+                if (selectedMap.equals("Twister")){
+                    if (checkpoint1 == null) { // Only create it once
+                        checkpoint1 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/client/images/checkpoint1.png")).toExternalForm()));
+                        checkpoint1.setFitWidth(50); // Adjust size if needed
+                        checkpoint1.setFitHeight(50);
+                        checkpoint1.setId("11");
+                        GridPane.setRowIndex(checkpoint1, 1);
+                        GridPane.setColumnIndex(checkpoint1, 10);
+                        game_grid.getChildren().add(checkpoint1); // Ensure myGridPane is accessible
+                    }
+                    if (checkpoint2 == null) { // Only create it once
+                        checkpoint2 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/client/images/checkpoint2.png")).toExternalForm()));
+                        checkpoint2.setFitWidth(50); // Adjust size if needed
+                        checkpoint2.setFitHeight(50);
+                        checkpoint2.setId("11");
+                        GridPane.setRowIndex(checkpoint2, 7);
+                        GridPane.setColumnIndex(checkpoint2, 6);
+                        game_grid.getChildren().add(checkpoint2); // Ensure myGridPane is accessible
+                    }
+                    if (checkpoint3 == null) { // Only create it once
+                        checkpoint3 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/client/images/checkpoint3.png")).toExternalForm()));
+                        checkpoint3.setFitWidth(50); // Adjust size if needed
+                        checkpoint3.setFitHeight(50);
+                        checkpoint3.setId("11");
+                        GridPane.setRowIndex(checkpoint3, 3);
+                        GridPane.setColumnIndex(checkpoint3, 5);
+                        game_grid.getChildren().add(checkpoint3); // Ensure myGridPane is accessible
+                    }
+                    if (checkpoint4 == null) { // Only create it once
+                        checkpoint4 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/client/images/checkpoint4.png")).toExternalForm()));
+                        checkpoint4.setFitWidth(50); // Adjust size if needed
+                        checkpoint4.setFitHeight(50);
+                        checkpoint4.setId("11");
+                        GridPane.setRowIndex(checkpoint4, 7);
+                        GridPane.setColumnIndex(checkpoint4, 9);
+                        game_grid.getChildren().add(checkpoint4); // Ensure myGridPane is accessible
+                    }
+                }
+
+
+
                 System.out.println("Background image changed to: " + imageName);
             } catch (NullPointerException e) {
                 System.err.println("Image not found: " + imageName);
@@ -487,6 +532,9 @@ public class GameBoardController implements Initializable {
             // Iterate over all nodes in the game grid
             for (javafx.scene.Node node : game_grid.getChildren()) {
                 if (node instanceof ImageView) {
+                    if (node == checkpoint1 || node == checkpoint2 || node == checkpoint3 || node == checkpoint4) {
+                        continue;  // Skip the checkpoint1 ImageView
+                    }
                     ImageView robotImage = (ImageView) node;
 
                     // Create a red tint effect at the tip
@@ -612,6 +660,54 @@ public class GameBoardController implements Initializable {
         });
 
     }
+
+    public void rotateCheckpointWithTransform() {
+        Rotate rotate = new Rotate(90, 10, 2); // 90-degree rotation around (10,2)
+        checkpoint1.getTransforms().add(rotate);
+        checkpoint1.setRotate(checkpoint1.getRotate() - 90);
+    }
+
+    public void moveCheckpoint1(int newColumn, int newRow) {
+        // Check if checkpoint1 is not null before moving it
+        if (checkpoint1 != null) {
+            // Set the new position of the checkpoint in the GridPane
+            GridPane.setRowIndex(checkpoint1, newRow);
+            GridPane.setColumnIndex(checkpoint1, newColumn);
+        } else {
+            System.err.println("Checkpoint1 is null, cannot move.");
+        }
+    }
+    public void moveCheckpoint2(int newColumn, int newRow) {
+        // Check if checkpoint1 is not null before moving it
+        if (checkpoint2 != null) {
+            // Set the new position of the checkpoint in the GridPane
+            GridPane.setRowIndex(checkpoint2, newRow);
+            GridPane.setColumnIndex(checkpoint2, newColumn);
+        } else {
+            System.err.println("Checkpoint2 is null, cannot move.");
+        }
+    }
+    public void moveCheckpoint3(int newColumn, int newRow) {
+        // Check if checkpoint1 is not null before moving it
+        if (checkpoint3 != null) {
+            // Set the new position of the checkpoint in the GridPane
+            GridPane.setRowIndex(checkpoint3, newRow);
+            GridPane.setColumnIndex(checkpoint3, newColumn);
+        } else {
+            System.err.println("Checkpoint3 is null, cannot move.");
+        }
+    }
+    public void moveCheckpoint4(int newColumn, int newRow) {
+        // Check if checkpoint1 is not null before moving it
+        if (checkpoint4 != null) {
+            // Set the new position of the checkpoint in the GridPane
+            GridPane.setRowIndex(checkpoint4, newRow);
+            GridPane.setColumnIndex(checkpoint4, newColumn);
+        } else {
+            System.err.println("Checkpoint4 is null, cannot move.");
+        }
+    }
+
 
 
     public void addClientIDRobotID(int ClientID , int RobotID){

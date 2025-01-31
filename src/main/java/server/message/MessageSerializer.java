@@ -278,6 +278,11 @@ public class MessageSerializer implements JsonSerializer<Message> {
                         messageBodyJson.add("gameMap", context.serialize(messageBody.getGameMap()));
                     }
                     break;
+                case "AnimationT":
+                    messageBodyJson.addProperty("number", messageBody.getNumber());
+                    messageBodyJson.addProperty("x", messageBody.getX());
+                    messageBodyJson.addProperty("y", messageBody.getY());
+                    break;
 
 
                 default:

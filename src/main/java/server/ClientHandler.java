@@ -721,6 +721,18 @@ public class ClientHandler implements Runnable{
         animationMessage.setMessageBody(animationMessageBody);
         broadcastMessage(gson.toJson(animationMessage));
     }
+
+    public void sendTwisterAnimationMessage (int checkpoint , int x, int y){
+        Message animationMessage = new Message();
+        animationMessage.setMessageType("AnimationT");
+        MessageBody animationMessageBody = new MessageBody();
+        animationMessageBody.setNumber(checkpoint);
+        animationMessageBody.setX(x);
+        animationMessageBody.setY(y);
+        animationMessage.setMessageBody(animationMessageBody);
+        broadcastMessage(gson.toJson(animationMessage));
+    }
+
     // reboot
     public void sendRebootMessage (int ClientID){
         Message rebootMessage = new Message();

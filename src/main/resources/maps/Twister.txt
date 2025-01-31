@@ -1,0 +1,10 @@
+Nothing,Nothing,RightOne,Nothing,Nothing,Nothing,Nothing,WallLeftLaser,WallRightLaser,Nothing,Nothing,Nothing,Nothing
+Nothing,StartPoint,Nothing,Nothing,RightTwo,RightTwo,DownTwo,Nothing,Nothing,RightTwo,CheckPoint1,DownTwo,Nothing
+Nothing,Nothing,Nothing,Nothing,UpTwo,EnergySpace,DownTwo,Nothing,Nothing,UpTwo,EnergySpace,DownTwo,Nothing
+StartPoint,Nothing,Nothing,Nothing,UpTwo,CheckPoint3,LeftTwo,Nothing,Nothing,UpTwo,LeftTwo,LeftTwo,Nothing
+Antenna,StartPoint,WallRight,WallUpLaser,Nothing,Nothing,Nothing,WallDown,WallLeft,Nothing,Nothing,Nothing,WallUpLaser
+Nothing,StartPoint,WallRight,WallDownLaser,Nothing,Nothing,Nothing,WallRight,WallUp,Nothing,Nothing,Nothing,WallDownLaser
+StartPoint,Nothing,Nothing,Nothing,RightTwo,RightTwo,DownTwo,Nothing,Nothing,RightTwo,RightTwo,DownTwo,Nothing
+RebootPoint,WallDown,Nothing,Nothing,UpTwo,EnergySpace,CheckPoint2,Nothing,Nothing,CheckPoint4,EnergySpace,DownTwo,Nothing
+Nothing,StartPoint,Nothing,Nothing,UpTwo,LeftTwo,LeftTwo,Nothing,Nothing,UpTwo,LeftTwo,LeftTwo,Nothing
+Nothing,Nothing,RightOne,Nothing,Nothing,Nothing,Nothing,WallLeftLaser,WallRightLaser,Nothing,Nothing,Nothing,Nothing

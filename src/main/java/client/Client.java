@@ -372,6 +372,21 @@ public class Client {
                                     gameBoardController.makeAllRobotsShootLaser(1.0);
                                 }
                                 break;
+                            case "AnimationT":
+                                if(messageFromHandlerBody.getNumber() == 1){
+                                    gameBoardController.moveCheckpoint1(messageFromHandlerBody.getX(),messageFromHandlerBody.getY());
+                                }
+                                if(messageFromHandlerBody.getNumber() == 2){
+                                    gameBoardController.moveCheckpoint2(messageFromHandlerBody.getX(),messageFromHandlerBody.getY());
+                                }
+                                if(messageFromHandlerBody.getNumber() == 3){
+                                    gameBoardController.moveCheckpoint3(messageFromHandlerBody.getX(),messageFromHandlerBody.getY());
+                                }
+                                if(messageFromHandlerBody.getNumber() == 4){
+                                    gameBoardController.moveCheckpoint4(messageFromHandlerBody.getX(),messageFromHandlerBody.getY());
+                                }
+                                break;
+
                         }
                     } catch (IOException e) {
                         System.out.println("error when receiving clienthandler message");

@@ -464,5 +464,9 @@ public class Player {
         clientHandler.sendAnimationMessage("laser");
     }
 
+    public void passTwisterCheckpoint(int checkpoint , int x, int y){
+        clientHandler.sendTwisterAnimationMessage(checkpoint,x,y);
+    }
+
 
 }

@@ -4,7 +4,8 @@ public enum CourseNameEnum {
     DIZZY_HIGHWAY("DizzyHighway"),
     LOST_BEARINGS("LostBearings"),
     EXTRA_CRISPY("ExtraCrispy"),
-    DEATH_TRAP("DeathTrap");
+    DEATH_TRAP("DeathTrap"),
+    TWISTER("Twister");
 
 
     private final String courseName;
@@ -32,6 +33,8 @@ public enum CourseNameEnum {
                 return CourseNameEnum.EXTRA_CRISPY;
             case "DeathTrap":
                 return CourseNameEnum.DEATH_TRAP;
+            case "Twister":
+                return CourseNameEnum.TWISTER;
             default:
                 return null;
         }
